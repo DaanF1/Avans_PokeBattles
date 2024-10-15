@@ -20,5 +20,10 @@ namespace Avans_PokeBattles
         {
             InitializeComponent();
         }
+
+        private void ClientView_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
