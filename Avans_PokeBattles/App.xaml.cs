@@ -31,7 +31,7 @@ namespace Avans_PokeBattles
             });
 
             // Start Client
-            var client = new Client.ClientView();
+            var client = new Client.LoginWindow();
             client.Show();
         }
     }
