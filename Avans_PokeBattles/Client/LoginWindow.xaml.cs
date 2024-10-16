@@ -23,7 +23,7 @@ namespace Avans_PokeBattles.Client
 
         private void LoginWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         private void txtName_MouseDown(object sender, MouseButtonEventArgs e)
