@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="LoginWindow" Loaded="LoginWindow_Loaded" Height="200" Width="300" WindowStartupLocation="CenterScreen">
     <Grid>
-        <TextBox x:Name="txtName" Margin="0,0,0,101" TextWrapping="Wrap" HorizontalAlignment="Center" Width="120" Height="19" VerticalAlignment="Bottom" Text="Enter your name..." PreviewMouseDown="txtName_MouseDown"/>
-        <Button x:Name="btnLogin" Content="Login" HorizontalAlignment="Center" Margin="0,132,0,0" Width="188" Height="26" VerticalAlignment="Top" Click="btnLogin_Clicked"/>
+        <TextBox x:Name="txtName" Margin="0,0,0,100" TextWrapping="Wrap" HorizontalAlignment="Center" Width="150" Height="20" VerticalAlignment="Bottom" Text="Enter your name..." PreviewMouseDown="txtName_MouseDown"/>
+        <Button x:Name="btnLogin" Content="Login" HorizontalAlignment="Center" Margin="0,100,0,0" Width="150" Height="20" VerticalAlignment="Top" Click="btnLogin_Clicked"/>
 
     </Grid>
 </Window>
