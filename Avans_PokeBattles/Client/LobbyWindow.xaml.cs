@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Avans_PokeBattles.Client
@@ -125,23 +126,28 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer2.Play();
             Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
         }
+
         private void RefreshMedia1Element()
         {
             // Update event for MediaElement of Player 1
-            while (PPlayer1State == MediaState.Play)
+            while (PPlayer1State == MediaState.Manual || PPlayer1State == MediaState.Play)
             {
                 PPlayer1State = GetMediaState(PokemonPlayer1);
-                
+
+                // TODO: Prevent gif from leaving dots around
+                //cvGameView.BringIntoView();
             }
         }
 
         private void RefreshMedia2Element()
         {
             // Update event for MediaElement of Player 2
-            while (PPlayer2State == MediaState.Play)
+            while (PPlayer2State == MediaState.Manual || PPlayer2State == MediaState.Play)
             {
                 PPlayer2State = GetMediaState(PokemonPlayer2);
 
+                // TODO: Prevent gif from leaving dots around
+                //cvGameView.BringIntoView();
             }
         }
 
