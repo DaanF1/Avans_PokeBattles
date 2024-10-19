@@ -35,12 +35,12 @@ namespace Avans_PokeBattles.Client
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
 
-        public LobbyWindow(string playerName)
+        public LobbyWindow()
         {
             InitializeComponent();
 
             // Set name
-            lblPlayer1Name.Content = playerName;
+            lblPlayer1Name.Content = ""; //playerName;
 
             // Create Pokemon & Moves
             List<Move> unownMoves = new List<Move>();

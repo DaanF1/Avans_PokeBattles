@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
         mc:Ignorable="d"
-        Title="SelectLobbyWindow" Height="150" Width="200" Loaded="SelectLobbyWindow_Loaded" >
+        Title="SelectLobbyWindow" Height="150" Width="200" Loaded="SelectLobbyWindow_Loaded" ResizeMode="NoResize" >
     <Grid>
         <Button Name="btnLobby1" Content="Join Lobby 1" HorizontalAlignment="Center" Margin="0,32,0,0" VerticalAlignment="Top" Click="btnJoinLobby1_Click" />
         <Button Name="btnLobby2" Content="Join Lobby 2" HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnJoinLobby2_Click" />

@@ -23,12 +23,14 @@ namespace Avans_PokeBattles.Client
         public LoginWindow()
         {
             InitializeComponent();
+
+            this.tcpClient = new TcpClient("127.0.0.1", port);
+            this.stream = tcpClient.GetStream();
         }
 
         private void LoginWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            tcpClient = new TcpClient("127.0.0.1", port);
-            stream = tcpClient.GetStream();
+            
         }
 
         private void txtName_MouseDown(object sender, MouseButtonEventArgs e)

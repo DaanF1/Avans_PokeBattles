@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Avans_PokeBattles.Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -23,6 +24,7 @@ namespace Avans_PokeBattles.Client
     {
         private TcpClient tcpClient;
         private NetworkStream stream;
+        private LobbyManager lobbyManager;
         private string playerName = "";
 
         public SelectLobbyWindow(TcpClient client)
@@ -31,31 +33,53 @@ namespace Avans_PokeBattles.Client
 
             this.tcpClient = client;
             this.stream = client.GetStream();
+            this.lobbyManager = new LobbyManager();
             //this.playerName = playerName;
         }
 
         private void SelectLobbyWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
+            lobbyManager.GetLobbyList();
         }
 
         private void btnJoinLobby1_Click(object sender, RoutedEventArgs e)
         {
-            
-            // Hide the lobby window and show the game window
-            this.Hide();
-            var gameWindow = new LobbyWindow(playerName);
-            gameWindow.Show();
+            // Try joining the lobby
+            bool joined = lobbyManager.TryJoinLobby("Lobby-1", tcpClient);
+            if (joined)
+            {
+                // Hide the lobby window and show the game window
+                this.Hide();
+                var gameWindow = new LobbyWindow();
+                gameWindow.Show();
+            }
         }
 
         private void btnJoinLobby2_Click(object sender, RoutedEventArgs e)
         {
-
+            // Try joining the lobby
+            bool joined = lobbyManager.TryJoinLobby("Lobby-2", tcpClient);
+            if (joined)
+            {
+                // Hide the lobby window and show the game window
+                this.Hide();
+                var gameWindow = new LobbyWindow();
+                gameWindow.Show();
+            }
         }
 
         private void btnJoinLobby3_Click(object sender, RoutedEventArgs e)
         {
-
+            // Try joining the lobby
+            bool joined = lobbyManager.TryJoinLobby("Lobby-3", tcpClient);
+            if (joined)
+            {
+                // Hide the lobby window and show the game window
+                this.Hide();
+                var gameWindow = new LobbyWindow();
+                gameWindow.Show();
+            }
         }
+
     }
 }
