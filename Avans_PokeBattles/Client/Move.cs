@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Avans_PokeBattles.Client
 {
-    class Move
+    internal class Move
     {
+        // Attributes
         private string moveName;
         private int moveDamage;
         private int accuracy;

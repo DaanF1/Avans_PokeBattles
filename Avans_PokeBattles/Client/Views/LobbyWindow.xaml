@@ -44,13 +44,13 @@
                 <Label Name="lblRound" FontSize="18" FontWeight="Bold" Content="Round: X" Foreground="White" />
 
                 <!-- Current Player Pokemon -->
-                <Label Content="Health: X" Height="25" Width="100" Canvas.Left="50" Canvas.Bottom="150" Foreground="White" />
+                <Label Name="lblP1PokemonHealth" Content="Health: X" Height="25" Width="100" Canvas.Left="50" Canvas.Bottom="150" Foreground="White" />
                 <Border Background="Black" Canvas.Left="50" Canvas.Bottom="50">
                     <MediaElement Name="PokemonPlayer1"  Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP1_MediaEnded" MediaFailed="PP1_MediaFailed" />
                 </Border>
                 
                 <!-- Opponent Player Pokemon -->
-                <Label Content="Health: X" Height="25" Width="100"  Canvas.Top="25" Canvas.Right="50" Foreground="White" />
+                <Label Name="lblP2PokemonHealth" Content="Health: X" Height="25" Width="100"  Canvas.Top="25" Canvas.Right="50" Foreground="White" />
                 <Border Background="Black" Canvas.Top="50" Canvas.Right="50">
                     <MediaElement Name="PokemonPlayer2" Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP2_MediaEndend" MediaFailed="PP2_MediaFailed" />
                 </Border>

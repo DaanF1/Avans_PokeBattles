@@ -35,6 +35,10 @@ namespace Avans_PokeBattles.Client
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
 
+        // Players
+        private Player player1;
+        private Player player2;
+
         public LobbyWindow()
         {
             InitializeComponent();
@@ -48,28 +52,28 @@ namespace Avans_PokeBattles.Client
             unownMoves.Add(new Move("Hydro Pump", 110, 80, Type.Water));
             unownMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
             unownMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
-            Pokemon unown = new Pokemon("Unown", new Uri(uriPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), unownMoves, 90);
+            Pokemon unown = new Pokemon("Unown", new Uri(uriPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), unownMoves, 80, 90);
 
             List<Move> venusaurMoves = new List<Move>();
             venusaurMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
             venusaurMoves.Add(new Move("Take Down", 90, 85, Type.Normal));
             venusaurMoves.Add(new Move("Razor Leaf", 55, 95, Type.Grass));
             venusaurMoves.Add(new Move("Tackle", 40, 100, Type.Normal));
-            Pokemon venusaur = new Pokemon("Venusaur", new Uri(uriPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), venusaurMoves, 70);
+            Pokemon venusaur = new Pokemon("Venusaur", new Uri(uriPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), venusaurMoves, 195, 70);
 
             List<Move> charizardMoves = new List<Move>();
             charizardMoves.Add(new Move("Scratch", 40, 100, Type.Normal));
             charizardMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
             charizardMoves.Add(new Move("Slash", 70, 100, Type.Normal));
             charizardMoves.Add(new Move("Flamethrower", 90, 100, Type.Fire));
-            Pokemon charizard = new Pokemon("Charizard", new Uri(uriPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind), charizardMoves, 120);
+            Pokemon charizard = new Pokemon("Charizard", new Uri(uriPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind), charizardMoves, 125, 120);
 
             List<Move> blastoiseMoves = new List<Move>();
             blastoiseMoves.Add(new Move("Hydro Pump", 110, 80, Type.Water));
             blastoiseMoves.Add(new Move("Aqua Tail", 90, 90, Type.Water));
             blastoiseMoves.Add(new Move("Tackle", 40, 100, Type.Normal));
             blastoiseMoves.Add(new Move("Rapid Spin", 50, 100, Type.Normal));
-            Pokemon blastoise = new Pokemon("Blastoise", new Uri(uriPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), blastoiseMoves, 75);
+            Pokemon blastoise = new Pokemon("Blastoise", new Uri(uriPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), blastoiseMoves, 145, 75);
 
             // Create Pokemon and add them to the lister
             lister.AddPokemon(unown);
@@ -86,42 +90,42 @@ namespace Avans_PokeBattles.Client
         private void LobbyWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Set Random Pokemon Player 1
-            Pokemon p1P1 = lister.GetRandomPokemon();
-            Pokemon p1P2 = lister.GetRandomPokemon();
-            Pokemon p1P3 = lister.GetRandomPokemon();
-            Pokemon p1P4 = lister.GetRandomPokemon();
-            Pokemon p1P5 = lister.GetRandomPokemon();
-            Pokemon p1P6 = lister.GetRandomPokemon();
+            List<Pokemon> player1Pokemon = new List<Pokemon>();
+            for (int i = 0; i < 6; i++)
+            {
+                player1Pokemon.Add(lister.GetRandomPokemon());
+            }
+            player1 = new Player("", player1Pokemon);
 
             // Set Preview Pokemon Player 1
-            P1Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon(p1P1.Name).PreviewUri);
-            P1Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon(p1P2.Name).PreviewUri);
-            P1Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon(p1P3.Name).PreviewUri);
-            P1Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon(p1P4.Name).PreviewUri);
-            P1Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon(p1P5.Name).PreviewUri);
-            P1Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon(p1P6.Name).PreviewUri);
+            P1Pokemon1Preview.Source = new BitmapImage(player1.GetPokemon(0).PreviewUri);
+            P1Pokemon2Preview.Source = new BitmapImage(player1.GetPokemon(1).PreviewUri);
+            P1Pokemon3Preview.Source = new BitmapImage(player1.GetPokemon(2).PreviewUri);
+            P1Pokemon4Preview.Source = new BitmapImage(player1.GetPokemon(3).PreviewUri);
+            P1Pokemon5Preview.Source = new BitmapImage(player1.GetPokemon(4).PreviewUri);
+            P1Pokemon6Preview.Source = new BitmapImage(player1.GetPokemon(5).PreviewUri);
 
-            // Set Random Pokemon Player 1
-            Pokemon p2P1 = lister.GetRandomPokemon();
-            Pokemon p2P2 = lister.GetRandomPokemon();
-            Pokemon p2P3 = lister.GetRandomPokemon();
-            Pokemon p2P4 = lister.GetRandomPokemon();
-            Pokemon p2P5 = lister.GetRandomPokemon();
-            Pokemon p2P6 = lister.GetRandomPokemon();
+            // Set Random Pokemon Player 2
+            List<Pokemon> player2Pokemon = new List<Pokemon>();
+            for (int i = 0; i < 6; i++)
+            {
+                player2Pokemon.Add(lister.GetRandomPokemon());
+            }
+            player2 = new Player("", player2Pokemon);
 
             // Set Preview Pokemon Player 2
-            P2Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon(p2P1.Name).PreviewUri);
-            P2Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon(p2P2.Name).PreviewUri);
-            P2Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon(p2P3.Name).PreviewUri);
-            P2Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon(p2P4.Name).PreviewUri);
-            P2Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon(p2P5.Name).PreviewUri);
-            P2Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon(p2P6.Name).PreviewUri);
+            P2Pokemon1Preview.Source = new BitmapImage(player2.GetPokemon(0).PreviewUri);
+            P2Pokemon2Preview.Source = new BitmapImage(player2.GetPokemon(1).PreviewUri);
+            P2Pokemon3Preview.Source = new BitmapImage(player2.GetPokemon(2).PreviewUri);
+            P2Pokemon4Preview.Source = new BitmapImage(player2.GetPokemon(3).PreviewUri);
+            P2Pokemon5Preview.Source = new BitmapImage(player2.GetPokemon(4).PreviewUri);
+            P2Pokemon6Preview.Source = new BitmapImage(player2.GetPokemon(5).PreviewUri);
 
-            // Set Battle Pokemon
-            PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
-            SetPlayer1Pokemon(lister.GetPokemon(p1P1.Name).BattleForUri);
-            PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
-            SetPlayer2Pokemon(lister.GetPokemon(p2P1.Name).BattleAgainstUri);
+            // Start the game
+            Task.Run(() =>
+            {
+                //StartGame();
+            });
         }
 
         private void PP1_MediaEnded(object sender, RoutedEventArgs e)
@@ -186,12 +190,22 @@ namespace Avans_PokeBattles.Client
             Task.Run(() => { RefreshMedia1Element(); }); // Start refreshing the MediaElement
         }
 
+        private void SetPlayer1PokemonHealth(int health)
+        {
+            lblP1PokemonHealth.Content = "Health: " + health.ToString();
+        }
+
         private void SetPlayer2Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
             PokemonPlayer2.Source = pokemonUri;
             PokemonPlayer2.Play();
             Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
+        }
+
+        private void SetPlayer2PokemonHealth(int health)
+        {
+            lblP2PokemonHealth.Content = "Health: " + health.ToString();
         }
 
         private void RefreshMedia1Element()
@@ -233,6 +247,58 @@ namespace Avans_PokeBattles.Client
             if (!state.Equals(null))
                 return (MediaState)state;
             return MediaState.Stop;
+        }
+
+        private async void StartGame()
+        {
+            // Go through rounds
+            for (int i = 1; i < int.MaxValue; i++)
+            {
+                lblRound.Content = "Round: " + i;
+
+                // Set Battle Pokemon
+                //PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
+                SetPlayer1Pokemon(player1.GetPokemon(i-1).BattleForUri);
+                SetPlayer1PokemonHealth(player1.GetPokemon(i-1).Health);
+                LoadPokemonAttacks(player1.GetPokemon(i-1));
+                //PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
+                SetPlayer2Pokemon(player2.GetPokemon(0).BattleAgainstUri);
+                SetPlayer2PokemonHealth(player2.GetPokemon(0).Health);
+
+                SelectMove();
+                
+            }
+        }
+
+        private void LoadPokemonAttacks(Pokemon pokemon)
+        {
+            btnOption1.Content = pokemon.GetMove(0).MoveName;
+            btnOption2.Content = pokemon.GetMove(1).MoveName;
+            btnOption3.Content = pokemon.GetMove(2).MoveName;
+            btnOption4.Content = pokemon.GetMove(3).MoveName;
+        }
+
+        private async Task SelectMove()
+        {
+            while (true)
+            {
+                if (btnOption1.IsPressed)
+                {
+
+                }
+                else if (btnOption2.IsPressed)
+                {
+
+                }
+                else if (btnOption3.IsPressed)
+                {
+
+                }
+                else if (btnOption4.IsPressed)
+                {
+
+                }
+            }
         }
 
     }

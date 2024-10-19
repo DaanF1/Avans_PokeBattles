@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Avans_PokeBattles.Client
 {
-    enum Type
+    internal enum Type
     {
         Water,
         Fire,

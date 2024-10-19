@@ -53,7 +53,7 @@ namespace Avans_PokeBattles.Client
                 MessageBox.Show("Please enter a name shorter than 11 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            byte[] buffer = Encoding.ASCII.GetBytes(name);
+            byte[] buffer = Encoding.ASCII.GetBytes("Player name: " + name);
             stream.Write(buffer, 0, buffer.Length);
 
             // Hide the login window and show the lobby window
