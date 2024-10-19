@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Avans_PokeBattles.Client
+{
+    enum Type
+    {
+        Water,
+        Fire,
+        Grass,
+        Normal,
+        Electric,
+        Ground,
+        Fairy,
+        Dragon,
+        Psychic,
+        Ice,
+        Dark
+    }
+}

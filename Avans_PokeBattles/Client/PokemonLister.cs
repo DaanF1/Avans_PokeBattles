@@ -14,10 +14,19 @@ namespace Avans_PokeBattles.Client
 
         public PokemonLister() { }
 
-        public void AddPokemon(string name, Uri previewUri, Uri battleForUri, Uri battleAgainstUri)
+        public void AddPokemon(Pokemon newPokemon)
         {
-            Pokemon newPokemon = new Pokemon(name, previewUri, battleForUri, battleAgainstUri);
             pokemonList.Add(newPokemon);
+        }
+
+        public Pokemon GetPokemon(string pokemonName)
+        {
+            Pokemon pokemonToGet = pokemonList.FirstOrDefault(pokemon => pokemon.Name == pokemonName);
+            if (pokemonToGet != null)
+            {
+                return pokemonToGet;
+            }
+            return GetPokemon("Unown");
         }
 
         //public void RemovePokemon(string pokemonName) 
@@ -28,16 +37,6 @@ namespace Avans_PokeBattles.Client
         //        pokemonList.Remove(pokemonToRemove);
         //    }
         //}
-
-        public Pokemon GetPokemon(string pokemonName)
-        {
-            Pokemon pokemonToGet = pokemonList.FirstOrDefault(pokemon => pokemon.GetName() == pokemonName);
-            if (pokemonToGet != null)
-            {
-                return pokemonToGet;
-            }
-            return GetPokemon("Unown");
-        }
 
     }
 }

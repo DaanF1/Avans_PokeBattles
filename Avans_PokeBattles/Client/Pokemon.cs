@@ -12,33 +12,32 @@ namespace Avans_PokeBattles.Client
         private Uri previewUri;
         private Uri battleForUri;
         private Uri battleAgainstUri;
+        private List<Move> pokemonMoves = new List<Move>();
 
-        public Pokemon(string pokemonName, Uri previewUri, Uri battleForUri, Uri battleAgainstUri)
+        public Pokemon(string pokemonName, Uri previewUri, Uri battleForUri, Uri battleAgainstUri, List<Move> moves)
         {
             this.pokemonName = pokemonName;
             this.previewUri = previewUri;
             this.battleForUri = battleForUri;
             this.battleAgainstUri = battleAgainstUri;
+            this.pokemonMoves = moves;
         }
 
-        public string GetName()
+        public string Name { get { return this.pokemonName; } }
+        public Uri PreviewUri { get { return this.previewUri; } }
+        public Uri BattleForUri { get { return this.battleForUri; } }
+        public Uri BattleAgainstUri { get { return this.BattleAgainstUri; } }
+
+        public Move GetMove(string moveName)
         {
-            return this.pokemonName;
+            return pokemonMoves.FirstOrDefault(move => move.MoveName == moveName);
         }
 
-        public Uri GetPreviewUri()
+        public Move GetRandomMove()
         {
-            return this.previewUri;
+            Random random = new Random();
+            return pokemonMoves[random.Next(pokemonMoves.Count)];
         }
 
-        public Uri GetBattleForUri()
-        {
-            return this.battleForUri;
-        }
-
-        public Uri GetBattleAgainstUri()
-        {
-            return this.battleAgainstUri;
-        }
     }
 }

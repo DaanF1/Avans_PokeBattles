@@ -27,24 +27,55 @@ namespace Avans_PokeBattles.Client
         // Public PokemonLister
         private PokemonLister lister = new PokemonLister();
 
+        // Uri prefixes for loading images
+        public string uriPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
+        public UriKind standardUriKind = UriKind.Absolute;
+
         // Pokemon Battle boxes
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
-        public string uriPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
-        public UriKind standardUriKind = UriKind.Absolute;
 
         public LobbyWindow(string playerName)
         {
             InitializeComponent();
-            // Set names
+
+            // Set name
             lblPlayer1Name.Content = playerName;
 
-            // Create Pokemon and add them to the lister
-            lister.AddPokemon("Unown", new Uri(uriPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind));
-            lister.AddPokemon("Venusaur", new Uri(uriPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind));
-            lister.AddPokemon("Charizard", new Uri(uriPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind));
-            lister.AddPokemon("Blastoise", new Uri(uriPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind));
+            // Create Pokemon & Moves
+            List<Move> unownMoves = new List<Move>();
+            unownMoves.Add(new Move("Hidden Power", 60, 100, Type.Normal));
+            unownMoves.Add(new Move("Psychic", 90, 100, Type.Psychic));
+            unownMoves.Add(new Move("Confusion", 50, 100, Type.Psychic));
+            unownMoves.Add(new Move("Psych Up", 100, 100, Type.Normal));
+            Pokemon unown = new Pokemon("Unown", new Uri(uriPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), unownMoves);
 
+            List<Move> venusaurMoves = new List<Move>();
+            venusaurMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
+            venusaurMoves.Add(new Move("Take Down", 90, 85, Type.Normal));
+            venusaurMoves.Add(new Move("Razor Leaf", 55, 95, Type.Grass));
+            venusaurMoves.Add(new Move("Tackle", 40, 100, Type.Normal));
+            Pokemon venusaur = new Pokemon("Venusaur", new Uri(uriPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), venusaurMoves);
+
+            List<Move> charizardMoves = new List<Move>();
+            charizardMoves.Add(new Move("Dragon Breath", 60, 100, Type.Dragon));
+            charizardMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
+            charizardMoves.Add(new Move("Slash", 70, 100, Type.Normal));
+            charizardMoves.Add(new Move("Flamethrower", 90, 100, Type.Fire));
+            Pokemon charizard = new Pokemon("Charizard", new Uri(uriPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind), charizardMoves);
+
+            List<Move> blastoiseMoves = new List<Move>();
+            blastoiseMoves.Add(new Move("Hydro Pump", 110, 80, Type.Water));
+            blastoiseMoves.Add(new Move("Aqua Tail", 90, 90, Type.Water));
+            blastoiseMoves.Add(new Move("Bite", 60, 100, Type.Dark));
+            blastoiseMoves.Add(new Move("Rapid Spin", 50, 100, Type.Normal));
+            Pokemon blastoise = new Pokemon("Blastoise", new Uri(uriPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), blastoiseMoves);
+
+            // Create Pokemon and add them to the lister
+            lister.AddPokemon(unown);
+            lister.AddPokemon(venusaur);
+            lister.AddPokemon(charizard);
+            lister.AddPokemon(blastoise);
         }
 
         /// <summary>
@@ -54,27 +85,29 @@ namespace Avans_PokeBattles.Client
         /// <param name="e"></param>
         private void LobbyWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // Set Random Pokemon for each player
+
             // Set Preview Pokemon Player 1
-            P1Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P1Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P1Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P1Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P1Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P1Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P1Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P1Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P1Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P1Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P1Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P1Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
 
             // Set Preview Pokemon Player 2
-            P2Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P2Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P2Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P2Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P2Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
-            P2Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P2Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P2Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P2Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P2Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P2Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
+            P2Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").PreviewUri);
 
             // Set Battle Pokemon
             PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
-            SetPlayer1Pokemon(lister.GetPokemon("Venusaur").GetBattleForUri());
+            SetPlayer1Pokemon(lister.GetPokemon("Venusaur").BattleForUri);
             PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
-            SetPlayer2Pokemon(lister.GetPokemon("Blastoise").GetBattleAgainstUri());
+            SetPlayer2Pokemon(lister.GetPokemon("Blastoise").BattleAgainstUri);
         }
 
         private void PP1_MediaEnded(object sender, RoutedEventArgs e)
@@ -104,6 +137,26 @@ namespace Avans_PokeBattles.Client
         }
 
         private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnOption1_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnOption2_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnOption3_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnOption4_Click(object sender, RoutedEventArgs e)
         {
 
         }

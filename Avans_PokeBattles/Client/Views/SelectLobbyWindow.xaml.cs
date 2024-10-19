@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,12 +30,29 @@ namespace Avans_PokeBattles.Client
             this.playerName = playerName;
         }
 
-        private void btnGoToGame_Click(object sender, RoutedEventArgs e)
+        private void SelectLobbyWindow_Loaded(object sender, RoutedEventArgs e)
         {
+
+        }
+
+        private void btnJoinLobby1_Click(object sender, RoutedEventArgs e)
+        {
+            TcpClient tcpClient = new TcpClient();
+
             // Hide the lobby window and show the game window
             this.Hide();
             var gameWindow = new LobbyWindow(playerName);
             gameWindow.Show();
+        }
+
+        private void btnJoinLobby2_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnJoinLobby3_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
