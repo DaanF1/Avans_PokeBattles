@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Avans_PokeBattles.Client
@@ -23,13 +24,27 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class LobbyWindow : Window
     {
+        // Public PokemonLister
+        private PokemonLister lister = new PokemonLister();
+
+        // Pokemon Battle boxes
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
+        public string uriPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
+        public UriKind standardUriKind = UriKind.Absolute;
+
         public LobbyWindow(string playerName)
         {
             InitializeComponent();
             // Set names
             lblPlayer1Name.Content = playerName;
+
+            // Create Pokemon and add them to the lister
+            lister.AddPokemon("Unown", new Uri(uriPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind));
+            lister.AddPokemon("Venusaur", new Uri(uriPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind));
+            lister.AddPokemon("Charizard", new Uri(uriPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind));
+            lister.AddPokemon("Blastoise", new Uri(uriPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind));
+
         }
 
         /// <summary>
@@ -39,30 +54,27 @@ namespace Avans_PokeBattles.Client
         /// <param name="e"></param>
         private void LobbyWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // Create Pokemon
-            Pokemon mVenusaurAgainst = new Pokemon(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurAgainst.gif", UriKind.Absolute));
-            Pokemon mVenusaurRegular = new Pokemon(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurRegular.gif", UriKind.Absolute));
+            // Set Preview Pokemon Player 1
+            P1Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P1Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P1Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P1Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P1Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P1Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
 
-            // Set Preview Pokemon
-            P1Pokemon1Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P1Pokemon2Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P1Pokemon3Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P1Pokemon4Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P1Pokemon5Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P1Pokemon6Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-
-            P2Pokemon1Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P2Pokemon2Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P2Pokemon3Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P2Pokemon4Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P2Pokemon5Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
-            P2Pokemon6Preview.Source = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "/Sprites/mVenusaurPreview.png", UriKind.Absolute));
+            // Set Preview Pokemon Player 2
+            P2Pokemon1Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P2Pokemon2Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P2Pokemon3Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P2Pokemon4Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P2Pokemon5Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
+            P2Pokemon6Preview.Source = new BitmapImage(lister.GetPokemon("Venusaur").GetPreviewUri());
 
             // Set Battle Pokemon
             PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
-            SetPlayer1Pokemon(mVenusaurRegular.GetUri());
+            SetPlayer1Pokemon(lister.GetPokemon("Venusaur").GetBattleForUri());
             PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
-            SetPlayer2Pokemon(mVenusaurAgainst.GetUri());
+            SetPlayer2Pokemon(lister.GetPokemon("Blastoise").GetBattleAgainstUri());
         }
 
         private void PP1_MediaEnded(object sender, RoutedEventArgs e)
@@ -114,23 +126,28 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer2.Play();
             Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
         }
+
         private void RefreshMedia1Element()
         {
             // Update event for MediaElement of Player 1
-            while (PPlayer1State == MediaState.Play)
+            while (PPlayer1State == MediaState.Manual || PPlayer1State == MediaState.Play)
             {
                 PPlayer1State = GetMediaState(PokemonPlayer1);
-                
+
+                // TODO: Prevent gif from leaving dots around
+                //cvGameView.BringIntoView();
             }
         }
 
         private void RefreshMedia2Element()
         {
             // Update event for MediaElement of Player 2
-            while (PPlayer2State == MediaState.Play)
+            while (PPlayer2State == MediaState.Manual || PPlayer2State == MediaState.Play)
             {
                 PPlayer2State = GetMediaState(PokemonPlayer2);
 
+                // TODO: Prevent gif from leaving dots around
+                //cvGameView.BringIntoView();
             }
         }
 
@@ -142,11 +159,14 @@ namespace Avans_PokeBattles.Client
         /// <returns></returns>
         private MediaState GetMediaState(MediaElement myMedia)
         {
-            FieldInfo hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object helperObject = hlp.GetValue(myMedia);
-            FieldInfo stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-            MediaState state = (MediaState)stateField.GetValue(helperObject);
-            return state;
+            FieldInfo? hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
+            object? helperObject = hlp.GetValue(myMedia);
+            FieldInfo? stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
+            MediaState? state = (MediaState)stateField.GetValue(helperObject);
+            if (!state.Equals(null))
+                return (MediaState)state;
+            return MediaState.Stop;
         }
+
     }
 }

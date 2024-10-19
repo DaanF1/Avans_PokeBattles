@@ -47,10 +47,10 @@ namespace Avans_PokeBattles.Client
                 return;
             }
 
-            // Hide the login window and show the game window
+            // Hide the login window and show the lobby window
             this.Hide();
-            var gameWindow = new LobbyWindow(name);
-            gameWindow.Show();
+            var selectLobbyWindow = new SelectLobbyWindow(name);
+            selectLobbyWindow.Show();
         }
     }
 }
