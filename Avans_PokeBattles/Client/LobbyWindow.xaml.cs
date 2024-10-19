@@ -148,7 +148,5 @@ namespace Avans_PokeBattles.Client
             MediaState state = (MediaState)stateField.GetValue(helperObject);
             return state;
         }
-
-
     }
 }
