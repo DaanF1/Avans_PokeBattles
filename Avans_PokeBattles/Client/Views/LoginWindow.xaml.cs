@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Sockets;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,9 +17,15 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class LoginWindow : Window
     {
+        private TcpClient tcpClient;
+        private NetworkStream stream;
+        private int port = 8000;
         public LoginWindow()
         {
             InitializeComponent();
+
+            this.tcpClient = new TcpClient("127.0.0.1", port);
+            this.stream = tcpClient.GetStream();
         }
 
         private void LoginWindow_Loaded(object sender, RoutedEventArgs e)
@@ -46,10 +53,12 @@ namespace Avans_PokeBattles.Client
                 MessageBox.Show("Please enter a name shorter than 11 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
+            byte[] buffer = Encoding.ASCII.GetBytes(name);
+            stream.Write(buffer, 0, buffer.Length);
 
             // Hide the login window and show the lobby window
             this.Hide();
-            var selectLobbyWindow = new SelectLobbyWindow(name);
+            var selectLobbyWindow = new SelectLobbyWindow(tcpClient);
             selectLobbyWindow.Show();
         }
     }
