@@ -8,16 +8,37 @@ namespace Avans_PokeBattles.Client
 {
     class Pokemon
     {
-        private Uri uri;
+        private string pokemonName;
+        private Uri previewUri;
+        private Uri battleForUri;
+        private Uri battleAgainstUri;
 
-        public Pokemon(Uri uri)
+        public Pokemon(string pokemonName, Uri previewUri, Uri battleForUri, Uri battleAgainstUri)
         {
-            this.uri = uri;
+            this.pokemonName = pokemonName;
+            this.previewUri = previewUri;
+            this.battleForUri = battleForUri;
+            this.battleAgainstUri = battleAgainstUri;
         }
 
-        public Uri GetUri()
+        public string GetName()
         {
-            return this.uri;
+            return this.pokemonName;
+        }
+
+        public Uri GetPreviewUri()
+        {
+            return this.previewUri;
+        }
+
+        public Uri GetBattleForUri()
+        {
+            return this.battleForUri;
+        }
+
+        public Uri GetBattleAgainstUri()
+        {
+            return this.battleAgainstUri;
         }
     }
 }
