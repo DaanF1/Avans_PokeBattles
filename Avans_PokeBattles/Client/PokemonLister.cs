@@ -20,9 +20,9 @@ namespace Avans_PokeBattles.Client
             pokemonList.Add(newPokemon);
         }
 
-        public void RemovePokemon(string name) 
+        public void RemovePokemon(string pokemonName) 
         {
-            Pokemon pokemonToRemove = pokemonList.FirstOrDefault(pokemon => pokemon.GetName() == name);
+            Pokemon pokemonToRemove = pokemonList.FirstOrDefault(pokemon => pokemon.GetName() == pokemonName);
             if (pokemonToRemove != null)
             {
                 pokemonList.Remove(pokemonToRemove);
@@ -30,14 +30,12 @@ namespace Avans_PokeBattles.Client
         }
         public Pokemon GetPokemon(string pokemonName)
         {
-            foreach (Pokemon pokemon in pokemonList)
+            Pokemon pokemonToGet = pokemonList.FirstOrDefault(pokemon => pokemon.GetName() == pokemonName);
+            if (pokemonToGet != null)
             {
-                if (pokemon.GetName().Equals(pokemonName))
-                {
-                    return pokemon;
-                }
+                return pokemonToGet;
             }
-            return null;
+            return GetPokemon("Unown");
         }
 
     }

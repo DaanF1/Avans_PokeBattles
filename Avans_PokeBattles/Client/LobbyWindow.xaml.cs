@@ -38,12 +38,11 @@ namespace Avans_PokeBattles.Client
             // Set names
             lblPlayer1Name.Content = playerName;
 
-            // Create Pokemon
+            // Create Pokemon and add them to the lister
+            lister.AddPokemon("Unown", new Uri(uriPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind));
             lister.AddPokemon("Venusaur", new Uri(uriPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind));
             lister.AddPokemon("Charizard", new Uri(uriPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind));
-
-
-            // Add all pokemon to list
+            
         }
 
         /// <summary>
@@ -73,7 +72,7 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
             SetPlayer1Pokemon(lister.GetPokemon("Venusaur").GetBattleForUri());
             PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
-            SetPlayer2Pokemon(lister.GetPokemon("Venusaur").GetBattleAgainstUri());
+            SetPlayer2Pokemon(lister.GetPokemon("Charizard").GetBattleAgainstUri());
         }
 
         private void PP1_MediaEnded(object sender, RoutedEventArgs e)
