@@ -13,20 +13,23 @@ namespace Avans_PokeBattles.Client
         private Uri battleForUri;
         private Uri battleAgainstUri;
         private List<Move> pokemonMoves = new List<Move>();
+        private int speed;
 
-        public Pokemon(string pokemonName, Uri previewUri, Uri battleForUri, Uri battleAgainstUri, List<Move> moves)
+        public Pokemon(string pokemonName, Uri previewUri, Uri battleForUri, Uri battleAgainstUri, List<Move> moves, int speed)
         {
             this.pokemonName = pokemonName;
             this.previewUri = previewUri;
             this.battleForUri = battleForUri;
             this.battleAgainstUri = battleAgainstUri;
             this.pokemonMoves = moves;
+            this.speed = speed;
         }
 
         public string Name { get { return this.pokemonName; } }
         public Uri PreviewUri { get { return this.previewUri; } }
         public Uri BattleForUri { get { return this.battleForUri; } }
-        public Uri BattleAgainstUri { get { return this.BattleAgainstUri; } }
+        public Uri BattleAgainstUri { get { return this.battleAgainstUri; } }
+        public int Speed { get { return this.speed; } }
 
         public Move GetMove(string moveName)
         {

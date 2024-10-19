@@ -29,6 +29,15 @@ namespace Avans_PokeBattles.Client
             return GetPokemon("Unown");
         }
 
+        public Pokemon GetRandomPokemon()
+        {
+            Random random = new Random();
+            Pokemon randomPokemon = pokemonList[random.Next(pokemonList.Count)];
+            if (randomPokemon.Name == "Unown")
+                return GetRandomPokemon();
+            return randomPokemon;
+        }
+
         //public void RemovePokemon(string pokemonName) 
         //{
         //    Pokemon pokemonToRemove = pokemonList.FirstOrDefault(pokemon => pokemon.GetName() == pokemonName);

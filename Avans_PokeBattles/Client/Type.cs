@@ -12,12 +12,5 @@ namespace Avans_PokeBattles.Client
         Fire,
         Grass,
         Normal,
-        Electric,
-        Ground,
-        Fairy,
-        Dragon,
-        Psychic,
-        Ice,
-        Dark
     }
 }

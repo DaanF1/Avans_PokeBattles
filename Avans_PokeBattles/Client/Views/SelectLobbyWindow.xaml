@@ -10,7 +10,6 @@
         <Button Name="btnLobby1" Content="Join Lobby 1" HorizontalAlignment="Center" Margin="0,32,0,0" VerticalAlignment="Top" Click="btnJoinLobby1_Click" />
         <Button Name="btnLobby2" Content="Join Lobby 2" HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnJoinLobby2_Click" />
         <Button Name="btnLobby3" Content="Join Lobby 3" HorizontalAlignment="Center" Margin="0,82,0,0" VerticalAlignment="Top" Click="btnJoinLobby3_Click" />
-
-
+        
     </Grid>
 </Window>

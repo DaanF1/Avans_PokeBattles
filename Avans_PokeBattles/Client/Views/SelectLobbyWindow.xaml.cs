@@ -21,13 +21,17 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class SelectLobbyWindow : Window
     {
-        private string playerName;
+        private TcpClient tcpClient;
+        private NetworkStream stream;
+        private string playerName = "";
 
-        public SelectLobbyWindow(string playerName)
+        public SelectLobbyWindow(TcpClient client)
         {
             InitializeComponent();
 
-            this.playerName = playerName;
+            this.tcpClient = client;
+            this.stream = client.GetStream();
+            //this.playerName = playerName;
         }
 
         private void SelectLobbyWindow_Loaded(object sender, RoutedEventArgs e)
@@ -37,8 +41,7 @@ namespace Avans_PokeBattles.Client
 
         private void btnJoinLobby1_Click(object sender, RoutedEventArgs e)
         {
-            TcpClient tcpClient = new TcpClient();
-
+            
             // Hide the lobby window and show the game window
             this.Hide();
             var gameWindow = new LobbyWindow(playerName);
