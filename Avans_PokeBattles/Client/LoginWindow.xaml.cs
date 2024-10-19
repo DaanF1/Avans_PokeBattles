@@ -23,7 +23,7 @@ namespace Avans_PokeBattles.Client
 
         private void LoginWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         private void txtName_MouseDown(object sender, MouseButtonEventArgs e)
@@ -40,10 +40,16 @@ namespace Avans_PokeBattles.Client
                 MessageBox.Show("Please enter a valid name.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+            // Make sure the name can fit in the next window
+            if (name.ToString().Count() > 9)
+            {
+                MessageBox.Show("Please enter a name shorter than 11 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
             // Hide the login window and show the game window
             this.Hide();
-            var gameWindow = new LobbyWindow();
+            var gameWindow = new LobbyWindow(name);
             gameWindow.Show();
         }
     }

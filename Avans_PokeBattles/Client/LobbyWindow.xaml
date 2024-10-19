@@ -5,22 +5,71 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
         mc:Ignorable="d"
-        Title="LobbyWindow" Height="450" Width="800">
+        Title="LobbyWindow" Height="450" Width="800" Loaded="LobbyWindow_Loaded" WindowStartupLocation="CenterScreen">
     <Grid>
+        <!-- Define Grid Rows & Columns -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="175" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="300"/>
+            <RowDefinition Height="350" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Canvas>
-            <Image Canvas.Left="0" Canvas.Top="0" Width="150" Height="300"/>
-            <Image Canvas.Left="150" Canvas.Top="0" Width="300" Height="300"/>
-            <Image Canvas.Left="450" Canvas.Top="0" Width="150" Height="300"/>
+
+        <!-- Game Panel (outer) -->
+        <Canvas Name="cvGamePanel" Grid.Row="0" Grid.Column="0">
+
+            <!-- Player 1 Name & Team Preview -->
+            <Label Name="lblPlayer1Name" FontSize="10" FontWeight="Bold" Canvas.Left="10" Canvas.Top="10" />
+            <Image Name="P1Pokemon1Preview" Canvas.Left="20" Canvas.Top="30" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P1Pokemon2Preview" Canvas.Left="20" Canvas.Top="80" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P1Pokemon3Preview" Canvas.Left="20" Canvas.Top="130" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P1Pokemon4Preview" Canvas.Left="20" Canvas.Top="180" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P1Pokemon5Preview" Canvas.Left="20" Canvas.Top="230" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P1Pokemon6Preview" Canvas.Left="20" Canvas.Top="280" Height="60" Width="60" Stretch="Fill" />
+
+            <!-- Player 2 Name & Team Preview -->
+            <Label Name="lblPlayer2Name" FontSize="10" FontWeight="Bold" Canvas.Right="10" Canvas.Top="10" />
+            <Image Name="P2Pokemon1Preview" Canvas.Right="10" Canvas.Top="30" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P2Pokemon2Preview" Canvas.Right="10" Canvas.Top="80" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P2Pokemon3Preview" Canvas.Right="10" Canvas.Top="130" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P2Pokemon4Preview" Canvas.Right="10" Canvas.Top="180" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P2Pokemon5Preview" Canvas.Right="10" Canvas.Top="230" Height="60" Width="60" Stretch="Fill" />
+            <Image Name="P2Pokemon6Preview" Canvas.Right="10" Canvas.Top="280" Height="60" Width="60" Stretch="Fill" />
+
+            
+            <!-- Game View (inner) -->
+            <Canvas Name="cvGameView" Canvas.Left="100" Height="350" Width="425" Background="Black">
+                <Label Name="lblRound" FontSize="18" FontWeight="Bold" Content="Round: X" Foreground="White" />
+
+                <!-- Current Player Pokemon -->
+                <Border Background="Black" Canvas.Left="50" Canvas.Bottom="50">
+                    <MediaElement Name="PokemonPlayer1"  Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP1_MediaEnded" MediaFailed="PP1_MediaFailed" />
+                </Border>
+                
+                <!-- Opponent Player Pokemon -->
+                <Border Background="Black" Canvas.Top="50" Canvas.Right="50">
+                    <MediaElement Name="PokemonPlayer2" Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP2_MediaEndend" MediaFailed="PP2_MediaFailed" />
+                </Border>
+                
+            </Canvas>
         </Canvas>
 
-    </Grid>
+        <!-- Read Chat here -->
+        <RichTextBox Name="txtReadChat" Grid.Row="0" Grid.Column="1" IsReadOnly="True" />
 
+        <StackPanel Name="pnlButtonActions" Grid.Row="1" Grid.Column="0">
+            <!-- Add Buttons here! -->
+            
+        </StackPanel>
+
+        <!-- Type to Chat here -->
+        <StackPanel Name="pnlChat" Grid.Row="1" Grid.Column="1">
+            <TextBox Name="txtTypeChat" IsReadOnly="False" Height="60" TextAlignment="Left" />
+            <Button Name="btnSendChat" Height="25" Content="Send Text" Click="btnSendChat_Clicked" />
+            
+        </StackPanel>
+        
+    </Grid>
 </Window>
