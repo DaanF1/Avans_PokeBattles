@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace Avans_PokeBattles.Server
 {
@@ -14,42 +10,63 @@ namespace Avans_PokeBattles.Server
     {
         private static TcpListener listener;
         private static int port = 8000;
-        private static int maxBytesInBuffer = 1500;
+        private static LobbyManager lobbyManager = new LobbyManager();
+
         public async void Start()
         {
-            // Wait for Client connection
             listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
+            Console.WriteLine("Server started. Waiting for connections...");
 
             while (true)
             {
                 var client = await listener.AcceptTcpClientAsync();
-                HandleClientAsync(client);
+                Console.WriteLine("Client connected.");
+                Task.Run(() => HandleClientAsync(client));
             }
         }
 
-        /// <summary>
-        /// Handle a single Client's requests
-        /// </summary>
-        /// <param name="client"></param>
-        public static async Task HandleClientAsync(TcpClient client)
+        // Handle individual client requests
+        private async Task HandleClientAsync(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
-            byte[] readBuffer = new byte[maxBytesInBuffer];
-            
-            // Print incoming message
+            byte[] buffer = new byte[1500];
             while (client.Connected)
             {
-                int bytesRead = await stream.ReadAsync(readBuffer, 0, maxBytesInBuffer);
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
                 if (bytesRead == 0)
                 {
                     break;
                 }
-                
-                string message = Encoding.UTF8.GetString(readBuffer, 0, bytesRead);
-                Console.WriteLine($"Received: {message}");
+
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine($"Received message: {message}");
+
+                // Handle client requests
+                if (message == "list-lobbies")
+                {
+                    // Send the list of available lobbies to the client
+                    string lobbyList = lobbyManager.GetLobbyList();
+                    byte[] response = Encoding.UTF8.GetBytes(lobbyList);
+                    await stream.WriteAsync(response, 0, response.Length);
+                }
+                else if (message.StartsWith("join-lobby"))
+                {
+                    // Parse the lobby ID from the message (e.g., "join-lobby:Lobby-1")
+                    string[] splitMessage = message.Split(':');
+                    if (splitMessage.Length == 2)
+                    {
+                        string lobbyId = splitMessage[1];
+                        bool joined = lobbyManager.TryJoinLobby(lobbyId, client);
+
+                        // Notify the client if joining the lobby was successful or not
+                        string responseMessage = joined ? "lobby-joined" : "lobby-full";
+                        byte[] response = Encoding.UTF8.GetBytes(responseMessage);
+                        await stream.WriteAsync(response, 0, response.Length);
+                    }
+                }
             }
-            client.Dispose();
+
             client.Close();
         }
     }
