@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace Avans_PokeBattles.Client
 {
@@ -19,9 +20,21 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class SelectLobbyWindow : Window
     {
-        public SelectLobbyWindow()
+        private string playerName;
+
+        public SelectLobbyWindow(string playerName)
         {
             InitializeComponent();
+
+            this.playerName = playerName;
+        }
+
+        private void btnGoToGame_Click(object sender, RoutedEventArgs e)
+        {
+            // Hide the lobby window and show the game window
+            this.Hide();
+            var gameWindow = new LobbyWindow(playerName);
+            gameWindow.Show();
         }
     }
 }
