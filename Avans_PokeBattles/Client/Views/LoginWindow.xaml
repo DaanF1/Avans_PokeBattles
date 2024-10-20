@@ -5,10 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
         mc:Ignorable="d"
-        Title="LoginWindow" Loaded="LoginWindow_Loaded" Height="200" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
+        Title="Login" Height="100" Width="200" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
     <Grid>
-        <TextBox x:Name="txtName" Margin="0,0,0,100" TextWrapping="Wrap" HorizontalAlignment="Center" Width="150" Height="20" VerticalAlignment="Bottom" Text="Enter your name..." PreviewMouseDown="txtName_MouseDown"/>
-        <Button x:Name="btnLogin" Content="Login" HorizontalAlignment="Center" Margin="0,100,0,0" Width="150" Height="20" VerticalAlignment="Top" Click="btnLogin_Clicked"/>
-
+        <TextBox x:Name="txtName" Margin="0,-25,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"  Width="150" Height="20"  Text="Enter your name..." PreviewMouseDown="txtName_MouseDown"/>
+        <Button x:Name="btnLogin" Margin="0,25,0,0" Content="Login" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="20" Click="btnLogin_Clicked"/>
     </Grid>
 </Window>

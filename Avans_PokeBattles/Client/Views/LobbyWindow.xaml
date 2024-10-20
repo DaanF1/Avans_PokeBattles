@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
         mc:Ignorable="d"
-        Title="LobbyWindow" Height="450" Width="800" Loaded="LobbyWindow_Loaded" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
+        Title="Battle" Height="450" Width="800" Loaded="LobbyWindow_Loaded" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
     <Grid>
         <!-- Define Grid Rows & Columns -->
         <Grid.ColumnDefinitions>
@@ -56,10 +56,10 @@
                 </Border>
 
                 <!-- Action Buttons -->
-                <Button Name="btnOption1" Content="Option 1" Canvas.Right="100" Canvas.Bottom="100" Width="60" Height="25" Click="btnOption1_Click" />
-                <Button Name="btnOption2" Content="Option 2" Canvas.Right="130" Canvas.Bottom="75" Width="60" Height="25" Click="btnOption2_Click" />
-                <Button Name="btnOption3" Content="Option 3" Canvas.Right="70" Canvas.Bottom="75" Width="60" Height="25" Click="btnOption3_Click" />
-                <Button Name="btnOption4" Content="Option 4" Canvas.Right="100" Canvas.Bottom="50" Width="60" Height="25" Click="btnOption4_Click" />
+                <Button Name="btnOption1" Content="Option 1" Canvas.Right="65" Canvas.Bottom="75" Width="80" Height="25" Click="btnOption1_Click" />
+                <Button Name="btnOption2" Content="Option 2" Canvas.Right="105" Canvas.Bottom="50" Width="80" Height="25" Click="btnOption2_Click" />
+                <Button Name="btnOption3" Content="Option 3" Canvas.Right="25" Canvas.Bottom="50" Width="80" Height="25" Click="btnOption3_Click" />
+                <Button Name="btnOption4" Content="Option 4" Canvas.Right="65" Canvas.Bottom="25" Width="80" Height="25" Click="btnOption4_Click" />
                 
             </Canvas>
         </Canvas>

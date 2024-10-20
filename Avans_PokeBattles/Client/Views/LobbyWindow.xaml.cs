@@ -1,21 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Avans_PokeBattles.Client
 {
@@ -75,7 +61,7 @@ namespace Avans_PokeBattles.Client
             blastoiseMoves.Add(new Move("Rapid Spin", 50, 100, Type.Normal));
             Pokemon blastoise = new Pokemon("Blastoise", new Uri(uriPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), blastoiseMoves, 145, 75);
 
-            // Create Pokemon and add them to the lister
+            // Add Pokemon to the lister
             lister.AddPokemon(unown);
             lister.AddPokemon(venusaur);
             lister.AddPokemon(charizard);
@@ -98,6 +84,18 @@ namespace Avans_PokeBattles.Client
             player1 = new Player("", player1Pokemon);
 
             // Set Preview Pokemon Player 1
+            for (int i = 0; i < 6; i++)
+            {
+                Image previewImage = new Image();
+                previewImage.Source = new BitmapImage(player1.GetPokemon(i).PreviewUri);
+            }
+            //foreach (var child in cvGamePanel.Children)
+            //{
+            //    if (child.GetType() == Image)
+            //    {
+
+            //    }
+            //}
             P1Pokemon1Preview.Source = new BitmapImage(player1.GetPokemon(0).PreviewUri);
             P1Pokemon2Preview.Source = new BitmapImage(player1.GetPokemon(1).PreviewUri);
             P1Pokemon3Preview.Source = new BitmapImage(player1.GetPokemon(2).PreviewUri);
@@ -121,6 +119,14 @@ namespace Avans_PokeBattles.Client
             P2Pokemon5Preview.Source = new BitmapImage(player2.GetPokemon(4).PreviewUri);
             P2Pokemon6Preview.Source = new BitmapImage(player2.GetPokemon(5).PreviewUri);
 
+            // Set Battle Pokemon
+            //PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
+            SetPlayer1Pokemon(player1.GetPokemon(0).BattleForUri);
+            SetPlayer1PokemonHealth(player1.GetPokemon(0).Health);
+            LoadPokemonAttacks(player1.GetPokemon(0));
+            //PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
+            SetPlayer2Pokemon(player2.GetPokemon(0).BattleAgainstUri);
+            SetPlayer2PokemonHealth(player2.GetPokemon(0).Health);
             // Start the game
             Task.Run(() =>
             {
@@ -273,9 +279,30 @@ namespace Avans_PokeBattles.Client
         private void LoadPokemonAttacks(Pokemon pokemon)
         {
             btnOption1.Content = pokemon.GetMove(0).MoveName;
+            btnOption1.Background = GetTypeColor(pokemon.GetMove(0).TypeOfAttack);
             btnOption2.Content = pokemon.GetMove(1).MoveName;
+            btnOption2.Background = GetTypeColor(pokemon.GetMove(1).TypeOfAttack);
             btnOption3.Content = pokemon.GetMove(2).MoveName;
+            btnOption3.Background = GetTypeColor(pokemon.GetMove(2).TypeOfAttack);
             btnOption4.Content = pokemon.GetMove(3).MoveName;
+            btnOption4.Background = GetTypeColor(pokemon.GetMove(3).TypeOfAttack);
+        }
+
+        private System.Windows.Media.Brush GetTypeColor(Type type)
+        {
+            switch (type)
+            {
+                case Type.Normal:
+                    return System.Windows.Media.Brushes.LightGray;
+                case Type.Fire:
+                    return System.Windows.Media.Brushes.Red;
+                case Type.Water:
+                    return System.Windows.Media.Brushes.LightBlue;
+                case Type.Grass:
+                    return System.Windows.Media.Brushes.LightGreen;
+                default:
+                    return null;
+            }
         }
 
         private async Task SelectMove()
