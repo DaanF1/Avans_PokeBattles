@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using System.Xml.Linq;
 
 namespace Avans_PokeBattles.Client
@@ -34,7 +35,7 @@ namespace Avans_PokeBattles.Client
             // Set up the TCP client and network stream with the provided client
             this.tcpClient = client;
             this.stream = client.GetStream();
-            this.lobbyManager = new LobbyManager();
+            this.lobbyManager = Server.Server.GetLobbymanager();
             // Load in Player name
             this.playerName = name;
             lblName.Content = "Name: " + this.playerName;
@@ -55,11 +56,10 @@ namespace Avans_PokeBattles.Client
                 byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {1}");
                 stream.Write(buffer, 0, buffer.Length);
 
-                //// Show the game window and close the current window
-                //var gameWindow = new LobbyWindow();
-                //gameWindow.Show();
-
-                //this.Close();
+                Task.Run(() =>
+                {
+                    WaitingInLobby();
+                });
             }
         }
 
@@ -94,6 +94,25 @@ namespace Avans_PokeBattles.Client
                 var gameWindow = new LobbyWindow();
                 gameWindow.Show();
                 this.Close();
+            }
+        }
+
+        private async Task WaitingInLobby()
+        {
+            while (true)
+            {
+                bool lobbyIsFull = lobbyManager.IsLobbyFull(1);
+                if (lobbyIsFull == true)
+                {
+                    // Dispatcher.Invoke because we are still on the main thread
+                    await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => {
+                        // Show the game window and close the current window
+                        this.Close();
+                        var gameWindow = new LobbyWindow();
+                        gameWindow.Show();
+                    }));
+                    break;
+                }
             }
         }
 

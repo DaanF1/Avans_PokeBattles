@@ -69,5 +69,11 @@ namespace Avans_PokeBattles.Server
 
             client.Close();
         }
+
+        // Get the lobby manager instance
+        internal static LobbyManager GetLobbymanager()
+        {
+            return lobbyManager;
+        }
     }
 }
