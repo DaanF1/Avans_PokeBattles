@@ -7,6 +7,7 @@ namespace Avans_PokeBattles.Server
     public class LobbyManager
     {
         private List<Lobby> lobbies = new List<Lobby>();
+        private Tuple<string, string> playersInLobby;
 
         public LobbyManager()
         {

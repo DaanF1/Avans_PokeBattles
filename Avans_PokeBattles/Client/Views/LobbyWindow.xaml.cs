@@ -1,6 +1,8 @@
+using System.Media;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Avans_PokeBattles.Client
@@ -14,16 +16,21 @@ namespace Avans_PokeBattles.Client
         private PokemonLister lister = new PokemonLister();
 
         // Uri prefixes for loading images
-        public string uriPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
+        public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
         public UriKind standardUriKind = UriKind.Absolute;
 
-        // Pokemon Battle boxes
+        // Media
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
+        public MediaPlayer playerBattleMusic = new MediaPlayer();
+        public MediaPlayer hitPlayer = new MediaPlayer();
 
         // Players
         private Player player1;
         private Player player2;
+
+
+       
 
         public LobbyWindow()
         {
@@ -38,34 +45,36 @@ namespace Avans_PokeBattles.Client
             unownMoves.Add(new Move("Hydro Pump", 110, 80, Type.Water));
             unownMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
             unownMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
-            Pokemon unown = new Pokemon("Unown", new Uri(uriPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), unownMoves, 80, 90);
+            Pokemon unown = new Pokemon("Unown", new Uri(dirPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), unownMoves, 80, 90);
 
             List<Move> venusaurMoves = new List<Move>();
             venusaurMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
             venusaurMoves.Add(new Move("Take Down", 90, 85, Type.Normal));
             venusaurMoves.Add(new Move("Razor Leaf", 55, 95, Type.Grass));
             venusaurMoves.Add(new Move("Tackle", 40, 100, Type.Normal));
-            Pokemon venusaur = new Pokemon("Venusaur", new Uri(uriPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), venusaurMoves, 195, 70);
+            Pokemon venusaur = new Pokemon("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), venusaurMoves, 195, 70);
 
             List<Move> charizardMoves = new List<Move>();
             charizardMoves.Add(new Move("Scratch", 40, 100, Type.Normal));
             charizardMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
             charizardMoves.Add(new Move("Slash", 70, 100, Type.Normal));
             charizardMoves.Add(new Move("Flamethrower", 90, 100, Type.Fire));
-            Pokemon charizard = new Pokemon("Charizard", new Uri(uriPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind), charizardMoves, 125, 120);
+            Pokemon charizard = new Pokemon("Charizard", new Uri(dirPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind), charizardMoves, 125, 120);
 
             List<Move> blastoiseMoves = new List<Move>();
             blastoiseMoves.Add(new Move("Hydro Pump", 110, 80, Type.Water));
             blastoiseMoves.Add(new Move("Aqua Tail", 90, 90, Type.Water));
             blastoiseMoves.Add(new Move("Tackle", 40, 100, Type.Normal));
             blastoiseMoves.Add(new Move("Rapid Spin", 50, 100, Type.Normal));
-            Pokemon blastoise = new Pokemon("Blastoise", new Uri(uriPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(uriPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), blastoiseMoves, 145, 75);
+            Pokemon blastoise = new Pokemon("Blastoise", new Uri(dirPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), blastoiseMoves, 145, 75);
 
             // Add Pokemon to the lister
             lister.AddPokemon(unown);
             lister.AddPokemon(venusaur);
             lister.AddPokemon(charizard);
             lister.AddPokemon(blastoise);
+
+            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
         }
 
         /// <summary>
@@ -162,17 +171,17 @@ namespace Avans_PokeBattles.Client
 
         private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         private void btnOption1_Click(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         private void btnOption2_Click(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         private void btnOption3_Click(object sender, RoutedEventArgs e)
@@ -290,6 +299,7 @@ namespace Avans_PokeBattles.Client
 
         private System.Windows.Media.Brush GetTypeColor(Type type)
         {
+            // Return button color based on attack type
             switch (type)
             {
                 case Type.Normal:
@@ -328,5 +338,52 @@ namespace Avans_PokeBattles.Client
             }
         }
 
+        /// <summary>
+        /// Play a music file from the project
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="volume"></param>
+        public void PlayMusic(MediaPlayer player, string path, double volume, bool loop)
+        {
+            if (path != null)
+            {
+                player.Open(new Uri(path));
+                if (loop)
+                {
+                    player.MediaEnded += new EventHandler(Media_Ended);
+                }
+                // MediaPlayer volume is a float value between 0 and 1.
+                player.Volume = volume / 100.0f;
+                player.Play();
+                return;
+            }
+        }
+
+        private void Media_Ended(object sender, EventArgs e)
+        {
+            // Set time to zero (replay/ loop)
+            playerBattleMusic.Position = TimeSpan.Zero;
+            playerBattleMusic.Play();
+        }
+
+        private void btnOption1_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
+
+        private void btnOption2_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
+
+        private void btnOption3_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
+
+        private void btnOption4_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
     }
 }
