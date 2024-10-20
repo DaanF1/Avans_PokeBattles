@@ -7,7 +7,7 @@ using System.Windows.Markup;
 
 namespace Avans_PokeBattles.Client
 {
-    class PokemonLister
+    internal class PokemonLister
     {
         // List with all availible pokemon
         private List<Pokemon> pokemonList = new List<Pokemon>();
@@ -16,9 +16,16 @@ namespace Avans_PokeBattles.Client
 
         public void AddPokemon(Pokemon newPokemon)
         {
-            pokemonList.Add(newPokemon);
+            // Add new Pokemon to the list
+            if (!pokemonList.Contains(newPokemon))
+                pokemonList.Add(newPokemon);
         }
 
+        /// <summary>
+        /// Gets the Pokemon based on its Name
+        /// If it isn't found we return Unown
+        /// </summary>
+        /// <param name="pokemonName"></param>
         public Pokemon GetPokemon(string pokemonName)
         {
             Pokemon pokemonToGet = pokemonList.FirstOrDefault(pokemon => pokemon.Name == pokemonName);
@@ -29,6 +36,9 @@ namespace Avans_PokeBattles.Client
             return GetPokemon("Unown");
         }
 
+        /// <summary>
+        /// Gets a random Pokemon from the list
+        /// </summary>
         public Pokemon GetRandomPokemon()
         {
             Random random = new Random();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Avans_PokeBattles.Client;
+using System;
 using System.Net.Sockets;
 
 namespace Avans_PokeBattles.Server

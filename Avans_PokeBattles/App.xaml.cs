@@ -30,9 +30,13 @@ namespace Avans_PokeBattles
                 server.Start();
             });
 
-            // Start Client
-            var client = new Client.LoginWindow();
-            client.Show();
+            // Start Client 1
+            var client1 = new Client.LoginWindow();
+            client1.Show();
+
+            // Start Client 2
+            var client2 = new Client.LoginWindow();
+            client2.Show();
         }
     }
 }

@@ -44,5 +44,11 @@ namespace Avans_PokeBattles.Server
 
             return false;
         }
+
+        // Check if a specific lobby is full
+        public bool IsLobbyFull(int lobbyNumber)
+        {
+            return lobbies[lobbyNumber-1].IsFull;
+        }
     }
 }

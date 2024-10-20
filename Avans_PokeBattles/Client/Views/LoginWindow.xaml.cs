@@ -28,11 +28,6 @@ namespace Avans_PokeBattles.Client
             this.stream = tcpClient.GetStream();
         }
 
-        private void LoginWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         private void txtName_MouseDown(object sender, MouseButtonEventArgs e)
         {
             txtName.Text = "";
@@ -53,13 +48,14 @@ namespace Avans_PokeBattles.Client
                 MessageBox.Show("Please enter a name shorter than 11 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            byte[] buffer = Encoding.ASCII.GetBytes(name);
+            // Send the players name to the server
+            byte[] buffer = Encoding.ASCII.GetBytes("Player name: " + name);
             stream.Write(buffer, 0, buffer.Length);
 
-            // Hide the login window and show the lobby window
-            this.Hide();
-            var selectLobbyWindow = new SelectLobbyWindow(tcpClient);
+            // Show the select lobby window and close the current window
+            var selectLobbyWindow = new SelectLobbyWindow(name, tcpClient);
             selectLobbyWindow.Show();
+            this.Close();
         }
     }
 }
