@@ -110,17 +110,17 @@ namespace Avans_PokeBattles.Client
             while (true)
             {
                 bool lobbyIsFull = lobbyManager.IsLobbyFull(lobbyNumber);
-                if (lobbyIsFull == true)
-                {
-                    // Dispatcher.Invoke because we are still on the main thread
-                    await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => {
-                        // Show the game window and close the current window
-                        var gameWindow = new LobbyWindow();
-                        gameWindow.Show();
-                        this.Close();
-                    }));
-                    break;
-                }
+                if (!lobbyIsFull)
+                    continue;
+
+                // Dispatcher.Invoke because we are still on the main thread
+                await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => {
+                    // Show the game window and close the current window
+                    var gameWindow = new LobbyWindow();
+                    gameWindow.Show();
+                    this.Close();
+                }));
+                break;
             }
         }
 
