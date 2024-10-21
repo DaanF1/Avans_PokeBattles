@@ -51,5 +51,6 @@ namespace Avans_PokeBattles.Server
         {
             return lobbies[lobbyNumber-1].IsFull;
         }
+
     }
 }

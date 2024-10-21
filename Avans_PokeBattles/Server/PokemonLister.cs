@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-namespace Avans_PokeBattles.Client
+namespace Avans_PokeBattles.Server
 {
     internal class PokemonLister
     {
@@ -47,15 +47,6 @@ namespace Avans_PokeBattles.Client
                 return GetRandomPokemon();
             return randomPokemon;
         }
-
-        //public void RemovePokemon(string pokemonName) 
-        //{
-        //    Pokemon pokemonToRemove = pokemonList.FirstOrDefault(pokemon => pokemon.GetName() == pokemonName);
-        //    if (pokemonToRemove != null)
-        //    {
-        //        pokemonList.Remove(pokemonToRemove);
-        //    }
-        //}
 
     }
 }
