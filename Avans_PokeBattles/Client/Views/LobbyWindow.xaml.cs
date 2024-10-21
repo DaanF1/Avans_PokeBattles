@@ -1,9 +1,13 @@
+using System.IO;
 using System.Media;
+using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml.Serialization;
 using Avans_PokeBattles.Server;
 
 namespace Avans_PokeBattles.Client
@@ -13,6 +17,11 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class LobbyWindow : Window
     {
+        private TcpClient tcpClient;
+        private NetworkStream stream;
+        private List<Pokemon> player1Team;
+        private List<Pokemon> player2Team;
+
         // Public PokemonLister
         private PokemonLister lister = new PokemonLister();
 
@@ -26,15 +35,98 @@ namespace Avans_PokeBattles.Client
         public MediaPlayer playerBattleMusic = new MediaPlayer();
         public MediaPlayer hitPlayer = new MediaPlayer();
 
-        public LobbyWindow()
+        public LobbyWindow(TcpClient client)
         {
             InitializeComponent();
 
             // Set name
             lblPlayer1Name.Content = ""; //playerName;
 
+            this.tcpClient = client;
+            this.stream = client.GetStream();
+
+            Task.Run(() => ListenForServerMessages());
             // Play Music
-            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+        }
+
+        private async Task ListenForServerMessages()
+        {
+            byte[] buffer = new byte[4096];
+            while (true)
+            {
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead > 0)
+                {
+                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                    if (message.StartsWith("Player 1 team:") || message.StartsWith("Player 2 team:"))
+                    {
+                        ProcessTeamData(message);
+                    }
+                    else
+                    {
+                        // Process other messages such as move commands
+                        Console.WriteLine(message);
+                    }
+                }
+            }
+        }
+
+        private void ProcessTeamData(string message)
+        {
+            // Deserialize the team data
+            if (message.StartsWith("Player 1 team:"))
+            {
+                player1Team = DeserializeTeamData(message);
+                // Show the team for Player 1 (local player)
+                ShowPlayer1Team();
+            }
+            else if (message.StartsWith("Player 2 team:"))
+            {
+                player2Team = DeserializeTeamData(message);
+                // Show the team for Player 2 (opponent)
+                ShowPlayer2Team();
+            }
+        }
+
+        private List<Pokemon> DeserializeTeamData(string message)
+        {
+            List<Pokemon> team = new List<Pokemon>();
+            string[] serializedPokemonArray = message.Split(':')[1].Trim().Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var serializedPokemon in serializedPokemonArray)
+            {
+                // Deserialize each Pokémon using XML Serializer
+                XmlSerializer serializer = new XmlSerializer(typeof(Pokemon));
+                using (TextReader reader = new StringReader(serializedPokemon))
+                {
+                    var pokemon = (Pokemon)serializer.Deserialize(reader);
+                    team.Add(pokemon);
+                }
+            }
+
+            return team;
+        }
+
+        private void ShowPlayer1Team()
+        {
+            P1Pokemon1Preview.Source = new BitmapImage(new Uri(player1Team[0].PreviewUri, UriKind.Absolute));
+            P1Pokemon2Preview.Source = new BitmapImage(new Uri(player1Team[1].PreviewUri, UriKind.Absolute));
+            P1Pokemon3Preview.Source = new BitmapImage(new Uri(player1Team[2].PreviewUri, UriKind.Absolute));
+            P1Pokemon4Preview.Source = new BitmapImage(new Uri(player1Team[3].PreviewUri, UriKind.Absolute));
+            P1Pokemon5Preview.Source = new BitmapImage(new Uri(player1Team[4].PreviewUri, UriKind.Absolute));
+            P1Pokemon6Preview.Source = new BitmapImage(new Uri(player1Team[5].PreviewUri, UriKind.Absolute));
+        }
+
+        private void ShowPlayer2Team()
+        {
+            P2Pokemon1Preview.Source = new BitmapImage(new Uri(player2Team[0].PreviewUri, UriKind.Absolute));
+            P2Pokemon2Preview.Source = new BitmapImage(new Uri(player2Team[1].PreviewUri, UriKind.Absolute));
+            P2Pokemon3Preview.Source = new BitmapImage(new Uri(player2Team[2].PreviewUri, UriKind.Absolute));
+            P2Pokemon4Preview.Source = new BitmapImage(new Uri(player2Team[3].PreviewUri, UriKind.Absolute));
+            P2Pokemon5Preview.Source = new BitmapImage(new Uri(player2Team[4].PreviewUri, UriKind.Absolute));
+            P2Pokemon6Preview.Source = new BitmapImage(new Uri(player2Team[5].PreviewUri, UriKind.Absolute));
         }
 
         /// <summary>

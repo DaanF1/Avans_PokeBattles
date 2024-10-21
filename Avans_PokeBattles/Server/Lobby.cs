@@ -73,12 +73,14 @@ namespace Avans_PokeBattles.Server
             {
                 player1 = client;
                 stream1 = client.GetStream();
+                Console.WriteLine("Player 1 has joined the lobby.");
             }
             else if (player2 == null)
             {
                 player2 = client;
                 stream2 = client.GetStream();
                 IsFull = true;  // Lobby is full when both players have joined
+                Console.WriteLine("Player 2 has joined the lobby.");
                 StartGame();  // Start game when the lobby is full
             }
         }
@@ -127,23 +129,6 @@ namespace Avans_PokeBattles.Server
 
             // Send the team data to the player
             await SendMessage(stream, teamMessage.ToString().TrimEnd(','));
-        }
-
-        /// <summary>
-        /// Helper method to serialize an object to a string
-        /// StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="toSerialize"></param>
-        public static string SerializeObject<T>(T toSerialize)
-        {
-            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
-
-            using (StringWriter textWriter = new StringWriter())
-            {
-                xmlSerializer.Serialize(textWriter, toSerialize); // Serialize the object
-                return textWriter.ToString(); // Return Serialized object in string form
-            }
         }
 
         private async Task HandleClient(TcpClient sender, NetworkStream senderStream, TcpClient receiver, NetworkStream receiverStream)
@@ -216,7 +201,24 @@ namespace Avans_PokeBattles.Server
         {
             byte[] response = Encoding.UTF8.GetBytes(message);
             await stream.WriteAsync(response, 0, response.Length);
+            await stream.FlushAsync();
         }
 
+        /// <summary>
+        /// Helper method to serialize an object to a string
+        /// StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="toSerialize"></param>
+        public static string SerializeObject<T>(T toSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(textWriter, toSerialize); // Serialize the object
+                return textWriter.ToString(); // Return Serialized object in string form
+            }
+        }
     }
 }

@@ -49,56 +49,44 @@ namespace Avans_PokeBattles.Client
 
         private void btnJoinLobby1_Click(object sender, RoutedEventArgs e)
         {
-            // Try joining the lobby
-            lobbyNumber = 1;
-            bool joined = lobbyManager.TryJoinLobby("Lobby-1", tcpClient);
-            if (joined)
-            {
-                // Send joining the lobby to the server
-                byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {lobbyNumber}");
-                stream.Write(buffer, 0, buffer.Length);
-
-                Task.Run(() =>
-                {
-                    WaitingInLobby(lobbyNumber);
-                });
-            }
+            JoinLobby("Lobby-1");
         }
 
         private void btnJoinLobby2_Click(object sender, RoutedEventArgs e)
         {
-            // Try joining the lobby
-            lobbyNumber = 2;
-            bool joined = lobbyManager.TryJoinLobby("Lobby-2", tcpClient);
-            if (joined)
-            {
-                // Send joining the lobby to the server
-                byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {lobbyNumber}");
-                stream.Write(buffer, 0, buffer.Length);
-
-                Task.Run(() =>
-                {
-                    WaitingInLobby(lobbyNumber);
-                });
-            }
+            JoinLobby("Lobby-2");
         }
 
         private void btnJoinLobby3_Click(object sender, RoutedEventArgs e)
         {
+            JoinLobby("Lobby-3");
+        }
+
+        private void JoinLobby(string lobbyId)
+        {
             // Try joining the lobby
-            lobbyNumber = 3;
-            bool joined = lobbyManager.TryJoinLobby("Lobby-3", tcpClient);
+            bool joined = lobbyManager.TryJoinLobby(lobbyId, tcpClient);
             if (joined)
             {
                 // Send joining the lobby to the server
-                byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {lobbyNumber}");
+                byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined {lobbyId}");
                 stream.Write(buffer, 0, buffer.Length);
 
+                // Start waiting for the lobby to be full
                 Task.Run(() =>
                 {
                     WaitingInLobby(lobbyNumber);
                 });
             }
+            else
+            {
+                MessageBox.Show("Failed to join the lobby.");
+            }
+        }
+
+        private int GetLobbyNumberFromId(string lobbyId)
+        {
+            return int.Parse(lobbyId.Split('-')[1]);
         }
 
         /// <summary>
@@ -116,7 +104,7 @@ namespace Avans_PokeBattles.Client
                 // Dispatcher.Invoke because we are still on the main thread
                 await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => {
                     // Show the game window and close the current window
-                    var gameWindow = new LobbyWindow();
+                    var gameWindow = new LobbyWindow(tcpClient);
                     gameWindow.Show();
                     this.Close();
                 }));
