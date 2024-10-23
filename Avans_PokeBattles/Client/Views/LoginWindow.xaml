@@ -7,7 +7,22 @@
         mc:Ignorable="d"
         Title="Login" Height="100" Width="200" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
     <Grid>
-        <TextBox x:Name="txtName" Margin="0,-25,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"  Width="150" Height="20"  Text="Enter your name..." PreviewMouseDown="txtName_MouseDown"/>
-        <Button x:Name="btnLogin" Margin="0,25,0,0" Content="Login" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="20" Click="btnLogin_Clicked"/>
+        <TextBox x:Name="txtName" 
+                 Margin="0,-25,0,0" 
+                 HorizontalAlignment="Center" 
+                 VerticalAlignment="Center" 
+                 TextWrapping="NoWrap"  
+                 Width="150" 
+                 Height="20"  
+                 Text="Enter your name..." 
+                 GotFocus="txtName_GotFocus"/>
+        <Button x:Name="btnLogin" 
+                Margin="0,25,0,0" 
+                Content="Login" 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center" 
+                Width="150" 
+                Height="20" 
+                Click="btnLogin_Clicked"/>
     </Grid>
 </Window>

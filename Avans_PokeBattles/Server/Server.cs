@@ -10,7 +10,10 @@ namespace Avans_PokeBattles.Server
     {
         private static TcpListener listener;
         private static int port = 8000;
-        private static LobbyManager lobbyManager = new LobbyManager();
+        private TcpClient player1;
+        private TcpClient player2;
+        private string player1Name = null;
+        private string player2Name = null;
 
         public async void Start()
         {
@@ -20,60 +23,91 @@ namespace Avans_PokeBattles.Server
 
             while (true)
             {
-                var client = await listener.AcceptTcpClientAsync();
-                Console.WriteLine("Client connected.");
-                Task.Run(() => HandleClientAsync(client));
+                if (player1 == null)
+                {
+                    player1 = await listener.AcceptTcpClientAsync();
+                    Console.WriteLine("Player 1 connected.");
+                    Task.Run(() => HandleClient(player1, 1));
+                }
+                else if (player2 == null)
+                {
+                    player2 = await listener.AcceptTcpClientAsync();
+                    Console.WriteLine("Player 2 connected.");
+                    Task.Run(() => HandleClient(player2, 2));
+                }
             }
         }
 
-        // Handle individual client requests
-        private async Task HandleClientAsync(TcpClient client)
+        private async Task HandleClient(TcpClient client, int playerNumber)
         {
             NetworkStream stream = client.GetStream();
             byte[] buffer = new byte[1500];
+
             while (client.Connected)
             {
                 int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
                 if (bytesRead == 0)
-                {
                     break;
-                }
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Received message: {message}");
+                Console.WriteLine($"Message from player {playerNumber}: {message}");
 
-                // Handle client requests
-                if (message == "list-lobbies")
+                if (message.StartsWith("Player name: "))
                 {
-                    // Send the list of available lobbies to the client
-                    string lobbyList = lobbyManager.GetLobbyList();
-                    byte[] response = Encoding.UTF8.GetBytes(lobbyList);
-                    await stream.WriteAsync(response, 0, response.Length);
-                }
-                else if (message.StartsWith("join-lobby"))
-                {
-                    // Parse the lobby ID from the message (e.g., "join-lobby:Lobby-1")
-                    string[] splitMessage = message.Split(':');
-                    if (splitMessage.Length == 2)
+                    string playerName = message.Substring("Player name: ".Length);
+
+                    if (playerNumber == 1)
+                        player1Name = playerName;
+                    else
+                        player2Name = playerName;
+
+                    Console.WriteLine($"Player {playerNumber} name set to {playerName}");
+
+                    // If both players have entered their names, notify them to start the game
+                    if (player1Name != null && player2Name != null)
                     {
-                        string lobbyId = splitMessage[1];
-                        bool joined = lobbyManager.TryJoinLobby(lobbyId, client);
-
-                        // Notify the client if joining the lobby was successful or not
-                        string responseMessage = joined ? "lobby-joined" : "lobby-full";
-                        byte[] response = Encoding.UTF8.GetBytes(responseMessage);
-                        await stream.WriteAsync(response, 0, response.Length);
+                        Task.Run(() => StartGame());
                     }
                 }
             }
 
+            // Handle disconnection
             client.Close();
         }
 
-        // Get the lobby manager instance
-        internal static LobbyManager GetLobbymanager()
+        private async Task StartGame()
         {
-            return lobbyManager;
+            NetworkStream stream1 = player1.GetStream();
+            NetworkStream stream2 = player2.GetStream();
+
+            // Notify both players to open their game window
+            await SendMessage(stream1, $"start-game:Player 1:{player1Name},Player 2:{player2Name}");
+            await SendMessage(stream2, $"start-game:Player 1:{player1Name},Player 2:{player2Name}");
+
+            // You can now send initial game state (team selection, etc.) to both players here
+            Task.Run(() => HandleGameLogic(player1, stream1, player2, stream2));
+        }
+
+        private async Task HandleGameLogic(TcpClient player1, NetworkStream stream1, TcpClient player2, NetworkStream stream2)
+        {
+            byte[] buffer = new byte[1500];
+
+            // Game logic handling between player 1 and player 2
+            // Process moves, game state, etc.
+            while (player1.Connected && player2.Connected)
+            {
+                // Example logic for move handling can be inserted here
+            }
+
+            player1.Close();
+            player2.Close();
+        }
+
+        private async Task SendMessage(NetworkStream stream, string message)
+        {
+            byte[] response = Encoding.UTF8.GetBytes(message);
+            await stream.WriteAsync(response, 0, response.Length);
+            await stream.FlushAsync();
         }
     }
 }
