@@ -122,7 +122,11 @@ namespace Avans_PokeBattles.Server
 
             foreach (Pokemon pokemon in team)
             {
-                teamMessage.Append($"{SerializeObject(pokemon)}, "); // Add the serialized Pokemon to the message
+                teamMessage.Append($"{SerializePokemon(pokemon)}, "); // Add the serialized Pokemon to the message
+                foreach (Move move in pokemon.PokemonMoves)
+                {
+                    teamMessage.Append($"{SerializeMove(move)}, "); // Add the serialized Move to the message
+                }
             }
 
             // Send the team data to the player
@@ -130,19 +134,36 @@ namespace Avans_PokeBattles.Server
         }
 
         /// <summary>
-        /// Helper method to serialize an object to a string
-        /// StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
+        /// Helper method to serialize a Pokemon to a string
+        /// Inspiration from StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="toSerialize"></param>
-        public static string SerializeObject<T>(T toSerialize)
+        /// <typeparam name="Pokemon"></typeparam>
+        /// <param name="pokemonToSerialize"></param>
+        public static string SerializePokemon<Pokemon>(Pokemon pokemonToSerialize)
         {
-            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
+            XmlSerializer xmlSerializer = new XmlSerializer(pokemonToSerialize.GetType());
 
             using (StringWriter textWriter = new StringWriter())
             {
-                xmlSerializer.Serialize(textWriter, toSerialize); // Serialize the object
-                return textWriter.ToString(); // Return Serialized object in string form
+                xmlSerializer.Serialize(textWriter, pokemonToSerialize); // Serialize the Pokemon
+                return textWriter.ToString(); // Return Serialized Pokemon in string form
+            }
+        }
+
+        /// <summary>
+        /// Helper method to serialize a Move to a string
+        /// Inspiration from StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
+        /// </summary>
+        /// <typeparam name="Move"></typeparam>
+        /// <param name="moveToSerialize"></param>
+        public static string SerializeMove<Move>(Move moveToSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(moveToSerialize.GetType());
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(textWriter, moveToSerialize); // Serialize the Move
+                return textWriter.ToString(); // Return Serialized Move in string form
             }
         }
 

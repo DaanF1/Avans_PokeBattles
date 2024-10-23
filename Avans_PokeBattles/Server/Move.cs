@@ -3,28 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Avans_PokeBattles.Server
 {
     public class Move
     {
         // Attributes
-        private string moveName;
-        private int moveDamage;
-        private int accuracy;
-        private Type typeOfAttack;
+        [XmlElement]
+        public string MoveName { get; set; }
+        [XmlElement]
+        public int MoveDamage { get; set; }
+        [XmlElement]
+        public int MoveAccuracy { get; set; }
+        [XmlElement]
+        public Type TypeOfAttack { get; set; }
 
+        public Move() { }
         public Move(string name, int attackHealth, int accuracy, Type type)
         {
-            moveName = name;
-            moveDamage = attackHealth;
-            this.accuracy = accuracy;
-            typeOfAttack = type;
+            MoveName = name;
+            MoveDamage = attackHealth;
+            MoveAccuracy = accuracy;
+            TypeOfAttack = type;
         }
 
-        public string MoveName { get { return moveName; } }
-        public int MoveDamage { get { return moveDamage; } }
-        public int MoveAccuracy { get { return accuracy; } }
-        public Type TypeOfAttack { get { return typeOfAttack; } }
     }
 }

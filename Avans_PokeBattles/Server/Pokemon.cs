@@ -4,48 +4,50 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Avans_PokeBattles
 {
     public class Pokemon
     {
-        // Attributes
-        private string pokemonName;
-        private Uri previewUri;
-        private Uri battleForUri;
-        private Uri battleAgainstUri;
-        private List<Move> pokemonMoves = new List<Move>();
-        private int maxHealth;
-        private int currentHealth;
-        private int speed;
+        [XmlElement]
+        public string Name { get; set; }
+
+        [XmlElement]
+        public string PreviewUri { get; set; }
+
+        [XmlElement]
+        public string BattleForUri { get; set; }
+
+        [XmlElement]
+        public string BattleAgainstUri { get; set; }
+
+        [XmlElement]
+        public int MaxHealth { get; set; }
+
+        [XmlElement]
+        public int CurrentHealth { get; set; }
+
+        [XmlElement]
+        public int Speed { get; set; }
+
+        [XmlArray("Moves")]
+        [XmlArrayItem("Move")]
+        public List<Move> PokemonMoves { get; set; }
 
         public Pokemon() { }
-        public Pokemon(string pokemonName, Uri previewUri, Uri battleForUri, Uri battleAgainstUri, List<Move> moves, int maxHealth, int speed)
+
+        public Pokemon(string name, Uri previewUri, Uri battleForUri, Uri battleAgainstUri, List<Move> moves, int maxHealth, int speed)
         {
-            this.pokemonName = pokemonName;
-            this.previewUri = previewUri;
-            this.battleForUri = battleForUri;
-            this.battleAgainstUri = battleAgainstUri;
-            pokemonMoves = moves;
-            this.maxHealth = maxHealth;
-            currentHealth = maxHealth;
-            this.speed = speed;
+            Name = name;
+            PreviewUri = previewUri.ToString();
+            BattleForUri = battleForUri.ToString();
+            BattleAgainstUri = battleAgainstUri.ToString();
+            PokemonMoves = moves;
+            MaxHealth = maxHealth;
+            CurrentHealth = maxHealth;
+            Speed = speed;
         }
-
-        public string Name { get { return pokemonName; } }
-
-        // Pokemons static image:
-        public Uri PreviewUri { get { return previewUri; } }
-
-        // Pokemons backside gif:
-        public Uri BattleForUri { get { return battleForUri; } }
-
-        // Pokemons frontside gif:
-        public Uri BattleAgainstUri { get { return battleAgainstUri; } }
-
-        public int Health { get { return maxHealth; } }
-
-        public int Speed { get { return speed; } }
 
         /// <summary>
         /// Gets a move based on the position of the move in the list
@@ -53,8 +55,8 @@ namespace Avans_PokeBattles
         /// <param name="position"></param>
         public Move GetMove(int position)
         {
-            if (position >= 0 && position < pokemonMoves.Count)
-                return pokemonMoves[position];
+            if (position >= 0 && position < PokemonMoves.Count)
+                return PokemonMoves[position];
             return null;
         }
 
@@ -64,7 +66,7 @@ namespace Avans_PokeBattles
         public Move GetRandomMove()
         {
             Random random = new Random();
-            return pokemonMoves[random.Next(pokemonMoves.Count)];
+            return PokemonMoves[random.Next(PokemonMoves.Count)];
         }
 
     }
