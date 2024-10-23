@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Xml.Serialization;
@@ -79,11 +80,10 @@ namespace Avans_PokeBattles.Server
                 player2 = client;
                 stream2 = client.GetStream();
                 IsFull = true;  // Lobby is full when both players have joined
-                StartGame();  // Start game when the lobby is full
             }
         }
 
-        private async void StartGame()
+        public async void StartGame()
         {
             // Assign random teams of 6 Pokémon to both players (allowing duplicates)
             List<Pokemon> player1Team = AssignRandomTeam();
@@ -118,19 +118,17 @@ namespace Avans_PokeBattles.Server
         private async Task SendTeam(NetworkStream stream, List<Pokemon> team, int playerNumber)
         {
             StringBuilder teamMessage = new StringBuilder();
-            teamMessage.Append($"Player {playerNumber} team: ");
+            teamMessage.Append($"Player {playerNumber} team: \n");
 
             foreach (Pokemon pokemon in team)
             {
-                teamMessage.Append($"{SerializePokemon(pokemon)}, "); // Add the serialized Pokemon to the message
-                foreach (Move move in pokemon.PokemonMoves)
-                {
-                    teamMessage.Append($"{SerializeMove(move)}, "); // Add the serialized Move to the message
-                }
+                // Add the serialized Pokemon with it's Moves to the message
+                teamMessage.Append($"{SerializePokemon(pokemon)},\n");
             }
 
             // Send the team data to the player
-            await SendMessage(stream, teamMessage.ToString().TrimEnd(','));
+            string stringMessage = teamMessage.ToString().TrimEnd('\n');
+            await SendMessage(stream, stringMessage.TrimEnd(','));
         }
 
         /// <summary>
@@ -146,24 +144,9 @@ namespace Avans_PokeBattles.Server
             using (StringWriter textWriter = new StringWriter())
             {
                 xmlSerializer.Serialize(textWriter, pokemonToSerialize); // Serialize the Pokemon
-                return textWriter.ToString(); // Return Serialized Pokemon in string form
-            }
-        }
-
-        /// <summary>
-        /// Helper method to serialize a Move to a string
-        /// Inspiration from StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
-        /// </summary>
-        /// <typeparam name="Move"></typeparam>
-        /// <param name="moveToSerialize"></param>
-        public static string SerializeMove<Move>(Move moveToSerialize)
-        {
-            XmlSerializer xmlSerializer = new XmlSerializer(moveToSerialize.GetType());
-
-            using (StringWriter textWriter = new StringWriter())
-            {
-                xmlSerializer.Serialize(textWriter, moveToSerialize); // Serialize the Move
-                return textWriter.ToString(); // Return Serialized Move in string form
+                string s = textWriter.ToString() + "\n"; // Return Serialized Pokemon in string form
+                Debug.WriteLine(s);
+                return s;
             }
         }
 
@@ -237,6 +220,11 @@ namespace Avans_PokeBattles.Server
         {
             byte[] response = Encoding.UTF8.GetBytes(message);
             await stream.WriteAsync(response, 0, response.Length);
+        }
+
+        private bool IsGameFull()
+        {
+            return this.IsFull;
         }
 
     }

@@ -30,7 +30,7 @@ namespace Avans_PokeBattles.Server
         private async Task HandleClientAsync(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[1500];
+            byte[] buffer = new byte[10000];
             while (client.Connected)
             {
                 int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);

@@ -52,5 +52,11 @@ namespace Avans_PokeBattles.Server
             return lobbies[lobbyNumber-1].IsFull;
         }
 
+        // Get current Lobby
+        public Lobby GetCurrentLobby(int lobbyNumber)
+        {
+            return lobbies[lobbyNumber - 1];
+        }
+
     }
 }
