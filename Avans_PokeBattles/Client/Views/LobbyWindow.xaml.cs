@@ -52,7 +52,7 @@ namespace Avans_PokeBattles.Client
 
         private async Task ListenForServerMessages()
         {
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[16384];
             while (true)
             {
                 int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
@@ -75,42 +75,32 @@ namespace Avans_PokeBattles.Client
 
         private void ProcessTeamData(string message)
         {
-            // Deserialize the team data
             if (message.StartsWith("Player 1 team:"))
             {
-                player1Team = DeserializeTeamData(message);
-                // Show the team for Player 1 (local player)
+                player1Team = DeserializeTeamData(message.Substring("Player 1 team:".Length));
                 ShowPlayer1Team();
             }
             else if (message.StartsWith("Player 2 team:"))
             {
-                player2Team = DeserializeTeamData(message);
-                // Show the team for Player 2 (opponent)
+                player2Team = DeserializeTeamData(message.Substring("Player 2 team:".Length));
                 ShowPlayer2Team();
             }
         }
 
-        private List<Pokemon> DeserializeTeamData(string message)
+        private List<Pokemon> DeserializeTeamData(string serializedTeam)
         {
-            List<Pokemon> team = new List<Pokemon>();
-            string[] serializedPokemonArray = message.Split(':')[1].Trim().Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var serializedPokemon in serializedPokemonArray)
+            List<Pokemon> team;
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Pokemon>));
+            using (StringReader reader = new StringReader(serializedTeam))
             {
-                // Deserialize each Pokémon using XML Serializer
-                XmlSerializer serializer = new XmlSerializer(typeof(Pokemon));
-                using (TextReader reader = new StringReader(serializedPokemon))
-                {
-                    var pokemon = (Pokemon)serializer.Deserialize(reader);
-                    team.Add(pokemon);
-                }
+                team = (List<Pokemon>)serializer.Deserialize(reader);
             }
-
             return team;
         }
 
         private void ShowPlayer1Team()
         {
+            Console.WriteLine(player1Team[0].PreviewUri);
             P1Pokemon1Preview.Source = new BitmapImage(new Uri(player1Team[0].PreviewUri, UriKind.Absolute));
             P1Pokemon2Preview.Source = new BitmapImage(new Uri(player1Team[1].PreviewUri, UriKind.Absolute));
             P1Pokemon3Preview.Source = new BitmapImage(new Uri(player1Team[2].PreviewUri, UriKind.Absolute));

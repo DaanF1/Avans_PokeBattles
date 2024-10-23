@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Avans_PokeBattles.Server
 {
@@ -14,11 +16,13 @@ namespace Avans_PokeBattles.Server
         private TcpClient player2;
         private string player1Name = null;
         private string player2Name = null;
+        private PokemonLister pokemonLister = new PokemonLister();
 
         public async void Start()
         {
             listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
+            AddInitialPokemon(pokemonLister);
             Console.WriteLine("Server started. Waiting for connections...");
 
             while (true)
@@ -77,15 +81,111 @@ namespace Avans_PokeBattles.Server
 
         private async Task StartGame()
         {
+            // Randomly assign teams to both players
+            var player1Team = RandomizeTeam(pokemonLister);
+            var player2Team = RandomizeTeam(pokemonLister);
+
+            // Serialize the teams
+            string player1TeamSerialized = SerializeTeam(player1Team);
+            string player2TeamSerialized = SerializeTeam(player2Team);
+
             NetworkStream stream1 = player1.GetStream();
             NetworkStream stream2 = player2.GetStream();
 
-            // Notify both players to open their game window
+            // Notify both players to open their game window and send the teams
             await SendMessage(stream1, $"start-game:Player 1:{player1Name},Player 2:{player2Name}");
             await SendMessage(stream2, $"start-game:Player 1:{player1Name},Player 2:{player2Name}");
 
-            // You can now send initial game state (team selection, etc.) to both players here
+            // Send team data to both players
+            Console.WriteLine($"Sending to Player 1: Player 1 team:{player1TeamSerialized}");
+            await SendMessage(stream1, $"Player 1 team:{player1TeamSerialized}");
+            Console.WriteLine($"Sending to Player 2: Player 2 team:{player2TeamSerialized}");
+            await SendMessage(stream2, $"Player 2 team:{player2TeamSerialized}");
+
             Task.Run(() => HandleGameLogic(player1, stream1, player2, stream2));
+        }
+
+        private void AddInitialPokemon(PokemonLister lister)
+        {
+            string baseUri = System.AppDomain.CurrentDomain.BaseDirectory + "Images/";
+
+            var venusaur = new Pokemon(
+        "Venusaur",
+        new Uri(baseUri + "mVenusaurPreview.png", UriKind.Absolute),
+        new Uri(baseUri + "mVenusaurFor.gif", UriKind.Absolute),
+        new Uri(baseUri + "mVenusaurAgainst.gif", UriKind.Absolute),
+        new List<Move>
+        {
+            new Move("Tackle", 40, 100, Type.Normal),
+            new Move("Vine Whip", 45, 100, Type.Grass),
+            new Move("Razor Leaf", 55, 95, Type.Grass),
+            new Move("Solar Beam", 120, 100, Type.Grass)
+        },
+        200,
+        80
+    );
+
+            var charizard = new Pokemon(
+                "Charizard",
+                new Uri(baseUri + "aCharizardPreview.png", UriKind.Absolute),
+                new Uri(baseUri + "aCharizardFor.gif", UriKind.Absolute),
+                new Uri(baseUri + "aCharizardAgainst.gif", UriKind.Absolute),
+                new List<Move>
+                {
+            new Move("Scratch", 40, 100, Type.Normal),
+            new Move("Flamethrower", 90, 100, Type.Fire),
+            new Move("Fire Spin", 35, 85, Type.Fire),
+            new Move("Dragon Claw", 80, 100, Type.Fire)
+                },
+                200,
+                100
+            );
+
+            var blastoise = new Pokemon(
+                "Blastoise",
+                new Uri(baseUri + "aBlastoisePreview.png", UriKind.Absolute),
+                new Uri(baseUri + "aBlastoiseFor.gif", UriKind.Absolute),
+                new Uri(baseUri + "aBlastoiseAgainst.gif", UriKind.Absolute),
+                new List<Move>
+                {
+            new Move("Tackle", 40, 100, Type.Normal),
+            new Move("Water Gun", 40, 100, Type.Water),
+            new Move("Hydro Pump", 110, 80, Type.Water),
+            new Move("Surf", 90, 100, Type.Water)
+                },
+                200,
+                70
+            );
+
+            // Add Pokémon to the list
+            lister.AddPokemon(venusaur);
+            lister.AddPokemon(charizard);
+            lister.AddPokemon(blastoise);
+        }
+
+        private List<Pokemon> RandomizeTeam(PokemonLister lister)
+        {
+            var team = new List<Pokemon>();
+
+            team.Add(lister.GetPokemon("Venusaur"));
+            team.Add(lister.GetPokemon("Charizard"));
+            team.Add(lister.GetPokemon("Blastoise"));
+            team.Add(lister.GetPokemon("Venusaur"));
+            team.Add(lister.GetPokemon("Charizard"));
+            team.Add(lister.GetPokemon("Blastoise"));
+
+            // Shuffle the team
+            return team.OrderBy(x => Guid.NewGuid()).ToList();
+        }
+
+        private string SerializeTeam(List<Pokemon> team)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Pokemon>));
+            using (StringWriter writer = new StringWriter())
+            {
+                serializer.Serialize(writer, team);
+                return writer.ToString();
+            }
         }
 
         private async Task HandleGameLogic(TcpClient player1, NetworkStream stream1, TcpClient player2, NetworkStream stream2)
