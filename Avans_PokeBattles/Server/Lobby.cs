@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System.Diagnostics;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Xml.Serialization;
@@ -80,12 +81,10 @@ namespace Avans_PokeBattles.Server
                 player2 = client;
                 stream2 = client.GetStream();
                 IsFull = true;  // Lobby is full when both players have joined
-                Console.WriteLine("Player 2 has joined the lobby.");
-                StartGame();  // Start game when the lobby is full
             }
         }
 
-        private async void StartGame()
+        public async void StartGame()
         {
             // Assign random teams of 6 Pokémon to both players (allowing duplicates)
             List<Pokemon> player1Team = AssignRandomTeam();
@@ -120,15 +119,36 @@ namespace Avans_PokeBattles.Server
         private async Task SendTeam(NetworkStream stream, List<Pokemon> team, int playerNumber)
         {
             StringBuilder teamMessage = new StringBuilder();
-            teamMessage.Append($"Player {playerNumber} team: ");
+            teamMessage.Append($"Player {playerNumber} team: \n");
 
             foreach (Pokemon pokemon in team)
             {
-                teamMessage.Append($"{SerializeObject(pokemon)}, "); // Add the serialized Pokemon to the message
+                // Add the serialized Pokemon with it's Moves to the message
+                teamMessage.Append($"{SerializePokemon(pokemon)},\n");
             }
 
             // Send the team data to the player
-            await SendMessage(stream, teamMessage.ToString().TrimEnd(','));
+            string stringMessage = teamMessage.ToString().TrimEnd('\n');
+            await SendMessage(stream, stringMessage.TrimEnd(','));
+        }
+
+        /// <summary>
+        /// Helper method to serialize a Pokemon to a string
+        /// Inspiration from StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
+        /// </summary>
+        /// <typeparam name="Pokemon"></typeparam>
+        /// <param name="pokemonToSerialize"></param>
+        public static string SerializePokemon<Pokemon>(Pokemon pokemonToSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(pokemonToSerialize.GetType());
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(textWriter, pokemonToSerialize); // Serialize the Pokemon
+                string s = textWriter.ToString() + "\n"; // Return Serialized Pokemon in string form
+                Debug.WriteLine(s);
+                return s;
+            }
         }
 
         private async Task HandleClient(TcpClient sender, NetworkStream senderStream, TcpClient receiver, NetworkStream receiverStream)
@@ -204,21 +224,10 @@ namespace Avans_PokeBattles.Server
             await stream.FlushAsync();
         }
 
-        /// <summary>
-        /// Helper method to serialize an object to a string
-        /// StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="toSerialize"></param>
-        public static string SerializeObject<T>(T toSerialize)
+        private bool IsGameFull()
         {
-            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
-
-            using (StringWriter textWriter = new StringWriter())
-            {
-                xmlSerializer.Serialize(textWriter, toSerialize); // Serialize the object
-                return textWriter.ToString(); // Return Serialized object in string form
-            }
+            return this.IsFull;
         }
+
     }
 }

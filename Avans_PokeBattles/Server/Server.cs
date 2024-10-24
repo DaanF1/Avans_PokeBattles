@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -45,8 +45,7 @@ namespace Avans_PokeBattles.Server
         private async Task HandleClient(TcpClient client, int playerNumber)
         {
             NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[1500];
-
+            byte[] buffer = new byte[10000];
             while (client.Connected)
             {
                 int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);

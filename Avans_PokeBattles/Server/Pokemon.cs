@@ -1,6 +1,9 @@
-﻿using Avans_PokeBattles.Server;
+using Avans_PokeBattles.Server;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Avans_PokeBattles
@@ -47,6 +50,10 @@ namespace Avans_PokeBattles
             Speed = speed;
         }
 
+        /// <summary>
+        /// Gets a move based on the position of the move in the list
+        /// </summary>
+        /// <param name="position"></param>
         public Move GetMove(int position)
         {
             if (position >= 0 && position < PokemonMoves.Count)
