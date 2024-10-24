@@ -49,7 +49,7 @@ namespace Avans_PokeBattles.Server
         // Check if a specific lobby is full
         public bool IsLobbyFull(int lobbyNumber)
         {
-            return lobbies[lobbyNumber].IsFull;
+            return lobbies[lobbyNumber - 1].IsFull;
         }
 
         // Get current Lobby

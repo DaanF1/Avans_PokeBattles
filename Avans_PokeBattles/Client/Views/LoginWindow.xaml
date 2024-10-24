@@ -14,8 +14,7 @@
                  TextWrapping="NoWrap"  
                  Width="150" 
                  Height="20"  
-                 Text="Enter your name..." 
-                 GotFocus="txtName_GotFocus"/>
+                 Text="Enter your name..." />
         <Button x:Name="btnLogin" 
                 Margin="0,25,0,0" 
                 Content="Login" 

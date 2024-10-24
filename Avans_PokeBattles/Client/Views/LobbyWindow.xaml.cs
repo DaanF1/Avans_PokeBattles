@@ -1,13 +1,9 @@
-using System.IO;
 using System.Media;
-using System.Net.Sockets;
 using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Xml.Serialization;
 using Avans_PokeBattles.Server;
 
 namespace Avans_PokeBattles.Client
@@ -17,11 +13,6 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class LobbyWindow : Window
     {
-        private TcpClient tcpClient;
-        private NetworkStream stream;
-        private List<Pokemon> player1Team;
-        private List<Pokemon> player2Team;
-
         // Public PokemonLister
         private PokemonLister lister = new PokemonLister();
 
@@ -35,88 +26,15 @@ namespace Avans_PokeBattles.Client
         public MediaPlayer playerBattleMusic = new MediaPlayer();
         public MediaPlayer hitPlayer = new MediaPlayer();
 
-        public LobbyWindow(TcpClient client)
+        public LobbyWindow()
         {
             InitializeComponent();
 
             // Set name
             lblPlayer1Name.Content = ""; //playerName;
 
-            this.tcpClient = client;
-            this.stream = client.GetStream();
-
-            Task.Run(() => ListenForServerMessages());
             // Play Music
-            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
-        }
-
-        private async Task ListenForServerMessages()
-        {
-            byte[] buffer = new byte[16384];
-            while (true)
-            {
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-                if (bytesRead > 0)
-                {
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-                    if (message.StartsWith("Player 1 team:") || message.StartsWith("Player 2 team:"))
-                    {
-                        ProcessTeamData(message);
-                    }
-                    else
-                    {
-                        // Process other messages such as move commands
-                        Console.WriteLine(message);
-                    }
-                }
-            }
-        }
-
-        private void ProcessTeamData(string message)
-        {
-            if (message.StartsWith("Player 1 team:"))
-            {
-                player1Team = DeserializeTeamData(message.Substring("Player 1 team:".Length));
-                ShowPlayer1Team();
-            }
-            else if (message.StartsWith("Player 2 team:"))
-            {
-                player2Team = DeserializeTeamData(message.Substring("Player 2 team:".Length));
-                ShowPlayer2Team();
-            }
-        }
-
-        private List<Pokemon> DeserializeTeamData(string serializedTeam)
-        {
-            List<Pokemon> team;
-            XmlSerializer serializer = new XmlSerializer(typeof(List<Pokemon>));
-            using (StringReader reader = new StringReader(serializedTeam))
-            {
-                team = (List<Pokemon>)serializer.Deserialize(reader);
-            }
-            return team;
-        }
-
-        private void ShowPlayer1Team()
-        {
-            Console.WriteLine(player1Team[0].PreviewUri);
-            P1Pokemon1Preview.Source = new BitmapImage(new Uri(player1Team[0].PreviewUri, UriKind.Absolute));
-            P1Pokemon2Preview.Source = new BitmapImage(new Uri(player1Team[1].PreviewUri, UriKind.Absolute));
-            P1Pokemon3Preview.Source = new BitmapImage(new Uri(player1Team[2].PreviewUri, UriKind.Absolute));
-            P1Pokemon4Preview.Source = new BitmapImage(new Uri(player1Team[3].PreviewUri, UriKind.Absolute));
-            P1Pokemon5Preview.Source = new BitmapImage(new Uri(player1Team[4].PreviewUri, UriKind.Absolute));
-            P1Pokemon6Preview.Source = new BitmapImage(new Uri(player1Team[5].PreviewUri, UriKind.Absolute));
-        }
-
-        private void ShowPlayer2Team()
-        {
-            P2Pokemon1Preview.Source = new BitmapImage(new Uri(player2Team[0].PreviewUri, UriKind.Absolute));
-            P2Pokemon2Preview.Source = new BitmapImage(new Uri(player2Team[1].PreviewUri, UriKind.Absolute));
-            P2Pokemon3Preview.Source = new BitmapImage(new Uri(player2Team[2].PreviewUri, UriKind.Absolute));
-            P2Pokemon4Preview.Source = new BitmapImage(new Uri(player2Team[3].PreviewUri, UriKind.Absolute));
-            P2Pokemon5Preview.Source = new BitmapImage(new Uri(player2Team[4].PreviewUri, UriKind.Absolute));
-            P2Pokemon6Preview.Source = new BitmapImage(new Uri(player2Team[5].PreviewUri, UriKind.Absolute));
+            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
         }
 
         /// <summary>
@@ -187,17 +105,17 @@ namespace Avans_PokeBattles.Client
 
         private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void btnOption1_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void btnOption2_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void btnOption3_Click(object sender, RoutedEventArgs e)
@@ -235,12 +153,12 @@ namespace Avans_PokeBattles.Client
         /// </summary>
         private async void GetServerMessages()
         {
-           await Task.Run(() =>
-           {
+            await Task.Run(() =>
+            {
 
-           });
+            });
         }
-        
+
         private void SetPlayer1Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
@@ -321,7 +239,7 @@ namespace Avans_PokeBattles.Client
         //        SetPlayer2PokemonHealth(player2.GetPokemon(0).Health);
 
         //        SelectMove();
-                
+
         //    }
         //}
 
