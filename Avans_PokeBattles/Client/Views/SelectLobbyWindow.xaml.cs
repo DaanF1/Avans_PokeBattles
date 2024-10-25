@@ -118,13 +118,14 @@ namespace Avans_PokeBattles.Client
 
                 // Start the Game
                 Lobby lobby = lobbyManager.GetCurrentLobby(lobbyNumber);
-                lobby.StartGame();
+                
 
                 // Dispatcher.Invoke because we are still on the main thread
                 await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => {
                     // Show the game window and close the current window
-                    var gameWindow = new LobbyWindow();
+                    var gameWindow = new LobbyWindow(tcpClient);
                     gameWindow.Show();
+                    lobby.StartGame();
                     this.Close();
                 }));
                 break;

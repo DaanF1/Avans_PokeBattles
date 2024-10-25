@@ -52,17 +52,24 @@ namespace Avans_PokeBattles.Server
                 }
                 else if (message.StartsWith("join-lobby"))
                 {
-                    // Parse the lobby ID from the message (e.g., "join-lobby:Lobby-1")
+                    // Parse the lobby ID from the message
                     string[] splitMessage = message.Split(':');
                     if (splitMessage.Length == 2)
                     {
                         string lobbyId = splitMessage[1];
                         bool joined = lobbyManager.TryJoinLobby(lobbyId, client);
 
-                        // Notify the client if joining the lobby was successful or not
+                        // Notify the client if joining the lobby was successful
                         string responseMessage = joined ? "lobby-joined" : "lobby-full";
                         byte[] response = Encoding.UTF8.GetBytes(responseMessage);
                         await stream.WriteAsync(response, 0, response.Length);
+
+                        // If lobby is now full, start game and send teams
+                        if (joined && lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1])).IsFull)
+                        {
+                            var lobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
+                            lobby.StartGame();
+                        }
                     }
                 }
             }

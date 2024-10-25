@@ -1,5 +1,7 @@
 using System.Media;
+using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,6 +17,7 @@ namespace Avans_PokeBattles.Client
     {
         // Public PokemonLister
         private PokemonLister lister = new PokemonLister();
+        private TcpClient tcpClient;
 
         // Uri prefixes for loading images
         public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -26,15 +29,89 @@ namespace Avans_PokeBattles.Client
         public MediaPlayer playerBattleMusic = new MediaPlayer();
         public MediaPlayer hitPlayer = new MediaPlayer();
 
-        public LobbyWindow()
+        public LobbyWindow(TcpClient client)
         {
             InitializeComponent();
 
             // Set name
             lblPlayer1Name.Content = ""; //playerName;
+            tcpClient = client;
 
             // Play Music
-            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            GetServerMessages();
+        }
+
+        private async void GetServerMessages()
+        {
+            NetworkStream stream = tcpClient.GetStream();
+            byte[] buffer = new byte[10000];
+            while (tcpClient.Connected)
+            {
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead == 0) break;
+
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine($"Received from server: {message}");
+
+                // Check if the message is a team info message
+                if (message.StartsWith("team-info:"))
+                {
+                    // Remove the "team-info:" prefix before displaying teams
+                    string teamInfoMessage = message.Substring("team-info:".Length).Trim();
+                    DisplayTeams(teamInfoMessage);
+                }
+                else
+                {
+                    // Handle other types of messages if necessary
+                    Console.WriteLine($"Unhandled message: {message}");
+                }
+            }
+        }
+
+
+        private void DisplayTeams(string teamMessage)
+        {
+            var lines = teamMessage.Split('\n');
+            bool opponentSection = false;
+            int p1Index = 1, p2Index = 1;
+
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("Opponent")) opponentSection = true;
+
+                if (!opponentSection && line.Contains("Player"))
+                {
+                    // Skip "Player team" header line
+                    continue;
+                }
+                else if (!opponentSection && !string.IsNullOrWhiteSpace(line))
+                {
+                    // Update Player 1's team
+                    switch (p1Index++)
+                    {
+                        case 1: P1Pokemon1Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
+                        case 2: P1Pokemon2Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
+                        case 3: P1Pokemon3Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
+                        case 4: P1Pokemon4Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
+                        case 5: P1Pokemon5Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
+                        case 6: P1Pokemon6Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
+                    }
+                }
+                else if (opponentSection && !string.IsNullOrWhiteSpace(line))
+                {
+                    // Update Player 2's team (Opponent)
+                    switch (p2Index++)
+                    {
+                        case 1: P2Pokemon1Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
+                        case 2: P2Pokemon2Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
+                        case 3: P2Pokemon3Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
+                        case 4: P2Pokemon4Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
+                        case 5: P2Pokemon5Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
+                        case 6: P2Pokemon6Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -148,16 +225,6 @@ namespace Avans_PokeBattles.Client
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
         }
 
-        /// <summary>
-        /// Self-made methods
-        /// </summary>
-        private async void GetServerMessages()
-        {
-            await Task.Run(() =>
-            {
-
-            });
-        }
 
         private void SetPlayer1Pokemon(Uri pokemonUri)
         {
