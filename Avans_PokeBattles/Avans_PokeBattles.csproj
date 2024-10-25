@@ -68,13 +68,13 @@
     <None Update="Sprites\aUnownPreview.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sprites\mVenusaurAgainst.gif">
+    <None Update="Sprites\aVenusaurAgainst.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sprites\mVenusaurPreview.png">
+    <None Update="Sprites\aVenusaurPreview.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sprites\mVenusaurFor.gif">
+    <None Update="Sprites\aVenusaurFor.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

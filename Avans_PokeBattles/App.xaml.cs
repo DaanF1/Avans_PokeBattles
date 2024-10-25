@@ -24,11 +24,10 @@ namespace Avans_PokeBattles
             AllocConsole();
 
             // Start Server
-            Task.Run(() =>
-            {
+            
                 var server = new Server.Server();
                 server.Start();
-            });
+            
 
             // Start Client 1
             var client1 = new Client.LoginWindow();
