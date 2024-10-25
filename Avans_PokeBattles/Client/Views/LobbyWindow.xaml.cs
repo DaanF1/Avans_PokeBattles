@@ -78,41 +78,67 @@ namespace Avans_PokeBattles.Client
 
             foreach (string line in lines)
             {
-                if (line.StartsWith("Opponent")) opponentSection = true;
+                // Identify the header for the opponent's team and start processing opponent Pokémon after this line
+                if (line.StartsWith("Opponent"))
+                {
+                    opponentSection = true;
+                    continue; // Skip the header line
+                }
 
+                // Skip the "Player team" header line for Player 1
                 if (!opponentSection && line.Contains("Player"))
                 {
-                    // Skip "Player team" header line
-                    continue;
+                    continue; // Skip the header line
                 }
-                else if (!opponentSection && !string.IsNullOrWhiteSpace(line))
+
+                // Process Player 1's Pokémon
+                if (!opponentSection && !string.IsNullOrWhiteSpace(line))
                 {
-                    // Update Player 1's team
+                    // Set the preview images for Player 1
+                    Uri previewUri = new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind);
                     switch (p1Index++)
                     {
-                        case 1: P1Pokemon1Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
-                        case 2: P1Pokemon2Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
-                        case 3: P1Pokemon3Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
-                        case 4: P1Pokemon4Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
-                        case 5: P1Pokemon5Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
-                        case 6: P1Pokemon6Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind)); break;
+                        case 1: P1Pokemon1Preview.Source = new BitmapImage(previewUri); break;
+                        case 2: P1Pokemon2Preview.Source = new BitmapImage(previewUri); break;
+                        case 3: P1Pokemon3Preview.Source = new BitmapImage(previewUri); break;
+                        case 4: P1Pokemon4Preview.Source = new BitmapImage(previewUri); break;
+                        case 5: P1Pokemon5Preview.Source = new BitmapImage(previewUri); break;
+                        case 6: P1Pokemon6Preview.Source = new BitmapImage(previewUri); break;
+                    }
+
+                    // Load the For.gif for the first Pokémon of Player 1 into PokemonPlayer1 MediaElement
+                    if (p1Index == 2) // Ensures it only sets the first Pokémon
+                    {
+                        Uri forGifUri = new Uri($"{dirPrefix}/Sprites/a{line}For.gif", standardUriKind);
+                        PokemonPlayer1.Source = forGifUri;
                     }
                 }
+
+                // Process Player 2's Pokémon (Opponent section)
                 else if (opponentSection && !string.IsNullOrWhiteSpace(line))
                 {
-                    // Update Player 2's team (Opponent)
+                    // Set the preview images for Player 2
+                    Uri previewUri = new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind);
                     switch (p2Index++)
                     {
-                        case 1: P2Pokemon1Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
-                        case 2: P2Pokemon2Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
-                        case 3: P2Pokemon3Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
-                        case 4: P2Pokemon4Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
-                        case 5: P2Pokemon5Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
-                        case 6: P2Pokemon6Preview.Source = new BitmapImage(new Uri($"{dirPrefix}/Sprites/a{line}Against.png", standardUriKind)); break;
+                        case 1: P2Pokemon1Preview.Source = new BitmapImage(previewUri); break;
+                        case 2: P2Pokemon2Preview.Source = new BitmapImage(previewUri); break;
+                        case 3: P2Pokemon3Preview.Source = new BitmapImage(previewUri); break;
+                        case 4: P2Pokemon4Preview.Source = new BitmapImage(previewUri); break;
+                        case 5: P2Pokemon5Preview.Source = new BitmapImage(previewUri); break;
+                        case 6: P2Pokemon6Preview.Source = new BitmapImage(previewUri); break;
+                    }
+
+                    // Load the Against.gif for the first Pokémon of Player 2 into PokemonPlayer2 MediaElement
+                    if (p2Index == 2) // Ensures it only sets the first Pokémon
+                    {
+                        Uri againstGifUri = new Uri($"{dirPrefix}/Sprites/a{line}Against.gif", standardUriKind);
+                        PokemonPlayer2.Source = againstGifUri;
                     }
                 }
             }
         }
+
 
         /// <summary>
         /// Generated methods

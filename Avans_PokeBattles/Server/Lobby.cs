@@ -87,6 +87,8 @@ namespace Avans_PokeBattles.Server
             List<Pokemon> player1Team = AssignRandomTeam();
             List<Pokemon> player2Team = AssignRandomTeam();
 
+            Console.WriteLine("Sending 'start-game' signal to both players...");
+
             await SendMessage(stream1, "start-game");
             await SendMessage(stream2, "start-game");
 
@@ -94,9 +96,11 @@ namespace Avans_PokeBattles.Server
             await SendTeam(stream1, player1Team, player2Team, 1); 
             await SendTeam(stream2, player2Team, player1Team, 2);
 
+            Console.WriteLine("Start-game messages sent to both players.");
+
             // Start the turn-based interaction
-            await SendMessage(stream1, "It's your turn. Choose a move.");
-            await SendMessage(stream2, "Waiting for Player 1 to choose a move.");
+            //await SendMessage(stream1, "It's your turn. Choose a move.");
+            //await SendMessage(stream2, "Waiting for Player 1 to choose a move.");
 
             Task.Run(() => HandleClient(player1, stream1, player2, stream2));
             Task.Run(() => HandleClient(player2, stream2, player1, stream1));

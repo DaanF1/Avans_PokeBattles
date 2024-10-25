@@ -40,13 +40,13 @@ namespace Avans_PokeBattles.Client
         private async Task JoinLobby(string lobbyId, int number)
         {
             lobbyNumber = number;
-            bool joined = lobbyManager.TryJoinLobby(lobbyId, tcpClient);
-            if (joined)
-            {
-                byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {lobbyNumber}");
-                await stream.WriteAsync(buffer, 0, buffer.Length);
-                await WaitForGameStart();  // Now just wait for the server's start signal
-            }
+
+            // Send a join-lobby request to the server in a format it can recognize
+            byte[] buffer = Encoding.UTF8.GetBytes($"join-lobby:{lobbyId}");
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+
+            // Now wait for the "start-game" signal from the server
+            await WaitForGameStart();
         }
 
         /// <summary>
@@ -61,7 +61,17 @@ namespace Avans_PokeBattles.Client
                 if (bytesRead == 0) break;
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                if (message.StartsWith("start-game"))
+                Console.WriteLine($"Received message from server: {message}");
+
+                if (message == "lobby-joined")
+                {
+                    Console.WriteLine("Joined lobby successfully. Waiting for other player...");
+                }
+                else if (message == "lobby-full")
+                {
+                    Console.WriteLine("Lobby is full. Waiting for the game to start...");
+                }
+                else if (message.StartsWith("start-game"))
                 {
                     await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
@@ -72,6 +82,7 @@ namespace Avans_PokeBattles.Client
                     break;
                 }
             }
+            Console.WriteLine("Connection closed or no more messages from server.");
         }
     }
 }

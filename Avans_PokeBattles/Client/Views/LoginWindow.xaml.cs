@@ -49,7 +49,7 @@ namespace Avans_PokeBattles.Client
                 return;
             }
             // Send the players name to the server
-            byte[] buffer = Encoding.ASCII.GetBytes("Player name: " + name);
+            byte[] buffer = Encoding.UTF8.GetBytes("Player name: " + name);
             stream.Write(buffer, 0, buffer.Length);
 
             // Show the select lobby window and close the current window
