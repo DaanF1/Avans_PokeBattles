@@ -87,6 +87,9 @@ namespace Avans_PokeBattles.Server
             List<Pokemon> player1Team = AssignRandomTeam();
             List<Pokemon> player2Team = AssignRandomTeam();
 
+            await SendMessage(stream1, "start-game");
+            await SendMessage(stream2, "start-game");
+
             // Send teams to both players
             await SendTeam(stream1, player1Team, player2Team, 1); 
             await SendTeam(stream2, player2Team, player1Team, 2);

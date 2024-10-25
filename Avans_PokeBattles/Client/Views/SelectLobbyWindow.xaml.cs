@@ -1,26 +1,13 @@
 ﻿using Avans_PokeBattles.Server;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using System.Xml.Linq;
 
 namespace Avans_PokeBattles.Client
 {
-    /// <summary>
-    /// Interaction logic for SelectLobbyWindow.xaml
-    /// </summary>
     public partial class SelectLobbyWindow : Window
     {
         private TcpClient tcpClient;
@@ -37,7 +24,6 @@ namespace Avans_PokeBattles.Client
             this.tcpClient = client;
             this.stream = client.GetStream();
             this.lobbyManager = Server.Server.GetLobbymanager();
-            // Load in Player name
             this.playerName = name;
             lblName.Content = "Name: " + this.playerName;
         }
@@ -47,90 +33,45 @@ namespace Avans_PokeBattles.Client
             lobbyManager.GetLobbyList();
         }
 
-        private async void btnJoinLobby1_Click(object sender, RoutedEventArgs e)
+        private async void btnJoinLobby1_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-1", 1);
+        private async void btnJoinLobby2_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-2", 2);
+        private async void btnJoinLobby3_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-3", 3);
+
+        private async Task JoinLobby(string lobbyId, int number)
         {
-            // Try joining the lobby
-            lobbyNumber = 1;
-            bool joined = lobbyManager.TryJoinLobby("Lobby-1", tcpClient);
+            lobbyNumber = number;
+            bool joined = lobbyManager.TryJoinLobby(lobbyId, tcpClient);
             if (joined)
             {
-                // Send joining the lobby to the server
                 byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {lobbyNumber}");
                 await stream.WriteAsync(buffer, 0, buffer.Length);
-
-                // Wait in lobby
-                await Task.Run(async () =>
-                {
-                    await WaitingInLobby(lobbyNumber);
-                });
-            }
-        }
-
-        private async void btnJoinLobby2_Click(object sender, RoutedEventArgs e)
-        {
-            // Try joining the lobby
-            lobbyNumber = 2;
-            bool joined = lobbyManager.TryJoinLobby("Lobby-2", tcpClient);
-            if (joined)
-            {
-                // Send joining the lobby to the server
-                byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {lobbyNumber}");
-                await stream.WriteAsync(buffer, 0, buffer.Length);
-
-                // Wait in lobby
-                await Task.Run(async () =>
-                {
-                    await WaitingInLobby(lobbyNumber);
-                });
-            }
-        }
-
-        private async void btnJoinLobby3_Click(object sender, RoutedEventArgs e)
-        {
-            // Try joining the lobby
-            lobbyNumber = 3;
-            bool joined = lobbyManager.TryJoinLobby("Lobby-3", tcpClient);
-            if (joined)
-            {
-                // Send joining the lobby to the server
-                byte[] buffer = Encoding.ASCII.GetBytes($"{this.playerName} joined lobby {lobbyNumber}");
-                await stream.WriteAsync(buffer, 0, buffer.Length);
-
-                // Wait in lobby
-                await Task.Run(async () =>
-                {
-                    await WaitingInLobby(lobbyNumber);
-                });
+                await WaitForGameStart();  // Now just wait for the server's start signal
             }
         }
 
         /// <summary>
-        /// When joining a lobby, wait for another player to join
+        /// Wait for the server to signal the game start.
         /// </summary>
-        /// <returns></returns>
-        private async Task WaitingInLobby(int lobbyNumber)
+        private async Task WaitForGameStart()
         {
-            while (true)
+            byte[] buffer = new byte[10000];
+            while (tcpClient.Connected)
             {
-                bool lobbyIsFull = lobbyManager.IsLobbyFull(lobbyNumber);
-                if (!lobbyIsFull)
-                    continue;
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead == 0) break;
 
-                // Start the Game
-                Lobby lobby = lobbyManager.GetCurrentLobby(lobbyNumber);
-                
-
-                // Dispatcher.Invoke because we are still on the main thread
-                await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => {
-                    // Show the game window and close the current window
-                    var gameWindow = new LobbyWindow(tcpClient);
-                    gameWindow.Show();
-                    lobby.StartGame();
-                    this.Close();
-                }));
-                break;
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                if (message.StartsWith("start-game"))
+                {
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        var gameWindow = new LobbyWindow(tcpClient);
+                        gameWindow.Show();
+                        this.Close();
+                    });
+                    break;
+                }
             }
         }
-
     }
 }

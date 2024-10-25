@@ -52,7 +52,6 @@ namespace Avans_PokeBattles.Server
                 }
                 else if (message.StartsWith("join-lobby"))
                 {
-                    // Parse the lobby ID from the message
                     string[] splitMessage = message.Split(':');
                     if (splitMessage.Length == 2)
                     {
@@ -65,9 +64,9 @@ namespace Avans_PokeBattles.Server
                         await stream.WriteAsync(response, 0, response.Length);
 
                         // If lobby is now full, start game and send teams
-                        if (joined && lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1])).IsFull)
+                        Lobby lobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
+                        if (joined && lobby.IsFull)
                         {
-                            var lobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
                             lobby.StartGame();
                         }
                     }
@@ -76,6 +75,7 @@ namespace Avans_PokeBattles.Server
 
             client.Close();
         }
+
 
         // Get the lobby manager instance
         internal static LobbyManager GetLobbymanager()
