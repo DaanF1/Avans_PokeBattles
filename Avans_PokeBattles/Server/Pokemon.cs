@@ -1,4 +1,4 @@
-﻿using Avans_PokeBattles.Server;
+using Avans_PokeBattles.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,7 @@ using System.Xml.Serialization;
 
 namespace Avans_PokeBattles
 {
+    [Serializable]
     public class Pokemon
     {
         [XmlElement]
@@ -60,14 +61,10 @@ namespace Avans_PokeBattles
             return null;
         }
 
-        /// <summary>
-        /// Gets a random Move of the Pokemon
-        /// </summary>
         public Move GetRandomMove()
         {
             Random random = new Random();
             return PokemonMoves[random.Next(PokemonMoves.Count)];
         }
-
     }
 }

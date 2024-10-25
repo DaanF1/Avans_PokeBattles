@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -39,7 +39,7 @@ namespace Avans_PokeBattles.Server
             unownMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
             unownMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
             Pokemon unown = new Pokemon("Unown", new Uri(dirPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), unownMoves, 80, 90);
-            
+
             List<Move> venusaurMoves = new List<Move>();
             venusaurMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
             venusaurMoves.Add(new Move("Take Down", 90, 85, Type.Normal));

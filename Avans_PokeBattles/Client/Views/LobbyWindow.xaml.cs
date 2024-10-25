@@ -105,17 +105,17 @@ namespace Avans_PokeBattles.Client
 
         private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void btnOption1_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void btnOption2_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void btnOption3_Click(object sender, RoutedEventArgs e)
@@ -153,12 +153,12 @@ namespace Avans_PokeBattles.Client
         /// </summary>
         private async void GetServerMessages()
         {
-           await Task.Run(() =>
-           {
+            await Task.Run(() =>
+            {
 
-           });
+            });
         }
-        
+
         private void SetPlayer1Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
@@ -239,7 +239,7 @@ namespace Avans_PokeBattles.Client
         //        SetPlayer2PokemonHealth(player2.GetPokemon(0).Health);
 
         //        SelectMove();
-                
+
         //    }
         //}
 

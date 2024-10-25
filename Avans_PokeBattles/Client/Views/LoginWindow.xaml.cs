@@ -28,7 +28,7 @@ namespace Avans_PokeBattles.Client
             this.stream = tcpClient.GetStream();
         }
 
-        private void txtName_MouseDown(object sender, MouseButtonEventArgs e)
+        private void txtName_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             txtName.Text = "";
         }
