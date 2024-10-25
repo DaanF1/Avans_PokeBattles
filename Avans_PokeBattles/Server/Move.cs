@@ -11,13 +11,9 @@ namespace Avans_PokeBattles.Server
     public class Move
     {
         // Attributes
-        [XmlElement]
         public string MoveName { get; set; }
-        [XmlElement]
         public int MoveDamage { get; set; }
-        [XmlElement]
         public int MoveAccuracy { get; set; }
-        [XmlElement]
         public Type TypeOfAttack { get; set; }
 
         public Move() { }
