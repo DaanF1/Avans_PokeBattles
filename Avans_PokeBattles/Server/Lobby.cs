@@ -38,28 +38,28 @@ namespace Avans_PokeBattles.Server
             unownMoves.Add(new Move("Hydro Pump", 110, 80, Type.Water));
             unownMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
             unownMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
-            Pokemon unown = new Pokemon("Unown", new Uri(dirPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), unownMoves, 80, 90);
+            Pokemon unown = new Pokemon("Unown", new Uri(dirPrefix + "/Sprites/aUnownPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aUnownAgainst.gif", standardUriKind), Type.Normal, 80, 90, unownMoves);
 
             List<Move> venusaurMoves = new List<Move>();
             venusaurMoves.Add(new Move("Solar Beam", 120, 100, Type.Grass));
             venusaurMoves.Add(new Move("Take Down", 90, 85, Type.Normal));
             venusaurMoves.Add(new Move("Razor Leaf", 55, 95, Type.Grass));
             venusaurMoves.Add(new Move("Tackle", 40, 100, Type.Normal));
-            Pokemon venusaur = new Pokemon("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), venusaurMoves, 195, 70);
+            Pokemon venusaur = new Pokemon("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), Type.Grass, 195, 70, venusaurMoves);
 
             List<Move> charizardMoves = new List<Move>();
             charizardMoves.Add(new Move("Scratch", 40, 100, Type.Normal));
             charizardMoves.Add(new Move("Inferno", 100, 50, Type.Fire));
             charizardMoves.Add(new Move("Slash", 70, 100, Type.Normal));
             charizardMoves.Add(new Move("Flamethrower", 90, 100, Type.Fire));
-            Pokemon charizard = new Pokemon("Charizard", new Uri(dirPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind), charizardMoves, 125, 120);
+            Pokemon charizard = new Pokemon("Charizard", new Uri(dirPrefix + "/Sprites/aCharizardPreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind), Type.Fire, 125, 120, charizardMoves);
 
             List<Move> blastoiseMoves = new List<Move>();
             blastoiseMoves.Add(new Move("Hydro Pump", 110, 80, Type.Water));
             blastoiseMoves.Add(new Move("Aqua Tail", 90, 90, Type.Water));
             blastoiseMoves.Add(new Move("Tackle", 40, 100, Type.Normal));
             blastoiseMoves.Add(new Move("Rapid Spin", 50, 100, Type.Normal));
-            Pokemon blastoise = new Pokemon("Blastoise", new Uri(dirPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), blastoiseMoves, 145, 75);
+            Pokemon blastoise = new Pokemon("Blastoise", new Uri(dirPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), Type.Water, 145, 75, blastoiseMoves);
 
             // Add Pokemon to the lister
             pokemonLister.AddPokemon(unown);
