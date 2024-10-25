@@ -14,9 +14,7 @@ namespace Avans_PokeBattles.Server
         private NetworkStream stream2;
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
-
         private PokemonLister pokemonLister = new PokemonLister();  // List of available Pokémon to pick from
-
         public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
         public UriKind standardUriKind = UriKind.Absolute; // Always get the absolute path
 
@@ -89,13 +87,20 @@ namespace Avans_PokeBattles.Server
             List<Pokemon> player1Team = AssignRandomTeam();
             List<Pokemon> player2Team = AssignRandomTeam();
 
+            Console.WriteLine("Sending 'start-game' signal to both players...");
+
+            await SendMessage(stream1, "start-game");
+            await SendMessage(stream2, "start-game");
+
             // Send teams to both players
-            await SendTeam(stream1, player1Team, 1);
-            await SendTeam(stream2, player2Team, 2);
+            await SendTeam(stream1, player1Team, player2Team, 1); 
+            await SendTeam(stream2, player2Team, player1Team, 2);
+
+            Console.WriteLine("Start-game messages sent to both players.");
 
             // Start the turn-based interaction
-            await SendMessage(stream1, "It's your turn. Choose a move.");
-            await SendMessage(stream2, "Waiting for Player 1 to choose a move.");
+            //await SendMessage(stream1, "It's your turn. Choose a move.");
+            //await SendMessage(stream2, "Waiting for Player 1 to choose a move.");
 
             Task.Run(() => HandleClient(player1, stream1, player2, stream2));
             Task.Run(() => HandleClient(player2, stream2, player1, stream1));
@@ -105,7 +110,6 @@ namespace Avans_PokeBattles.Server
         {
             // Select 6 Pokémon randomly
             List<Pokemon> teamOfPlayer = new List<Pokemon>();
-
             for (int i = 0; i < 6; i++)
             {
                 Pokemon randomPokemon = pokemonLister.GetRandomPokemon(); // Allow duplicate Pokemon to be in the same team
@@ -115,20 +119,28 @@ namespace Avans_PokeBattles.Server
             return teamOfPlayer;
         }
 
-        private async Task SendTeam(NetworkStream stream, List<Pokemon> team, int playerNumber)
+        private async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
         {
             StringBuilder teamMessage = new StringBuilder();
-            teamMessage.Append($"Player {playerNumber} team: \n");
 
-            foreach (Pokemon pokemon in team)
+            teamMessage.Append("team-info:\n");
+
+            // Add player's own team names
+            teamMessage.Append($"Player {playerNumber} team:\n");
+            foreach (Pokemon pokemon in playerTeam)
             {
-                // Add the serialized Pokemon with it's Moves to the message
-                teamMessage.Append($"{SerializePokemon(pokemon)},\n");
+                teamMessage.Append($"{pokemon.Name}\n");
+            }
+
+            // Add opponent's team names as "against" versions
+            teamMessage.Append($"\nOpponent's team:\n");
+            foreach (Pokemon pokemon in opponentTeam)
+            {
+                teamMessage.Append($"{pokemon.Name}\n");
             }
 
             // Send the team data to the player
-            string stringMessage = teamMessage.ToString().TrimEnd('\n');
-            await SendMessage(stream, stringMessage.TrimEnd(','));
+            await SendMessage(stream, teamMessage.ToString().TrimEnd('\n'));
         }
 
         /// <summary>
