@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Type = Avans_PokeBattles.Server.Type;
 
 namespace Avans_PokeBattles
 {
@@ -24,6 +25,9 @@ namespace Avans_PokeBattles
         public string BattleAgainstUri { get; set; }
 
         [XmlElement]
+        public Type PokemonType { get; set; }
+
+        [XmlElement]
         public int MaxHealth { get; set; }
 
         [XmlElement]
@@ -38,16 +42,17 @@ namespace Avans_PokeBattles
 
         public Pokemon() { }
 
-        public Pokemon(string name, Uri previewUri, Uri battleForUri, Uri battleAgainstUri, List<Move> moves, int maxHealth, int speed)
+        public Pokemon(string name, Uri previewUri, Uri battleForUri, Uri battleAgainstUri, Type type, int maxHealth, int speed, List<Move> moves)
         {
             Name = name;
             PreviewUri = previewUri.ToString();
             BattleForUri = battleForUri.ToString();
             BattleAgainstUri = battleAgainstUri.ToString();
-            PokemonMoves = moves;
+            PokemonType = type;
             MaxHealth = maxHealth;
             CurrentHealth = maxHealth;
             Speed = speed;
+            PokemonMoves = moves;
         }
 
         /// <summary>
