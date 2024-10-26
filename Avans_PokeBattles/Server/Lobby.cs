@@ -90,7 +90,7 @@ namespace Avans_PokeBattles.Server
             List<Pokemon> player1Team = AssignRandomTeam();
             List<Pokemon> player2Team = AssignRandomTeam();
 
-            Console.WriteLine("Sending 'start-game' signal to both players...");
+            Console.WriteLine("LOBBY: Sending 'start-game' signal to both players...");
 
             await SendMessage(stream1, "start-game");
             await SendMessage(stream2, "start-game");
@@ -99,7 +99,7 @@ namespace Avans_PokeBattles.Server
             await SendTeam(stream1, player1Team, player2Team, 1);
             await SendTeam(stream2, player2Team, player1Team, 2);
 
-            Console.WriteLine("Start-game messages sent to both players.");
+            Console.WriteLine("LOBBY: Start-game messages sent to both players.");
 
             Task.Run(() => HandleClient(player1, stream1, player2, stream2));
             Task.Run(() => HandleClient(player2, stream2, player1, stream1));
@@ -119,11 +119,11 @@ namespace Avans_PokeBattles.Server
         }
 
         private async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
-        {
+            {
             StringBuilder teamMessage = new StringBuilder();
 
             // Indicate sending a Player's team:
-            teamMessage.Append($"Player {playerNumber} team:\n");
+            teamMessage.Append($"PlayerTeam {playerNumber} team:\n");
             await SendMessage(stream, teamMessage.ToString());
 
             // Send the team now:
@@ -153,7 +153,7 @@ namespace Avans_PokeBattles.Server
                     break;
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Message from player: {message}");
+                Console.WriteLine($"LOBBY: Message from player: {message}");
 
                 if (IsMoveMessage(message))
                 {
