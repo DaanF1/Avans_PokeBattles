@@ -1,11 +1,18 @@
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Media;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Markup.Localizer;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using Avans_PokeBattles.Server;
 
 namespace Avans_PokeBattles.Client
@@ -15,8 +22,7 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class LobbyWindow : Window
     {
-        // Public PokemonLister
-        private PokemonLister lister = new PokemonLister();
+        // Important stuff:
         private TcpClient tcpClient;
 
         // Uri prefixes for loading images
@@ -27,7 +33,11 @@ namespace Avans_PokeBattles.Client
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
         public MediaPlayer playerBattleMusic = new MediaPlayer();
+        public MediaPlayer buttonPlayer = new MediaPlayer();
         public MediaPlayer hitPlayer = new MediaPlayer();
+
+        // Other variables:
+        private int pokemonIndex = 0;
 
         public LobbyWindow(TcpClient client)
         {
@@ -38,7 +48,7 @@ namespace Avans_PokeBattles.Client
             tcpClient = client;
 
             // Play Music
-            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
             GetServerMessages();
         }
 
@@ -55,11 +65,16 @@ namespace Avans_PokeBattles.Client
                 Console.WriteLine($"Received from server: {message}");
 
                 // Check if the message is a team info message
-                if (message.StartsWith("team-info:"))
+                if (message.StartsWith("Player"))
                 {
-                    // Remove the "team-info:" prefix before displaying teams
-                    string teamInfoMessage = message.Substring("team-info:".Length).Trim();
-                    DisplayTeams(teamInfoMessage);
+                    List<Pokemon> pokemon = new List<Pokemon>();
+                    // Get Pokemon of both teams
+                    for (int i = 0; i < 6; i++)
+                    {
+                        Pokemon p = await GetServerPokemon(stream);
+                        pokemon.Add(p);
+                    }
+                    DisplayTeams(pokemon);
                 }
                 else
                 {
@@ -69,76 +84,82 @@ namespace Avans_PokeBattles.Client
             }
         }
 
-
-        private void DisplayTeams(string teamMessage)
+        /// <summary>
+        /// Helper method to read serialized Pokemon objects.
+        /// Made with help from ChatGPT!
+        /// </summary>
+        /// <param name="stream"></param>
+        private async Task<Pokemon> GetServerPokemon(NetworkStream stream)
         {
-            var lines = teamMessage.Split('\n');
-            bool opponentSection = false;
-            int p1Index = 1, p2Index = 1;
-
-            foreach (string line in lines)
+            while (true)
             {
-                // Identify the header for the opponent's team and start processing opponent Pokémon after this line
-                if (line.StartsWith("Opponent"))
-                {
-                    opponentSection = true;
-                    continue; // Skip the header line
-                }
+                // Read the length of the incoming message
+                byte[] lengthBytes = new byte[4];
+                int bytesRead = await stream.ReadAsync(lengthBytes, 0, lengthBytes.Length);
+                if (bytesRead == 0) break; // End of stream
 
-                // Skip the "Player team" header line for Player 1
-                if (!opponentSection && line.Contains("Player"))
-                {
-                    continue; // Skip the header line
-                }
+                int messageLength = BitConverter.ToInt32(lengthBytes, 0);
 
-                // Process Player 1's Pokémon
-                if (!opponentSection && !string.IsNullOrWhiteSpace(line))
-                {
-                    // Set the preview images for Player 1
-                    Uri previewUri = new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind);
-                    switch (p1Index++)
-                    {
-                        case 1: P1Pokemon1Preview.Source = new BitmapImage(previewUri); break;
-                        case 2: P1Pokemon2Preview.Source = new BitmapImage(previewUri); break;
-                        case 3: P1Pokemon3Preview.Source = new BitmapImage(previewUri); break;
-                        case 4: P1Pokemon4Preview.Source = new BitmapImage(previewUri); break;
-                        case 5: P1Pokemon5Preview.Source = new BitmapImage(previewUri); break;
-                        case 6: P1Pokemon6Preview.Source = new BitmapImage(previewUri); break;
-                    }
+                // Read the actual message
+                byte[] jsonBytes = new byte[messageLength];
+                bytesRead = await stream.ReadAsync(jsonBytes, 0, jsonBytes.Length);
+                if (bytesRead == 0) break; // End of stream
 
-                    // Load the For.gif for the first Pokémon of Player 1 into PokemonPlayer1 MediaElement
-                    if (p1Index == 2) // Ensures it only sets the first Pokémon
-                    {
-                        Uri forGifUri = new Uri($"{dirPrefix}/Sprites/a{line}For.gif", standardUriKind);
-                        PokemonPlayer1.Source = forGifUri;
-                    }
-                }
+                // Convert the JSON bytes to a string
+                string jsonString = Encoding.UTF8.GetString(jsonBytes);
 
-                // Process Player 2's Pokémon (Opponent section)
-                else if (opponentSection && !string.IsNullOrWhiteSpace(line))
-                {
-                    // Set the preview images for Player 2
-                    Uri previewUri = new Uri($"{dirPrefix}/Sprites/a{line}Preview.png", standardUriKind);
-                    switch (p2Index++)
-                    {
-                        case 1: P2Pokemon1Preview.Source = new BitmapImage(previewUri); break;
-                        case 2: P2Pokemon2Preview.Source = new BitmapImage(previewUri); break;
-                        case 3: P2Pokemon3Preview.Source = new BitmapImage(previewUri); break;
-                        case 4: P2Pokemon4Preview.Source = new BitmapImage(previewUri); break;
-                        case 5: P2Pokemon5Preview.Source = new BitmapImage(previewUri); break;
-                        case 6: P2Pokemon6Preview.Source = new BitmapImage(previewUri); break;
-                    }
+                // Deserialize the JSON string to a Pokemon object
+                Pokemon receivedPokemon = JsonSerializer.Deserialize<Pokemon>(jsonString);
 
-                    // Load the Against.gif for the first Pokémon of Player 2 into PokemonPlayer2 MediaElement
-                    if (p2Index == 2) // Ensures it only sets the first Pokémon
-                    {
-                        Uri againstGifUri = new Uri($"{dirPrefix}/Sprites/a{line}Against.gif", standardUriKind);
-                        PokemonPlayer2.Source = againstGifUri;
-                    }
-                }
+                // Display the deserialized object
+                Console.WriteLine($"Received Pokemon: Name={receivedPokemon.Name}, Health={receivedPokemon.CurrentHealth}");
+
+                return receivedPokemon;
             }
+            return null; // If we even get here
         }
 
+        private void DisplayTeams(List<Pokemon> pokemon)
+        {
+            foreach (Pokemon poke in pokemon)
+            {
+                // Set the preview images for Player 1 & Player 2
+                Uri previewUri = new Uri($"{dirPrefix}/Sprites/a{poke.Name}Preview.png", standardUriKind);
+                switch (pokemonIndex)
+                {
+                    case 0: P1Pokemon1Preview.Source = new BitmapImage(previewUri); break;
+                    case 1: P1Pokemon2Preview.Source = new BitmapImage(previewUri); break;
+                    case 2: P1Pokemon3Preview.Source = new BitmapImage(previewUri); break;
+                    case 3: P1Pokemon4Preview.Source = new BitmapImage(previewUri); break;
+                    case 4: P1Pokemon5Preview.Source = new BitmapImage(previewUri); break;
+                    case 5: P1Pokemon6Preview.Source = new BitmapImage(previewUri); break;
+                    case 6: P2Pokemon1Preview.Source = new BitmapImage(previewUri); break;
+                    case 7: P2Pokemon2Preview.Source = new BitmapImage(previewUri); break;
+                    case 8: P2Pokemon3Preview.Source = new BitmapImage(previewUri); break;
+                    case 9: P2Pokemon4Preview.Source = new BitmapImage(previewUri); break;
+                    case 10: P2Pokemon5Preview.Source = new BitmapImage(previewUri); break;
+                    case 11: P2Pokemon6Preview.Source = new BitmapImage(previewUri); break;
+                }
+
+                // Load the For.gif for the first Pokémon of Player 1 into PokemonPlayer1 MediaElement
+                if (pokemonIndex == 0) // Ensures it only sets the first Pokémon
+                {
+                    Uri forGifUri = new Uri($"{dirPrefix}/Sprites/a{poke.Name}For.gif", standardUriKind);
+                    SetPlayer1Pokemon(forGifUri);
+                    SetPlayer1PokemonHealth(poke.CurrentHealth);
+                    LoadPokemonAttacks(poke);
+                }
+
+                // Load the Against.gif for the first Pokémon of Player 2 into PokemonPlayer2 MediaElement
+                if (pokemonIndex == 6) // Ensures it only sets the first Pokémon
+                {
+                    Uri againstGifUri = new Uri($"{dirPrefix}/Sprites/a{poke.Name}Against.gif", standardUriKind);
+                    SetPlayer2Pokemon(againstGifUri);
+                    SetPlayer2PokemonHealth(poke.CurrentHealth);
+                }
+                pokemonIndex++;
+            }
+        }
 
         /// <summary>
         /// Generated methods
@@ -147,111 +168,11 @@ namespace Avans_PokeBattles.Client
         /// <param name="e"></param>
         private void LobbyWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO: Load in Players Pokemon
-
-
-            //// Set Preview Pokemon Player 1
-            //P1Pokemon1Preview.Source = new BitmapImage(player1.GetPokemon(0).PreviewUri);
-            //P1Pokemon2Preview.Source = new BitmapImage(player1.GetPokemon(1).PreviewUri);
-            //P1Pokemon3Preview.Source = new BitmapImage(player1.GetPokemon(2).PreviewUri);
-            //P1Pokemon4Preview.Source = new BitmapImage(player1.GetPokemon(3).PreviewUri);
-            //P1Pokemon5Preview.Source = new BitmapImage(player1.GetPokemon(4).PreviewUri);
-            //P1Pokemon6Preview.Source = new BitmapImage(player1.GetPokemon(5).PreviewUri);
-            //// Set Preview Pokemon Player 2
-            //P2Pokemon1Preview.Source = new BitmapImage(player2.GetPokemon(0).PreviewUri);
-            //P2Pokemon2Preview.Source = new BitmapImage(player2.GetPokemon(1).PreviewUri);
-            //P2Pokemon3Preview.Source = new BitmapImage(player2.GetPokemon(2).PreviewUri);
-            //P2Pokemon4Preview.Source = new BitmapImage(player2.GetPokemon(3).PreviewUri);
-            //P2Pokemon5Preview.Source = new BitmapImage(player2.GetPokemon(4).PreviewUri);
-            //P2Pokemon6Preview.Source = new BitmapImage(player2.GetPokemon(5).PreviewUri);
-
-            //// Set Battle Pokemon
-            ////PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
-            //SetPlayer1Pokemon(player1.GetPokemon(0).BattleForUri);
-            //SetPlayer1PokemonHealth(player1.GetPokemon(0).Health);
-            //LoadPokemonAttacks(player1.GetPokemon(0));
-            ////PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
-            //SetPlayer2Pokemon(player2.GetPokemon(0).BattleAgainstUri);
-            //SetPlayer2PokemonHealth(player2.GetPokemon(0).Health);
-            //// Start the game
-            //Task.Run(() =>
-            //{
-            //    //StartGame();
-            //});
-        }
-
-        private void PP1_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            // Replay gif animation
-            PPlayer1State = MediaState.Stop;
-            PokemonPlayer1.Position = new TimeSpan(0, 0, 1);
-            PokemonPlayer1.Play();
-        }
-
-        private void PP1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            Console.WriteLine("Could not load in .gif file!");
-        }
-
-        private void PP2_MediaEndend(object sender, RoutedEventArgs e)
-        {
-            // Replay gif animation
-            PPlayer2State = MediaState.Stop;
-            PokemonPlayer2.Position = new TimeSpan(0, 0, 1);
-            PokemonPlayer2.Play();
-        }
-
-        private void PP2_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            Console.WriteLine("Could not load in .gif file!");
-        }
-
-        private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
-        {
+            // Handle turn starting:
 
         }
 
-        private void btnOption1_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption2_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption3_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption4_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption1_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption2_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption3_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption4_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-
+        // Setting items:
         private void SetPlayer1Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
@@ -259,12 +180,10 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer1.Play();
             Task.Run(() => { RefreshMedia1Element(); }); // Start refreshing the MediaElement
         }
-
         private void SetPlayer1PokemonHealth(int health)
         {
             lblP1PokemonHealth.Content = "Health: " + health.ToString();
         }
-
         private void SetPlayer2Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
@@ -272,69 +191,10 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer2.Play();
             Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
         }
-
         private void SetPlayer2PokemonHealth(int health)
         {
             lblP2PokemonHealth.Content = "Health: " + health.ToString();
         }
-
-        private void RefreshMedia1Element()
-        {
-            // Update event for MediaElement of Player 1
-            while (PPlayer1State == MediaState.Manual || PPlayer1State == MediaState.Play)
-            {
-                PPlayer1State = GetMediaState(PokemonPlayer1);
-                // TODO: Prevent gif from leaving dots around
-            }
-        }
-
-        private void RefreshMedia2Element()
-        {
-            // Update event for MediaElement of Player 2
-            while (PPlayer2State == MediaState.Manual || PPlayer2State == MediaState.Play)
-            {
-                PPlayer2State = GetMediaState(PokemonPlayer2);
-                // TODO: Prevent gif from leaving dots around
-            }
-        }
-
-        /// <summary>
-        /// Helper method to get the state of the MediaElement
-        /// From StackOverflow: https://stackoverflow.com/questions/4338951/how-do-i-determine-if-mediaelement-is-playing
-        /// </summary>
-        /// <param name="myMedia"></param>
-        /// <returns></returns>
-        private MediaState GetMediaState(MediaElement myMedia)
-        {
-            FieldInfo? hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object? helperObject = hlp.GetValue(myMedia);
-            FieldInfo? stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-            MediaState? state = (MediaState)stateField.GetValue(helperObject);
-            if (!state.Equals(null))
-                return (MediaState)state;
-            return MediaState.Stop;
-        }
-
-        //private async void StartGame()
-        //{
-        //    // Go through rounds
-        //    for (int i = 1; i < int.MaxValue; i++)
-        //    {
-        //        lblRound.Content = "Round: " + i;
-
-        //        // Set Battle Pokemon
-        //        //PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
-        //        SetPlayer1Pokemon(player1.GetPokemon(i-1).BattleForUri);
-        //        SetPlayer1PokemonHealth(player1.GetPokemon(i-1).Health);
-        //        LoadPokemonAttacks(player1.GetPokemon(i-1));
-        //        //PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
-        //        SetPlayer2Pokemon(player2.GetPokemon(0).BattleAgainstUri);
-        //        SetPlayer2PokemonHealth(player2.GetPokemon(0).Health);
-
-        //        SelectMove();
-
-        //    }
-        //}
 
         private void LoadPokemonAttacks(Pokemon pokemon)
         {
@@ -366,6 +226,32 @@ namespace Avans_PokeBattles.Client
             }
         }
 
+        // Media:
+        private void PP1_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            // Replay gif animation
+            PokemonPlayer1.RenderSize = new System.Windows.Size(50, 50);
+            PPlayer1State = MediaState.Stop;
+            PokemonPlayer1.Position = new TimeSpan(0, 0, 1);
+            PokemonPlayer1.Play();
+        }
+        private void PP1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            Console.WriteLine("Could not load in .gif file!");
+        }
+
+        private void PP2_MediaEndend(object sender, RoutedEventArgs e)
+        {
+            // Replay gif animation
+            PokemonPlayer2.RenderSize = new System.Windows.Size(50, 50);
+            PPlayer2State = MediaState.Stop;
+            PokemonPlayer2.Position = new TimeSpan(0, 0, 1);
+            PokemonPlayer2.Play();
+        }
+        private void PP2_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            Console.WriteLine("Could not load in .gif file!");
+        }
         /// <summary>
         /// Play a music file from the project
         /// </summary>
@@ -386,12 +272,101 @@ namespace Avans_PokeBattles.Client
                 return;
             }
         }
-
         private void Media_Ended(object sender, EventArgs e)
         {
             // Set time to zero (replay/ loop)
             playerBattleMusic.Position = TimeSpan.Zero;
             playerBattleMusic.Play();
+        }
+
+        // Preview sound of attacks:
+        private void btnOption1_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
+        private void btnOption2_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
+        private void btnOption3_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
+        private void btnOption4_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+        }
+
+        // Hit events:
+        private void btnOption1_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnOption2_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnOption3_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnOption4_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
+        {
+            // Handle chatting / displaying rounds
+
+        }
+
+        // Helper methods for refreshing MediaElements:
+        private void RefreshMedia1Element()
+        {
+            // Update event for MediaElement of Player 1
+            while (PPlayer1State == MediaState.Manual || PPlayer1State == MediaState.Play)
+            {
+                PPlayer1State = GetMediaState(PokemonPlayer1);
+                // TODO: Prevent gif from leaving dots around
+            }
+        }
+        private void RefreshMedia2Element()
+        {
+            // Update event for MediaElement of Player 2
+            while (PPlayer2State == MediaState.Manual || PPlayer2State == MediaState.Play)
+            {
+                PPlayer2State = GetMediaState(PokemonPlayer2);
+                // TODO: Prevent gif from leaving dots around
+            }
+        }
+
+        /// <summary>
+        /// Helper method to get the state of the MediaElement
+        /// From StackOverflow: https://stackoverflow.com/questions/4338951/how-do-i-determine-if-mediaelement-is-playing
+        /// </summary>
+        /// <param name="myMedia"></param>
+        /// <returns></returns>
+        private MediaState GetMediaState(MediaElement myMedia)
+        {
+            FieldInfo? hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
+            object? helperObject = hlp.GetValue(myMedia);
+            FieldInfo? stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
+            MediaState? state = (MediaState)stateField.GetValue(helperObject);
+            if (!state.Equals(null))
+                return (MediaState)state;
+            return MediaState.Stop;
         }
 
     }

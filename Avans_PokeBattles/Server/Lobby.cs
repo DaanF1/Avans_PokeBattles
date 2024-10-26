@@ -1,7 +1,10 @@
+using System.Buffers.Text;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using System.Xml.Serialization;
 
 namespace Avans_PokeBattles.Server
@@ -93,14 +96,10 @@ namespace Avans_PokeBattles.Server
             await SendMessage(stream2, "start-game");
 
             // Send teams to both players
-            await SendTeam(stream1, player1Team, player2Team, 1); 
+            await SendTeam(stream1, player1Team, player2Team, 1);
             await SendTeam(stream2, player2Team, player1Team, 2);
 
             Console.WriteLine("Start-game messages sent to both players.");
-
-            // Start the turn-based interaction
-            //await SendMessage(stream1, "It's your turn. Choose a move.");
-            //await SendMessage(stream2, "Waiting for Player 1 to choose a move.");
 
             Task.Run(() => HandleClient(player1, stream1, player2, stream2));
             Task.Run(() => HandleClient(player2, stream2, player1, stream1));
@@ -123,42 +122,23 @@ namespace Avans_PokeBattles.Server
         {
             StringBuilder teamMessage = new StringBuilder();
 
-            teamMessage.Append("team-info:\n");
-
-            // Add player's own team names
+            // Indicate sending a Player's team:
             teamMessage.Append($"Player {playerNumber} team:\n");
+            await SendMessage(stream, teamMessage.ToString());
+
+            // Send the team now:
             foreach (Pokemon pokemon in playerTeam)
             {
-                teamMessage.Append($"{pokemon.Name}\n");
+                await SendPokemon(stream, pokemon);
             }
 
-            // Add opponent's team names as "against" versions
-            teamMessage.Append($"\nOpponent's team:\n");
+            // Indicate sending the opponent's team:
+            teamMessage.Append($"Opponent team:\n");
+            await SendMessage(stream, teamMessage.ToString());
+
             foreach (Pokemon pokemon in opponentTeam)
             {
-                teamMessage.Append($"{pokemon.Name}\n");
-            }
-
-            // Send the team data to the player
-            await SendMessage(stream, teamMessage.ToString().TrimEnd('\n'));
-        }
-
-        /// <summary>
-        /// Helper method to serialize a Pokemon to a string
-        /// Inspiration from StackOverflow: https://stackoverflow.com/questions/2434534/serialize-an-object-to-string 
-        /// </summary>
-        /// <typeparam name="Pokemon"></typeparam>
-        /// <param name="pokemonToSerialize"></param>
-        public static string SerializePokemon<Pokemon>(Pokemon pokemonToSerialize)
-        {
-            XmlSerializer xmlSerializer = new XmlSerializer(pokemonToSerialize.GetType());
-
-            using (StringWriter textWriter = new StringWriter())
-            {
-                xmlSerializer.Serialize(textWriter, pokemonToSerialize); // Serialize the Pokemon
-                string s = textWriter.ToString() + "\n"; // Return Serialized Pokemon in string form
-                Debug.WriteLine(s);
-                return s;
+                await SendPokemon(stream, pokemon);
             }
         }
 
@@ -234,9 +214,27 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(response, 0, response.Length);
         }
 
-        private bool IsGameFull()
+        /// <summary>
+        /// This helper method sends a Json serialized Pokemon to the client
+        /// Made with help from ChatGPT!
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="pokemon"></param>
+        private async Task SendPokemon(NetworkStream stream, Pokemon pokemon)
         {
-            return this.IsFull;
+            // Serialize each Pokemon object
+            string jsonString = JsonSerializer.Serialize(pokemon);
+            byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
+
+            // Send the length of the message first
+            byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
+            await stream.WriteAsync(lengthBytes, 0, lengthBytes.Length);
+
+            // Send the actual JSON data
+            await stream.WriteAsync(jsonBytes, 0, jsonBytes.Length);
+
+            // Wait for data to be read client-side
+            await Task.Delay(100);
         }
 
     }
