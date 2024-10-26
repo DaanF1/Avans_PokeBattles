@@ -33,6 +33,7 @@ namespace Avans_PokeBattles.Client
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
         public MediaPlayer playerBattleMusic = new MediaPlayer();
+        public MediaPlayer buttonPlayer = new MediaPlayer();
         public MediaPlayer hitPlayer = new MediaPlayer();
 
         // Other variables:
@@ -67,14 +68,12 @@ namespace Avans_PokeBattles.Client
                 if (message.StartsWith("Player"))
                 {
                     List<Pokemon> pokemon = new List<Pokemon>();
-
                     // Get Pokemon of both teams
                     for (int i = 0; i < 6; i++)
                     {
                         Pokemon p = await GetServerPokemon(stream);
                         pokemon.Add(p);
                     }
-
                     DisplayTeams(pokemon);
                 }
                 else
@@ -162,6 +161,18 @@ namespace Avans_PokeBattles.Client
             }
         }
 
+        /// <summary>
+        /// Generated methods
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LobbyWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Handle turn starting:
+
+        }
+
+        // Setting items:
         private void SetPlayer1Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
@@ -169,12 +180,10 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer1.Play();
             Task.Run(() => { RefreshMedia1Element(); }); // Start refreshing the MediaElement
         }
-
         private void SetPlayer1PokemonHealth(int health)
         {
             lblP1PokemonHealth.Content = "Health: " + health.ToString();
         }
-
         private void SetPlayer2Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
@@ -182,7 +191,6 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer2.Play();
             Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
         }
-
         private void SetPlayer2PokemonHealth(int health)
         {
             lblP2PokemonHealth.Content = "Health: " + health.ToString();
@@ -218,6 +226,7 @@ namespace Avans_PokeBattles.Client
             }
         }
 
+        // Media:
         private void PP1_MediaEnded(object sender, RoutedEventArgs e)
         {
             // Replay gif animation
@@ -226,7 +235,6 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer1.Position = new TimeSpan(0, 0, 1);
             PokemonPlayer1.Play();
         }
-
         private void PP1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             Console.WriteLine("Could not load in .gif file!");
@@ -240,12 +248,10 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer2.Position = new TimeSpan(0, 0, 1);
             PokemonPlayer2.Play();
         }
-
         private void PP2_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             Console.WriteLine("Could not load in .gif file!");
         }
-
         /// <summary>
         /// Play a music file from the project
         /// </summary>
@@ -266,7 +272,6 @@ namespace Avans_PokeBattles.Client
                 return;
             }
         }
-
         private void Media_Ended(object sender, EventArgs e)
         {
             // Set time to zero (replay/ loop)
@@ -274,26 +279,60 @@ namespace Avans_PokeBattles.Client
             playerBattleMusic.Play();
         }
 
+        // Preview sound of attacks:
         private void btnOption1_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
         }
-
         private void btnOption2_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
         }
-
         private void btnOption3_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
         }
-
         private void btnOption4_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            PlayMusic(hitPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
+            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
         }
 
+        // Hit events:
+        private void btnOption1_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnOption2_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnOption3_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnOption4_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle hit:
+
+            PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
+        }
+
+        private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
+        {
+            // Handle chatting / displaying rounds
+
+        }
+
+        // Helper methods for refreshing MediaElements:
         private void RefreshMedia1Element()
         {
             // Update event for MediaElement of Player 1
@@ -303,7 +342,6 @@ namespace Avans_PokeBattles.Client
                 // TODO: Prevent gif from leaving dots around
             }
         }
-
         private void RefreshMedia2Element()
         {
             // Update event for MediaElement of Player 2
@@ -329,41 +367,6 @@ namespace Avans_PokeBattles.Client
             if (!state.Equals(null))
                 return (MediaState)state;
             return MediaState.Stop;
-        }
-
-        /// <summary>
-        /// Generated methods
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LobbyWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption1_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption2_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption3_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnOption4_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
     }
