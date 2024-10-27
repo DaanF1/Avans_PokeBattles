@@ -11,6 +11,7 @@ namespace Avans_PokeBattles.Server
         private static TcpListener listener;
         private static int port = 8000;
         private static LobbyManager lobbyManager = new LobbyManager();
+        private static Lobby connectedLobby;
 
         public async void Start()
         {
@@ -59,16 +60,15 @@ namespace Avans_PokeBattles.Server
                         // If the lobby is now full, start the game
                         if (joined && lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1])).IsFull)
                         {
-                            var lobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
+                            connectedLobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
                             Console.WriteLine("SERVER: Lobby is full, starting the game...");
-                            lobby.StartGame(); // Only start the game when lobby is confirmed full
+                            connectedLobby.StartGame(); // Only start the game when lobby is confirmed full
                         }
                     }
                 }
             }
             client.Close();
         }
-
 
         // Get the lobby manager instance
         internal static LobbyManager GetLobbymanager()

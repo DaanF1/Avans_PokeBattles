@@ -119,7 +119,7 @@ namespace Avans_PokeBattles.Server
         }
 
         private async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
-            {
+        {
             StringBuilder teamMessage = new StringBuilder();
 
             // Indicate sending a Player's team:

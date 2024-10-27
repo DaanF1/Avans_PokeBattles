@@ -44,11 +44,12 @@ namespace Avans_PokeBattles.Client
             InitializeComponent();
 
             // Set name
-            lblPlayer1Name.Content = ""; //playerName;
+            lblPlayer1Name.Content = "Your team:";
+            lblPlayer2Name.Content = "Oponent team:";
             tcpClient = client;
 
             // Play Music
-            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
             GetServerMessages();
         }
 
