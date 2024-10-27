@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Media;
 using System.Net.Sockets;
@@ -76,6 +77,18 @@ namespace Avans_PokeBattles.Client
                         pokemon.Add(p);
                     }
                     DisplayTeams(pokemon);
+                }
+                else if (message.StartsWith("chat:"))
+                {
+                    // Display chat message
+                    if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+                    {
+                        txtReadChat.Text += $"\nOpponent: {message.Split(':')[1]}";
+                    }
+                    else
+                    {
+                        txtReadChat.Text += $"Opponent: {message.Split(':')[1]}";
+                    }
                 }
                 else
                 {
@@ -318,35 +331,149 @@ namespace Avans_PokeBattles.Client
             }
         }
 
+        // Attack buttons:
         private void btnOption1_Click(object sender, RoutedEventArgs e)
         {
             // Send move selected from btnOption1
             SendMoveToServer(btnOption1.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
-
         private void btnOption2_Click(object sender, RoutedEventArgs e)
         {
             SendMoveToServer(btnOption2.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
-
         private void btnOption3_Click(object sender, RoutedEventArgs e)
         {
             SendMoveToServer(btnOption3.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
-
         private void btnOption4_Click(object sender, RoutedEventArgs e)
         {
             SendMoveToServer(btnOption4.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
 
+        // Chatting:
         private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
         {
             // Handle chatting / displaying rounds
+            if (txtTypeChat.Text.Length > 0 && !txtTypeChat.Text.Equals("Type something..."))
+            {
+                if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+                {
+                    txtReadChat.Text += $"\nYou: {txtTypeChat.Text}";
+                }
+                else
+                {
+                    txtReadChat.Text += $"You: {txtTypeChat.Text}";
+                }
+                // Send chat to server
+                SendChatToServer(txtTypeChat.Text);
+                txtTypeChat.Text = "Type something...";
+            }
+        }
+        private void txtTypeChat_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            txtTypeChat.Text = "";
+        }
+        private async void SendChatToServer(string chatMessage)
+        {
+            try
+            {
+                // Create chat message format
+                string chat = $"chat:{chatMessage}";
 
+                // Convert chat message to bytes and send to server
+                byte[] chatBytes = Encoding.UTF8.GetBytes(chat);
+                await tcpClient.GetStream().WriteAsync(chatBytes, 0, chatBytes.Length);
+
+                Console.WriteLine($"CLIENT: Sent chat to server: {chat}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CLIENT: Failed to send move: {ex.Message}");
+            }
+        }
+
+        // FileIO chatlogs:
+        private void btnCreateChatlog_Clicked(object sender, RoutedEventArgs e)
+        {
+            // Create file
+            string currentTime = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + currentTime + ".txt";
+            if (!File.Exists(path))
+            {
+                var logFile = File.Create(path);
+                logFile.Close();
+            }
+            // Write to file
+            using (StreamWriter outputFile = new StreamWriter(path))
+            {
+                outputFile.WriteLine("---Chatlog---");
+                foreach (string line in txtReadChat.Text.Split("\n"))
+                    outputFile.WriteLine(line);
+            }
+            // Confirm in chat
+            if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+            {
+                txtReadChat.Text += $"\nServer: Chatlog created!";
+            }
+            else
+            {
+                txtReadChat.Text += $"Server: Chatlog created!";
+            }
+
+        }
+        private void btnReadChatlog_Clicked(object sender, RoutedEventArgs e)
+        {
+            // Check file DateTime
+            DateTime currentDateTime = DateTime.Now;
+            string currentString = currentDateTime.ToString("dd-MM-yyyy_HH-mm-ss"); // Format
+
+            string pathToLogs = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs";
+            string[] pathToFiles = Directory.GetFiles(pathToLogs);
+            DateTime[] dateTimes = new DateTime[pathToFiles.Length];
+            for (int i = 0; i < pathToFiles.Length; i++)
+            {
+                string fileName = pathToFiles[i].Split("\\").Last();
+                DateTime fileDateTime = DateTime.ParseExact(fileName.Substring(8, 19), "dd-MM-yyyy_HH-mm-ss", CultureInfo.InvariantCulture); // Format
+                dateTimes[i] = fileDateTime;
+            }
+
+            // Filter on today's most recent chatlog
+            DateTime latestDate = dateTimes.Where(r => r.Year.Equals(currentDateTime.Year) && 
+                r.Month.Equals(currentDateTime.Month) && 
+                r.Day.Equals(currentDateTime.Day)).Max();
+
+            // Print the most recent chatlog in the chat
+            if (latestDate != DateTime.MinValue) // != null
+            {
+                string latestString = latestDate.ToString("dd-MM-yyyy_HH-mm-ss"); // Format
+                txtReadChat.Text += $"Server: Loading chatlog from {latestString}!";
+
+                string recentFilePath = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + latestString + ".txt";
+                using (StreamReader sr = new StreamReader(recentFilePath))
+                {
+                    string line = "not null";
+                    while (line != null)
+                    {
+                        line = sr.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+                        {
+                            txtReadChat.Text += $"\n{line}";
+                        }
+                        else
+                        {
+                            txtReadChat.Text += line;
+                        }
+                    }
+                }
+                txtReadChat.Text += $"---End Chatlog---";
+            }
+            else {
+                txtReadChat.Text += $"Server: No recent chatlog found!";
+            }
         }
 
         // Helper methods for refreshing MediaElements:

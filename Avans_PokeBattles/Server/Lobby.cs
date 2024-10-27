@@ -167,6 +167,18 @@ namespace Avans_PokeBattles.Server
                         await SendMessage(senderStream, "It's not your turn.");
                     }
                 }
+                else if (IsChatMessage(message))
+                {
+                    // Send message to other player
+                    if (sender == player1 )
+                    {
+                        await SendMessage(receiverStream, message);
+                    }
+                    else if (sender == player2)
+                    {
+                        await SendMessage(receiverStream, message);
+                    }
+                }
                 else
                 {
                     await SendMessage(senderStream, "Unknown command.");
@@ -181,6 +193,11 @@ namespace Avans_PokeBattles.Server
         private bool IsMoveMessage(string message)
         {
             return message.StartsWith("move:");  // Simplified check for move commands (possible to be expanded upon later)
+        }
+
+        private bool IsChatMessage(string message)
+        {
+            return message.StartsWith("chat:");  // Simplified check for move commands (possible to be expanded upon later)
         }
 
         private async Task HandleMove(string move, NetworkStream senderStream, NetworkStream receiverStream)

@@ -65,18 +65,18 @@
         </Canvas>
 
         <!-- Read Chat here -->
-        <RichTextBox Name="txtReadChat" Grid.Row="0" Grid.Column="1" IsReadOnly="True" />
+        <TextBox Name="txtReadChat" Grid.Row="0" Grid.Column="1" IsReadOnly="True" TextWrapping="Wrap" />
 
         <StackPanel Name="pnlButtonActions" Grid.Row="1" Grid.Column="0">
             <!-- Add Buttons here! -->
-            
+            <Button Name="btnCreateChatlog" Width="150" Height="25" Content="Create chatlog file" Click="btnCreateChatlog_Clicked" />
+            <Button Name="btnReadChatlog" Width="150" Height="25" Content="Read chatlog file" Click="btnReadChatlog_Clicked" />
         </StackPanel>
 
         <!-- Type to Chat here -->
         <StackPanel Name="pnlChat" Grid.Row="1" Grid.Column="1">
-            <TextBox Name="txtTypeChat" IsReadOnly="False" Height="40" TextAlignment="Left" TextWrapping="Wrap"/>
+            <TextBox Name="txtTypeChat" IsReadOnly="False" Height="40" TextAlignment="Left" TextWrapping="Wrap" PreviewMouseDown="txtTypeChat_PreviewMouseDown" Text="Type something..."/>
             <Button Name="btnSendChat" Height="25" Content="Send Text" Click="btnSendChat_Clicked" />
-            
         </StackPanel>
         
     </Grid>
