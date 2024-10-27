@@ -14,7 +14,7 @@ namespace PokeBattles_UnitTesting.UnitTests
         [TestMethod]
         public void PokemonListerTest() // Unit Test: Adding and getting a Pokemon from the PokemonLister
         {
-            PokemonLister pokemonLister = new PokemonLister(); // Create PokemonLister
+            PokemonLister pokemonLister = new(); // Create PokemonLister
             Console.WriteLine("PokemonLister Created!");
 
             pokemonLister = new PokemonLister();
@@ -25,7 +25,7 @@ namespace PokeBattles_UnitTesting.UnitTests
                 new Move("Razor Leaf", 55, 95, Type.Grass),
                 new Move("Tackle", 40, 100, Type.Normal),
             ];  // Create Pokemon
-            Pokemon venusaur = new Pokemon("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
+            Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), 
                 Type.Grass, 195, 70, venusaurMoves);
@@ -51,7 +51,7 @@ namespace PokeBattles_UnitTesting.UnitTests
         [TestMethod]
         public void PokemonMoveTest() // Unit Test: Getting Moves from a Pokemon
         {
-            PokemonLister pokemonLister = new PokemonLister(); // Create PokemonLister
+            PokemonLister pokemonLister = new(); // Create PokemonLister
             Console.WriteLine("PokemonLister Created!");
 
             List<Move> venusaurMoves =
@@ -61,7 +61,7 @@ namespace PokeBattles_UnitTesting.UnitTests
                 new Move("Razor Leaf", 55, 95, Type.Grass),
                 new Move("Tackle", 40, 100, Type.Normal),
             ]; // Create Pokemon
-            Pokemon venusaur = new Pokemon("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
+            Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), 
                 Type.Grass, 195, 70, venusaurMoves);

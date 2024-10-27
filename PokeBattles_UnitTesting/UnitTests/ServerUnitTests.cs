@@ -11,10 +11,10 @@ namespace PokeBattles_UnitTesting.UnitTests
         [TestMethod]
         public void JoinLobbyTest() // Unit Test: Joining a Lobby
         {
-            Server server = new Server(); // Create Server
+            Server server = new(); // Create Server
             server.Start(); // Start the Server
 
-            TcpClient client1 = new TcpClient(); // Create Client 1
+            TcpClient client1 = new(); // Create Client 1
             client1.Connect("localhost", 8000); // Connect to Server
             byte[] response1 = Encoding.UTF8.GetBytes("join-lobby:Lobby-1"); // Join Lobby 1
             client1.GetStream().Write(response1, 0, response1.Length); // Send command to the Server
@@ -31,7 +31,7 @@ namespace PokeBattles_UnitTesting.UnitTests
         [TestMethod]
         public void MultipleClientsTest() // Unit Test: Multiple Clients can connect to the Server
         {
-            Server server = new Server();  // Create Server
+            Server server = new();  // Create Server
             server.Start(); // Start the Server
 
             TcpClient client1 = new TcpClient(); // Create Client 1
@@ -51,6 +51,13 @@ namespace PokeBattles_UnitTesting.UnitTests
 
             Assert.IsTrue(true); // Test is successful
             server.Stop(); // Stop the Server
+        }
+
+        [TestMethod]
+        public void TestDefault() // Unit Test: Default last test to handle Server
+        {
+            Console.WriteLine("Default Unit Test: Success");
+            Assert.IsTrue(true); // Test is always successful
         }
     }
 }
