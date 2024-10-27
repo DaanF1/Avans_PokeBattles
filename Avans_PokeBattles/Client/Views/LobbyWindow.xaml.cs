@@ -392,7 +392,7 @@ namespace Avans_PokeBattles.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"CLIENT: Failed to send move: {ex.Message}");
+                Console.WriteLine($"CLIENT: Failed to send chat: {ex.Message}");
             }
         }
 
@@ -412,7 +412,10 @@ namespace Avans_PokeBattles.Client
             {
                 outputFile.WriteLine("---Chatlog---");
                 foreach (string line in txtReadChat.Text.Split("\n"))
+                {
                     outputFile.WriteLine(line);
+                } 
+                outputFile.WriteLine("---End of Chatlog---");
             }
             // Confirm in chat
             if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
@@ -441,13 +444,17 @@ namespace Avans_PokeBattles.Client
                 dateTimes[i] = fileDateTime;
             }
 
-            // Filter on today's most recent chatlog
-            DateTime latestDate = dateTimes.Where(r => r.Year.Equals(currentDateTime.Year) && 
-                r.Month.Equals(currentDateTime.Month) && 
-                r.Day.Equals(currentDateTime.Day)).Max();
-
+            DateTime latestDate = DateTime.MinValue;
+            if (dateTimes != null)
+            {
+                // Filter on today's most recent chatlog
+                latestDate = dateTimes.Where(r => r.Year.Equals(currentDateTime.Year) &&
+                    r.Month.Equals(currentDateTime.Month) &&
+                    r.Day.Equals(currentDateTime.Day)).Max();
+            }
+            
             // Print the most recent chatlog in the chat
-            if (latestDate != DateTime.MinValue) // != null
+            if (latestDate != DateTime.MinValue)
             {
                 string latestString = latestDate.ToString("dd-MM-yyyy_HH-mm-ss"); // Format
                 txtReadChat.Text += $"Server: Loading chatlog from {latestString}!";
@@ -469,7 +476,6 @@ namespace Avans_PokeBattles.Client
                         }
                     }
                 }
-                txtReadChat.Text += $"---End Chatlog---";
             }
             else {
                 txtReadChat.Text += $"Server: No recent chatlog found!";
