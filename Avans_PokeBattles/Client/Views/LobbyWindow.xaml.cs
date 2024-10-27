@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Media;
 using System.Net.Sockets;
@@ -44,7 +45,8 @@ namespace Avans_PokeBattles.Client
             InitializeComponent();
 
             // Set name
-            lblPlayer1Name.Content = ""; //playerName;
+            lblPlayer1Name.Content = "Your team:";
+            lblPlayer2Name.Content = "Oponent team:";
             tcpClient = client;
 
             // Play Music
@@ -62,10 +64,10 @@ namespace Avans_PokeBattles.Client
                 if (bytesRead == 0) break;
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Received from server: {message}");
+                Console.WriteLine($"CLIENT: Received from server: {message}");
 
                 // Check if the message is a team info message
-                if (message.StartsWith("Player"))
+                if (message.StartsWith("PlayerTeam"))
                 {
                     List<Pokemon> pokemon = new List<Pokemon>();
                     // Get Pokemon of both teams
@@ -76,10 +78,22 @@ namespace Avans_PokeBattles.Client
                     }
                     DisplayTeams(pokemon);
                 }
+                else if (message.StartsWith("chat:"))
+                {
+                    // Display chat message
+                    if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+                    {
+                        txtReadChat.Text += $"\nOpponent: {message.Split(':')[1]}";
+                    }
+                    else
+                    {
+                        txtReadChat.Text += $"Opponent: {message.Split(':')[1]}";
+                    }
+                }
                 else
                 {
                     // Handle other types of messages if necessary
-                    Console.WriteLine($"Unhandled message: {message}");
+                    Console.WriteLine($"CLIENT: Unhandled message: {message}");
                 }
             }
         }
@@ -112,7 +126,7 @@ namespace Avans_PokeBattles.Client
                 Pokemon receivedPokemon = JsonSerializer.Deserialize<Pokemon>(jsonString);
 
                 // Display the deserialized object
-                Console.WriteLine($"Received Pokemon: Name={receivedPokemon.Name}, Health={receivedPokemon.CurrentHealth}");
+                Console.WriteLine($"CLIENT: Received Pokemon: Name={receivedPokemon.Name}, Health={receivedPokemon.CurrentHealth}");
 
                 return receivedPokemon;
             }
@@ -237,7 +251,7 @@ namespace Avans_PokeBattles.Client
         }
         private void PP1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
-            Console.WriteLine("Could not load in .gif file!");
+            Console.WriteLine("CLIENT: Could not load in .gif file!");
         }
 
         private void PP2_MediaEndend(object sender, RoutedEventArgs e)
@@ -250,7 +264,7 @@ namespace Avans_PokeBattles.Client
         }
         private void PP2_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
-            Console.WriteLine("Could not load in .gif file!");
+            Console.WriteLine("CLIENT: Could not load in .gif file!");
         }
         /// <summary>
         /// Play a music file from the project
@@ -298,38 +312,174 @@ namespace Avans_PokeBattles.Client
         }
 
         // Hit events:
+        private async void SendMoveToServer(string moveName)
+        {
+            try
+            {
+                // Create move message format
+                string moveMessage = $"move:{moveName}";
+
+                // Convert message to bytes and send to server
+                byte[] moveBytes = Encoding.UTF8.GetBytes(moveMessage);
+                await tcpClient.GetStream().WriteAsync(moveBytes, 0, moveBytes.Length);
+
+                Console.WriteLine($"CLIENT: Sent move to server: {moveMessage}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CLIENT: Failed to send move: {ex.Message}");
+            }
+        }
+
+        // Attack buttons:
         private void btnOption1_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            // Send move selected from btnOption1
+            SendMoveToServer(btnOption1.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
-
         private void btnOption2_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            SendMoveToServer(btnOption2.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
-
         private void btnOption3_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            SendMoveToServer(btnOption3.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
-
         private void btnOption4_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            SendMoveToServer(btnOption4.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
 
+        // Chatting:
         private void btnSendChat_Clicked(object sender, RoutedEventArgs e)
         {
             // Handle chatting / displaying rounds
+            if (txtTypeChat.Text.Length > 0 && !txtTypeChat.Text.Equals("Type something..."))
+            {
+                if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+                {
+                    txtReadChat.Text += $"\nYou: {txtTypeChat.Text}";
+                }
+                else
+                {
+                    txtReadChat.Text += $"You: {txtTypeChat.Text}";
+                }
+                // Send chat to server
+                SendChatToServer(txtTypeChat.Text);
+                txtTypeChat.Text = "Type something...";
+            }
+        }
+        private void txtTypeChat_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            txtTypeChat.Text = "";
+        }
+        private async void SendChatToServer(string chatMessage)
+        {
+            try
+            {
+                // Create chat message format
+                string chat = $"chat:{chatMessage}";
 
+                // Convert chat message to bytes and send to server
+                byte[] chatBytes = Encoding.UTF8.GetBytes(chat);
+                await tcpClient.GetStream().WriteAsync(chatBytes, 0, chatBytes.Length);
+
+                Console.WriteLine($"CLIENT: Sent chat to server: {chat}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CLIENT: Failed to send chat: {ex.Message}");
+            }
+        }
+
+        // FileIO chatlogs:
+        private void btnCreateChatlog_Clicked(object sender, RoutedEventArgs e)
+        {
+            // Create file (at Avans_PokeBattles\Avans_PokeBattles\bin\Debug\net8.0-windows\Chatlogs directory)
+            string currentTime = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + currentTime + ".txt";
+            if (!File.Exists(path))
+            {
+                var logFile = File.Create(path);
+                logFile.Close();
+            }
+            // Write to file
+            using (StreamWriter outputFile = new StreamWriter(path))
+            {
+                outputFile.WriteLine("---Chatlog---");
+                foreach (string line in txtReadChat.Text.Split("\n"))
+                {
+                    outputFile.WriteLine(line);
+                } 
+                outputFile.WriteLine("---End of Chatlog---");
+            }
+            // Confirm in chat
+            if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+            {
+                txtReadChat.Text += $"\nServer: Chatlog created!";
+            }
+            else
+            {
+                txtReadChat.Text += $"Server: Chatlog created!";
+            }
+
+        }
+        private void btnReadChatlog_Clicked(object sender, RoutedEventArgs e)
+        {
+            // Check file DateTime (at: (Project_Name)\Avans_PokeBattles\Avans_PokeBattles\bin\Debug\net8.0-windows\Chatlogs directory)
+            DateTime currentDateTime = DateTime.Now;
+            string currentString = currentDateTime.ToString("dd-MM-yyyy_HH-mm-ss"); // Format DateTime
+
+            string pathToLogs = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs";
+            string[] pathToFiles = Directory.GetFiles(pathToLogs);
+            DateTime[] dateTimes = new DateTime[pathToFiles.Length];
+            for (int i = 0; i < pathToFiles.Length; i++)
+            {
+                string fileName = pathToFiles[i].Split("\\").Last();
+                DateTime fileDateTime = DateTime.ParseExact(fileName.Substring(8, 19), "dd-MM-yyyy_HH-mm-ss", CultureInfo.InvariantCulture); // Format DateTime
+                dateTimes[i] = fileDateTime;
+            }
+
+            DateTime latestDate = DateTime.MinValue;
+            if (dateTimes != null)
+            {
+                // Filter on today's most recent chatlog
+                latestDate = dateTimes.Where(r => r.Year.Equals(currentDateTime.Year) &&
+                    r.Month.Equals(currentDateTime.Month) &&
+                    r.Day.Equals(currentDateTime.Day)).Max();
+            }
+            
+            // Print the most recent chatlog in the chat
+            if (latestDate != DateTime.MinValue)
+            {
+                string latestString = latestDate.ToString("dd-MM-yyyy_HH-mm-ss"); // Format DateTime
+                txtReadChat.Text += $"\nServer: Loading chatlog from {latestString}!";
+
+                string recentFilePath = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + latestString + ".txt";
+                using (StreamReader sr = new StreamReader(recentFilePath))
+                {
+                    string line = "not null";
+                    while (line != null)
+                    {
+                        line = sr.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
+                        {
+                            txtReadChat.Text += $"\n{line}";
+                        }
+                        else
+                        {
+                            txtReadChat.Text += line;
+                        }
+                    }
+                }
+            }
+            else {
+                txtReadChat.Text += $"\nServer: No recent chatlog found!";
+            }
         }
 
         // Helper methods for refreshing MediaElements:

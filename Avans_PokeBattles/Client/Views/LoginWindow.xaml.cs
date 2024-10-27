@@ -37,7 +37,7 @@ namespace Avans_PokeBattles.Client
         {
             // Get the name and check if it's valid
             string name = txtName.Text.ToString();
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name) || txtName.Text.Equals("Enter your name..."))
             {
                 MessageBox.Show("Please enter a valid name.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;

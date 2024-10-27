@@ -11,17 +11,18 @@ namespace Avans_PokeBattles.Server
         private static TcpListener listener;
         private static int port = 8000;
         private static LobbyManager lobbyManager = new LobbyManager();
+        private static Lobby connectedLobby;
 
         public async void Start()
         {
             listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
-            Console.WriteLine("Server started. Waiting for connections...");
+            Console.WriteLine("SERVER: Server started. Waiting for connections...");
 
             while (true)
             {
                 var client = await listener.AcceptTcpClientAsync();
-                Console.WriteLine("Client connected.");
+                Console.WriteLine("SERVER: Client connected.");
                 Task.Run(() => HandleClientAsync(client));
             }
         }
@@ -40,7 +41,7 @@ namespace Avans_PokeBattles.Server
                 }
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Received message: {message}");
+                Console.WriteLine($"SERVER: Received message: {message}");
 
                 // Handle join-lobby request
                 if (message.StartsWith("join-lobby"))
@@ -59,16 +60,15 @@ namespace Avans_PokeBattles.Server
                         // If the lobby is now full, start the game
                         if (joined && lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1])).IsFull)
                         {
-                            var lobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
-                            Console.WriteLine("Lobby is full, starting the game...");
-                            lobby.StartGame(); // Only start the game when lobby is confirmed full
+                            connectedLobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
+                            Console.WriteLine("SERVER: Lobby is full, starting the game...");
+                            connectedLobby.StartGame(); // Only start the game when lobby is confirmed full
                         }
                     }
                 }
             }
             client.Close();
         }
-
 
         // Get the lobby manager instance
         internal static LobbyManager GetLobbymanager()

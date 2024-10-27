@@ -21,7 +21,7 @@
         <Canvas Name="cvGamePanel" Grid.Row="0" Grid.Column="0">
 
             <!-- Player 1 Name & Team Preview -->
-            <Label Name="lblPlayer1Name" FontSize="10" FontWeight="Bold" Canvas.Left="10" Canvas.Top="10" />
+            <Label Name="lblPlayer1Name" FontSize="10" FontWeight="Bold" Canvas.Left="5" Canvas.Top="10" />
             <Image Name="P1Pokemon1Preview" Canvas.Left="20" Canvas.Top="30" Height="60" Width="60" Stretch="Fill" />
             <Image Name="P1Pokemon2Preview" Canvas.Left="20" Canvas.Top="80" Height="60" Width="60" Stretch="Fill" />
             <Image Name="P1Pokemon3Preview" Canvas.Left="20" Canvas.Top="130" Height="60" Width="60" Stretch="Fill" />
@@ -30,7 +30,7 @@
             <Image Name="P1Pokemon6Preview" Canvas.Left="20" Canvas.Top="280" Height="60" Width="60" Stretch="Fill" />
 
             <!-- Player 2 Name & Team Preview -->
-            <Label Name="lblPlayer2Name" FontSize="10" FontWeight="Bold" Canvas.Right="10" Canvas.Top="10" />
+            <Label Name="lblPlayer2Name" FontSize="10" FontWeight="Bold" Canvas.Right="5" Canvas.Top="10" />
             <Image Name="P2Pokemon1Preview" Canvas.Right="10" Canvas.Top="30" Height="60" Width="60" Stretch="Fill" />
             <Image Name="P2Pokemon2Preview" Canvas.Right="10" Canvas.Top="80" Height="60" Width="60" Stretch="Fill" />
             <Image Name="P2Pokemon3Preview" Canvas.Right="10" Canvas.Top="130" Height="60" Width="60" Stretch="Fill" />
@@ -65,18 +65,18 @@
         </Canvas>
 
         <!-- Read Chat here -->
-        <RichTextBox Name="txtReadChat" Grid.Row="0" Grid.Column="1" IsReadOnly="True" />
+        <TextBox Name="txtReadChat" Grid.Row="0" Grid.Column="1" IsReadOnly="True" TextWrapping="Wrap" />
 
         <StackPanel Name="pnlButtonActions" Grid.Row="1" Grid.Column="0">
             <!-- Add Buttons here! -->
-            
+            <Button Name="btnCreateChatlog" Width="150" Height="25" Content="Create chatlog file" Click="btnCreateChatlog_Clicked" />
+            <Button Name="btnReadChatlog" Width="150" Height="25" Content="Read chatlog file" Click="btnReadChatlog_Clicked" />
         </StackPanel>
 
         <!-- Type to Chat here -->
         <StackPanel Name="pnlChat" Grid.Row="1" Grid.Column="1">
-            <TextBox Name="txtTypeChat" IsReadOnly="False" Height="40" TextAlignment="Left" TextWrapping="Wrap"/>
+            <TextBox Name="txtTypeChat" IsReadOnly="False" Height="40" TextAlignment="Left" TextWrapping="Wrap" PreviewMouseDown="txtTypeChat_PreviewMouseDown" Text="Type something..."/>
             <Button Name="btnSendChat" Height="25" Content="Send Text" Click="btnSendChat_Clicked" />
-            
         </StackPanel>
         
     </Grid>

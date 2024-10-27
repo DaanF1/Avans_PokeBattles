@@ -43,17 +43,6 @@ namespace Avans_PokeBattles
         }
 
         /// <summary>
-        /// Deserialize a Pokemon sent via TCP
-        /// Inspiration from StackOverflow: https://stackoverflow.com/questions/221925/creating-a-byte-array-from-a-stream 
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static Pokemon Deserialize(string jsonMessage) //SerialMessage message
-        {
-            return JsonSerializer.Deserialize<Pokemon>(jsonMessage);
-        }
-
-        /// <summary>
         /// Gets a move based on the position of the move in the list
         /// </summary>
         /// <param name="position"></param>
