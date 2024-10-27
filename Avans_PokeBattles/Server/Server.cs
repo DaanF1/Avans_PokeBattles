@@ -16,12 +16,12 @@ namespace Avans_PokeBattles.Server
         {
             listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
-            Console.WriteLine("Server started. Waiting for connections...");
+            Console.WriteLine("SERVER: Server started. Waiting for connections...");
 
             while (true)
             {
                 var client = await listener.AcceptTcpClientAsync();
-                Console.WriteLine("Client connected.");
+                Console.WriteLine("SERVER: Client connected.");
                 Task.Run(() => HandleClientAsync(client));
             }
         }
@@ -40,7 +40,7 @@ namespace Avans_PokeBattles.Server
                 }
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Received message: {message}");
+                Console.WriteLine($"SERVER: Received message: {message}");
 
                 // Handle join-lobby request
                 if (message.StartsWith("join-lobby"))
@@ -60,7 +60,7 @@ namespace Avans_PokeBattles.Server
                         if (joined && lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1])).IsFull)
                         {
                             var lobby = lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1]));
-                            Console.WriteLine("Lobby is full, starting the game...");
+                            Console.WriteLine("SERVER: Lobby is full, starting the game...");
                             lobby.StartGame(); // Only start the game when lobby is confirmed full
                         }
                     }

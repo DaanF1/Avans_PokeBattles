@@ -48,7 +48,7 @@ namespace Avans_PokeBattles.Client
             tcpClient = client;
 
             // Play Music
-            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
             GetServerMessages();
         }
 
@@ -62,10 +62,10 @@ namespace Avans_PokeBattles.Client
                 if (bytesRead == 0) break;
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"Received from server: {message}");
+                Console.WriteLine($"CLIENT: Received from server: {message}");
 
                 // Check if the message is a team info message
-                if (message.StartsWith("Player"))
+                if (message.StartsWith("PlayerTeam"))
                 {
                     List<Pokemon> pokemon = new List<Pokemon>();
                     // Get Pokemon of both teams
@@ -79,7 +79,7 @@ namespace Avans_PokeBattles.Client
                 else
                 {
                     // Handle other types of messages if necessary
-                    Console.WriteLine($"Unhandled message: {message}");
+                    Console.WriteLine($"CLIENT: Unhandled message: {message}");
                 }
             }
         }
@@ -112,7 +112,7 @@ namespace Avans_PokeBattles.Client
                 Pokemon receivedPokemon = JsonSerializer.Deserialize<Pokemon>(jsonString);
 
                 // Display the deserialized object
-                Console.WriteLine($"Received Pokemon: Name={receivedPokemon.Name}, Health={receivedPokemon.CurrentHealth}");
+                Console.WriteLine($"CLIENT: Received Pokemon: Name={receivedPokemon.Name}, Health={receivedPokemon.CurrentHealth}");
 
                 return receivedPokemon;
             }
@@ -237,7 +237,7 @@ namespace Avans_PokeBattles.Client
         }
         private void PP1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
-            Console.WriteLine("Could not load in .gif file!");
+            Console.WriteLine("CLIENT: Could not load in .gif file!");
         }
 
         private void PP2_MediaEndend(object sender, RoutedEventArgs e)
@@ -250,7 +250,7 @@ namespace Avans_PokeBattles.Client
         }
         private void PP2_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
-            Console.WriteLine("Could not load in .gif file!");
+            Console.WriteLine("CLIENT: Could not load in .gif file!");
         }
         /// <summary>
         /// Play a music file from the project
@@ -298,31 +298,47 @@ namespace Avans_PokeBattles.Client
         }
 
         // Hit events:
+        private async void SendMoveToServer(string moveName)
+        {
+            try
+            {
+                // Create move message format
+                string moveMessage = $"move:{moveName}";
+
+                // Convert message to bytes and send to server
+                byte[] moveBytes = Encoding.UTF8.GetBytes(moveMessage);
+                await tcpClient.GetStream().WriteAsync(moveBytes, 0, moveBytes.Length);
+
+                Console.WriteLine($"CLIENT: Sent move to server: {moveMessage}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CLIENT: Failed to send move: {ex.Message}");
+            }
+        }
+
         private void btnOption1_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            // Send move selected from btnOption1
+            SendMoveToServer(btnOption1.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
 
         private void btnOption2_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            SendMoveToServer(btnOption2.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
 
         private void btnOption3_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            SendMoveToServer(btnOption3.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
 
         private void btnOption4_Click(object sender, RoutedEventArgs e)
         {
-            // Handle hit:
-
+            SendMoveToServer(btnOption4.Content.ToString());
             PlayMusic(hitPlayer, dirPrefix + "/Sounds/Hit.wav", 50, false);
         }
 
