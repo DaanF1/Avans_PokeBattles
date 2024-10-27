@@ -1,15 +1,15 @@
-using Avans_PokeBattles;
+﻿using Avans_PokeBattles;
 using Avans_PokeBattles.Server;
 
-namespace PokeBattles_UnitTesting
+namespace PokeBattles_UnitTesting.UnitTests
 {
     [TestClass]
-    public class UnitTest1
+    public class UnitTest2
     {
         [TestMethod]
         public void TestMethod1()
         {
-            //Lobby _lobby = new Lobby();
+            Assert.IsTrue(true);
         }
     }
 }

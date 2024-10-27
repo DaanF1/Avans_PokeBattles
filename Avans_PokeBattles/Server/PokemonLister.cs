@@ -7,7 +7,7 @@ using System.Windows.Markup;
 
 namespace Avans_PokeBattles.Server
 {
-    internal class PokemonLister
+    public class PokemonLister
     {
         // List with all availible pokemon
         private List<Pokemon> pokemonList = new List<Pokemon>();
