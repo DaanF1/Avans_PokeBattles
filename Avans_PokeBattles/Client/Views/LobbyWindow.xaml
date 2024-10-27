@@ -16,7 +16,7 @@
             <RowDefinition Height="350" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <!-- Game Panel (outer) -->
         <Canvas Name="cvGamePanel" Grid.Row="0" Grid.Column="0">
 
@@ -38,17 +38,21 @@
             <Image Name="P2Pokemon5Preview" Canvas.Right="10" Canvas.Top="230" Height="60" Width="60" Stretch="Fill" />
             <Image Name="P2Pokemon6Preview" Canvas.Right="10" Canvas.Top="280" Height="60" Width="60" Stretch="Fill" />
 
-            
+
             <!-- Game View (inner) -->
             <Canvas Name="cvGameView" Canvas.Left="100" Height="350" Width="425" Background="Black">
                 <Label Name="lblRound" FontSize="18" FontWeight="Bold" Content="Round: X" Foreground="White" />
+
+                <!-- Turn Indicator -->
+                <Label Name="lblTurnIndicator" Content="Turn: Player X" FontSize="16" FontWeight="Bold" Foreground="White" 
+                       Canvas.Left="260" Canvas.Bottom="100" />
 
                 <!-- Current Player Pokemon -->
                 <Label Name="lblP1PokemonHealth" Content="Health: X" Height="25" Width="100" Canvas.Left="50" Canvas.Bottom="150" Foreground="White" />
                 <Border Background="Black" Canvas.Left="50" Canvas.Bottom="50">
                     <MediaElement Name="PokemonPlayer1"  Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP1_MediaEnded" MediaFailed="PP1_MediaFailed" />
                 </Border>
-                
+
                 <!-- Opponent Player Pokemon -->
                 <Label Name="lblP2PokemonHealth" Content="Health: X" Height="25" Width="100"  Canvas.Top="25" Canvas.Right="50" Foreground="White" />
                 <Border Background="Black" Canvas.Top="50" Canvas.Right="50">
@@ -60,7 +64,7 @@
                 <Button Name="btnOption2" Content="Option 2" Canvas.Right="105" Canvas.Bottom="50" Width="80" Height="25" Click="btnOption2_Click" MouseEnter="btnOption2_MouseEnter"  />
                 <Button Name="btnOption3" Content="Option 3" Canvas.Right="25" Canvas.Bottom="50" Width="80" Height="25" Click="btnOption3_Click" MouseEnter="btnOption3_MouseEnter" />
                 <Button Name="btnOption4" Content="Option 4" Canvas.Right="65" Canvas.Bottom="25" Width="80" Height="25" Click="btnOption4_Click" MouseEnter="btnOption4_MouseEnter" />
-                
+
             </Canvas>
         </Canvas>
 
@@ -69,15 +73,15 @@
 
         <StackPanel Name="pnlButtonActions" Grid.Row="1" Grid.Column="0">
             <!-- Add Buttons here! -->
-            
+
         </StackPanel>
 
         <!-- Type to Chat here -->
         <StackPanel Name="pnlChat" Grid.Row="1" Grid.Column="1">
             <TextBox Name="txtTypeChat" IsReadOnly="False" Height="40" TextAlignment="Left" TextWrapping="Wrap"/>
             <Button Name="btnSendChat" Height="25" Content="Send Text" Click="btnSendChat_Clicked" />
-            
+
         </StackPanel>
-        
+
     </Grid>
 </Window>

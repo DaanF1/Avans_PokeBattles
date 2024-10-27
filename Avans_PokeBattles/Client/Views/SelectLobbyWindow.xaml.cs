@@ -73,9 +73,11 @@ namespace Avans_PokeBattles.Client
                 }
                 else if (message.StartsWith("start-game"))
                 {
+                    bool isPlayerOne = message == "start-game:player1";
+
                     await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
-                        var gameWindow = new LobbyWindow(tcpClient);
+                        var gameWindow = new LobbyWindow(tcpClient, isPlayerOne);
                         gameWindow.Show();
                         this.Close();
                     });
