@@ -24,6 +24,7 @@ namespace Avans_PokeBattles.Client
     {
         // Important stuff:
         private TcpClient tcpClient;
+        private NetworkStream stream;
 
         // Uri prefixes for loading images
         public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -46,6 +47,7 @@ namespace Avans_PokeBattles.Client
             // Set name
             lblPlayer1Name.Content = ""; //playerName;
             tcpClient = client;
+            stream = tcpClient.GetStream();
 
             // Play Music
             //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
@@ -54,7 +56,6 @@ namespace Avans_PokeBattles.Client
 
         private async void GetServerMessages()
         {
-            NetworkStream stream = tcpClient.GetStream();
             byte[] buffer = new byte[10000];
             while (tcpClient.Connected)
             {
@@ -62,13 +63,11 @@ namespace Avans_PokeBattles.Client
                 if (bytesRead == 0) break;
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"CLIENT: Received from server: {message}");
+                //Console.WriteLine($"CLIENT: Received from server: {message}");
 
-                // Check if the message is a team info message
                 if (message.StartsWith("PlayerTeam"))
                 {
                     List<Pokemon> pokemon = new List<Pokemon>();
-                    // Get Pokemon of both teams
                     for (int i = 0; i < 6; i++)
                     {
                         Pokemon p = await GetServerPokemon(stream);
@@ -78,10 +77,10 @@ namespace Avans_PokeBattles.Client
                 }
                 else
                 {
-                    // Handle other types of messages if necessary
-                    Console.WriteLine($"CLIENT: Unhandled message: {message}");
+                    //Console.WriteLine($"CLIENT: Unhandled message: {message}");
                 }
             }
+            //Console.WriteLine("CLIENT: Connection closed or no more messages from server.");
         }
 
         /// <summary>
@@ -302,14 +301,12 @@ namespace Avans_PokeBattles.Client
         {
             try
             {
-                // Create move message format
                 string moveMessage = $"move:{moveName}";
-
-                // Convert message to bytes and send to server
                 byte[] moveBytes = Encoding.UTF8.GetBytes(moveMessage);
-                await tcpClient.GetStream().WriteAsync(moveBytes, 0, moveBytes.Length);
 
-                Console.WriteLine($"CLIENT: Sent move to server: {moveMessage}");
+                await stream.WriteAsync(moveBytes, 0, moveBytes.Length);
+
+                //Console.WriteLine($"CLIENT: Move sent to server: {moveMessage}");
             }
             catch (Exception ex)
             {

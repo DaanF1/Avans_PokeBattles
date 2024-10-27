@@ -118,8 +118,13 @@ namespace Avans_PokeBattles.Server
             return teamOfPlayer;
         }
 
+        public bool HasClient(TcpClient client)
+        {
+            return client == player1 || client == player2;
+        }
+
         private async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
-            {
+        {
             StringBuilder teamMessage = new StringBuilder();
 
             // Indicate sending a Player's team:
@@ -157,15 +162,7 @@ namespace Avans_PokeBattles.Server
 
                 if (IsMoveMessage(message))
                 {
-                    if (isPlayer1Turn && sender == player1 || !isPlayer1Turn && sender == player2)
-                    {
-                        await HandleMove(message, senderStream, receiverStream);
-                    }
-                    else
-                    {
-                        // Inform the sender that it's not their turn
-                        await SendMessage(senderStream, "It's not your turn.");
-                    }
+                   await HandleMove(message, sender);
                 }
                 else
                 {
@@ -180,31 +177,42 @@ namespace Avans_PokeBattles.Server
 
         private bool IsMoveMessage(string message)
         {
-            return message.StartsWith("move:");  // Simplified check for move commands (possible to be expanded upon later)
+            return message.StartsWith("move:") || message.StartsWith(" move:");  // Simplified check for move commands (possible to be expanded upon later)
         }
 
-        private async Task HandleMove(string move, NetworkStream senderStream, NetworkStream receiverStream)
+        public async Task HandleMove(string move, TcpClient sender)
         {
-            // Simulate basic move handling logic
-            string result = $"Player {(isPlayer1Turn ? 1 : 2)} used {move.Substring(5)}!";
+            Console.WriteLine("HANDLING MOVE");
+            // Identify which player sent the move
+            NetworkStream senderStream = (sender == player1) ? stream1 : stream2;
+            NetworkStream receiverStream = (sender == player1) ? stream2 : stream1;
 
-            // Relay the move result to both players
-            await SendMessage(senderStream, result);  // To the player who made the move
-            await SendMessage(receiverStream, result);  // To the opponent
-
-            // Switch turns
-            isPlayer1Turn = !isPlayer1Turn;
-
-            // Notify players about whose turn is next using structured messages
-            if (isPlayer1Turn)
+            // Check if it's the correct player's turn
+            if ((isPlayer1Turn && sender == player1) || (!isPlayer1Turn && sender == player2))
             {
-                await SendMessage(stream1, "switch_turn:player1");  // Player 1's turn
-                await SendMessage(stream2, "switch_turn:player1");  // Notify Player 2 that it's Player 1's turn
+                Console.WriteLine($"LOBBY {LobbyId}: Handling move from player {(sender == player1 ? 1 : 2)}.");
+
+                // Process the move
+                string result = $"Player {(isPlayer1Turn ? 1 : 2)} used {move.Substring(5)}!";
+
+                // Send result of the move to both players
+                await SendMessage(senderStream, result);  // Send result to the player who made the move
+                await SendMessage(receiverStream, result);  // Send result to the opponent
+
+                // Switch turns
+                isPlayer1Turn = !isPlayer1Turn;
+
+                // Notify both players about whose turn is next
+                string nextTurnMessage = isPlayer1Turn ? "switch_turn:player1" : "switch_turn:player2";
+                await SendMessage(stream1, nextTurnMessage);
+                await SendMessage(stream2, nextTurnMessage);
+
             }
             else
             {
-                await SendMessage(stream1, "switch_turn:player2");  // Notify Player 1 that it's Player 2's turn
-                await SendMessage(stream2, "switch_turn:player2");  // Player 2's turn
+                // Inform the sender that it's not their turn
+                Console.WriteLine($"LOBBY {LobbyId}: Not player {(sender == player1 ? 1 : 2)}'s turn.");
+                await SendMessage(senderStream, "It's not your turn.");
             }
         }
 

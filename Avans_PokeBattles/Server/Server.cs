@@ -65,6 +65,20 @@ namespace Avans_PokeBattles.Server
                         }
                     }
                 }
+                else if (message.StartsWith("move:"))
+                {
+                    // Handle move command by forwarding it to the appropriate lobby
+                    var lobby = lobbyManager.GetLobbyForClient(client);
+                    if (lobby != null)
+                    {
+                        Console.WriteLine($"SERVER: Forwarding move to Lobby {lobby.LobbyId}");
+                        await lobby.HandleMove(message, client);
+                    }
+                    else
+                    {
+                        Console.WriteLine("SERVER: Client not assigned to any lobby.");
+                    }
+                }
             }
             client.Close();
         }

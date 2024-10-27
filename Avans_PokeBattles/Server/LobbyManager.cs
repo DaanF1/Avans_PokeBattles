@@ -58,5 +58,10 @@ namespace Avans_PokeBattles.Server
             return lobbies[lobbyNumber - 1];
         }
 
+        public Lobby GetLobbyForClient(TcpClient client)
+        {
+            return lobbies.FirstOrDefault(lobby => lobby.HasClient(client));
+        }
+
     }
 }
