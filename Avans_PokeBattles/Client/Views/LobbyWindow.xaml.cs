@@ -399,7 +399,7 @@ namespace Avans_PokeBattles.Client
         // FileIO chatlogs:
         private void btnCreateChatlog_Clicked(object sender, RoutedEventArgs e)
         {
-            // Create file
+            // Create file (at Avans_PokeBattles\Avans_PokeBattles\bin\Debug\net8.0-windows\Chatlogs directory)
             string currentTime = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
             string path = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + currentTime + ".txt";
             if (!File.Exists(path))
@@ -430,9 +430,9 @@ namespace Avans_PokeBattles.Client
         }
         private void btnReadChatlog_Clicked(object sender, RoutedEventArgs e)
         {
-            // Check file DateTime
+            // Check file DateTime (at: (Project_Name)\Avans_PokeBattles\Avans_PokeBattles\bin\Debug\net8.0-windows\Chatlogs directory)
             DateTime currentDateTime = DateTime.Now;
-            string currentString = currentDateTime.ToString("dd-MM-yyyy_HH-mm-ss"); // Format
+            string currentString = currentDateTime.ToString("dd-MM-yyyy_HH-mm-ss"); // Format DateTime
 
             string pathToLogs = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs";
             string[] pathToFiles = Directory.GetFiles(pathToLogs);
@@ -440,7 +440,7 @@ namespace Avans_PokeBattles.Client
             for (int i = 0; i < pathToFiles.Length; i++)
             {
                 string fileName = pathToFiles[i].Split("\\").Last();
-                DateTime fileDateTime = DateTime.ParseExact(fileName.Substring(8, 19), "dd-MM-yyyy_HH-mm-ss", CultureInfo.InvariantCulture); // Format
+                DateTime fileDateTime = DateTime.ParseExact(fileName.Substring(8, 19), "dd-MM-yyyy_HH-mm-ss", CultureInfo.InvariantCulture); // Format DateTime
                 dateTimes[i] = fileDateTime;
             }
 
@@ -456,8 +456,8 @@ namespace Avans_PokeBattles.Client
             // Print the most recent chatlog in the chat
             if (latestDate != DateTime.MinValue)
             {
-                string latestString = latestDate.ToString("dd-MM-yyyy_HH-mm-ss"); // Format
-                txtReadChat.Text += $"Server: Loading chatlog from {latestString}!";
+                string latestString = latestDate.ToString("dd-MM-yyyy_HH-mm-ss"); // Format DateTime
+                txtReadChat.Text += $"\nServer: Loading chatlog from {latestString}!";
 
                 string recentFilePath = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + latestString + ".txt";
                 using (StreamReader sr = new StreamReader(recentFilePath))
@@ -478,7 +478,7 @@ namespace Avans_PokeBattles.Client
                 }
             }
             else {
-                txtReadChat.Text += $"Server: No recent chatlog found!";
+                txtReadChat.Text += $"\nServer: No recent chatlog found!";
             }
         }
 

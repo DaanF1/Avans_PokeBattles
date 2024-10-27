@@ -170,14 +170,7 @@ namespace Avans_PokeBattles.Server
                 else if (IsChatMessage(message))
                 {
                     // Send message to other player
-                    if (sender == player1 )
-                    {
-                        await SendMessage(receiverStream, message);
-                    }
-                    else if (sender == player2)
-                    {
-                        await SendMessage(receiverStream, message);
-                    }
+                    await SendMessage(receiverStream, message);
                 }
                 else
                 {
