@@ -101,8 +101,6 @@ namespace Avans_PokeBattles.Server
 
             Console.WriteLine("LOBBY: Start-game messages sent to both players.");
 
-            Task.Run(() => HandleClient(player1, stream1, player2, stream2));
-            Task.Run(() => HandleClient(player2, stream2, player1, stream1));
         }
 
         private List<Pokemon> AssignRandomTeam()
@@ -145,34 +143,6 @@ namespace Avans_PokeBattles.Server
             {
                 await SendPokemon(stream, pokemon);
             }
-        }
-
-        private async Task HandleClient(TcpClient sender, NetworkStream senderStream, TcpClient receiver, NetworkStream receiverStream)
-        {
-            byte[] buffer = new byte[1500];
-
-            while (sender.Connected && receiver.Connected)
-            {
-                int bytesRead = await senderStream.ReadAsync(buffer, 0, buffer.Length);
-                if (bytesRead == 0)
-                    break;
-
-                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"LOBBY: Message from player: {message}");
-
-                if (IsMoveMessage(message))
-                {
-                   await HandleMove(message, sender);
-                }
-                else
-                {
-                    await SendMessage(senderStream, "Unknown command.");
-                }
-            }
-
-            // Handle disconnection
-            sender.Close();
-            receiver.Close();
         }
 
         private bool IsMoveMessage(string message)
