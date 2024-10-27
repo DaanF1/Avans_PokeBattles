@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avans_PokeBattles", "Avans_PokeBattles\Avans_PokeBattles.csproj", "{A4E01CAF-D486-4891-A5E2-3ADB04E5FD38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBattles_UnitTesting", "PokeBattles_UnitTesting\PokeBattles_UnitTesting.csproj", "{91B16291-20D5-42EC-A8A3-6A461410D1A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avans_PokeBattles-UnitTests", "PokeBattles_UnitTesting\Avans_PokeBattles-UnitTests.csproj", "{91B16291-20D5-42EC-A8A3-6A461410D1A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

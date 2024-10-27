@@ -27,6 +27,11 @@ namespace Avans_PokeBattles.Server
             }
         }
 
+        public void Stop()
+        {
+            this.Stop(); // Stop the Server
+        }
+
         // Handle individual client requests
         private async Task HandleClientAsync(TcpClient client)
         {
