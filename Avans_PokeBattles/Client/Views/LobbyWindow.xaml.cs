@@ -24,7 +24,7 @@ namespace Avans_PokeBattles.Client
         private string namePlayer2;
 
         // Uri prefixes for loading images
-        public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
+        public string dirPrefix = AppDomain.CurrentDomain.BaseDirectory;
         public UriKind standardUriKind = UriKind.Absolute;
 
         // Media
@@ -39,13 +39,14 @@ namespace Avans_PokeBattles.Client
         private int nameIndex = 1;
         private readonly bool isPlayerOne;
 
+        // Pokemon lists & searching:
         private readonly List<Pokemon> playerPokemon = [];
         private readonly List<Pokemon> opponentPokemon = [];
-
         private int playerActivePokemonIndex = 0;
         private int opponentActivePokemonIndex = 0;
 
-        private static readonly string[] stateSeparator = ["fainted!", "switch_turn:", "Game Over!"];
+        // Separators
+        private static readonly string[] failtedSeparator = ["fainted!", "switch_turn:", "Game Over!"];
         private static readonly string[] damageHpSeparator = ["damage dealt.", " has ", " HP left."];
 
         public LobbyWindow(TcpClient client, bool isPlayerOne)
@@ -59,9 +60,13 @@ namespace Avans_PokeBattles.Client
             tcpClient = client;
             stream = tcpClient.GetStream();
 
-            // Play Music
+            // Play music
             PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+
+            // Ínitialize buttons
             InitializeButtonStates();
+
+            // Start waiting for Server messages
             GetServerMessages();
         }
 
@@ -218,7 +223,7 @@ namespace Avans_PokeBattles.Client
         private void ProcessFaintMessage(string message)
         {
             // Example message: "Blastoise fainted! player1Game Over! Player 1 wins!"
-            string[] parts = message.Split(stateSeparator, StringSplitOptions.None);
+            string[] parts = message.Split(failtedSeparator, StringSplitOptions.None);
 
             if (parts.Length < 2) return;  // Exit if the format is unexpected
 

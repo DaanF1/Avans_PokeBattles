@@ -9,6 +9,7 @@ namespace PokeBattles_UnitTesting.UnitTests
     public class ServerUnitTests // Unit Tests for the Server, LobbyManager and Lobby classes
     {
         public Server server = new(); // Create Server
+
         [TestMethod]
         public void JoinLobbyTest() // Unit Test: Joining a Lobby
         {

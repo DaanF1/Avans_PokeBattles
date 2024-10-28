@@ -17,18 +17,18 @@ namespace PokeBattles_UnitTesting.UnitTests
             PokemonLister pokemonLister = new(); // Create PokemonLister
             Console.WriteLine("PokemonLister Created!");
 
-            pokemonLister = new PokemonLister();
+            pokemonLister = new();
             List<Move> venusaurMoves =
             [
                 new Move("Solar Beam", 120, 100, Type.Grass),
                 new Move("Take Down", 90, 85, Type.Normal),
                 new Move("Razor Leaf", 55, 95, Type.Grass),
                 new Move("Tackle", 40, 100, Type.Normal),
-            ];  // Create Pokemon
+            ];
             Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), 
-                Type.Grass, 195, 70, venusaurMoves);
+                Type.Grass, 195, 70, venusaurMoves); // Create Pokemon
             Console.WriteLine("Pokemon Created!");
 
             pokemonLister.AddPokemon(venusaur); // Add Pokemon to PokemonLister
@@ -60,11 +60,11 @@ namespace PokeBattles_UnitTesting.UnitTests
                 new Move("Take Down", 90, 85, Type.Normal),
                 new Move("Razor Leaf", 55, 95, Type.Grass),
                 new Move("Tackle", 40, 100, Type.Normal),
-            ]; // Create Pokemon
+            ];
             Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind), 
-                Type.Grass, 195, 70, venusaurMoves);
+                Type.Grass, 195, 70, venusaurMoves); // Create Pokemon
             Console.WriteLine("Pokemon Created!");
 
             pokemonLister.AddPokemon(venusaur); // Add Pokemon to PokemonLister

@@ -15,7 +15,7 @@ namespace Avans_PokeBattles.Server
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
         private PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
-        public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
+        public string dirPrefix = AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
         public UriKind standardUriKind = UriKind.Absolute; // Always get the absolute path
 
         private List<Pokemon> player1Team;
@@ -310,7 +310,7 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(jsonBytes);
 
             // Wait for data to be read client-side
-            await Task.Delay(30);
+            await Task.Delay(35);
         }
 
     }
