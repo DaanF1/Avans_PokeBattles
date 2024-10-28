@@ -26,7 +26,7 @@ namespace Avans_PokeBattles
             // Start Server
             
                 var server = new Server.Server();
-                server.Start();
+            Server.Server.Start();
             
 
             // Start Client 1

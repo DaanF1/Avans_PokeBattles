@@ -29,9 +29,9 @@ namespace Avans_PokeBattles.Client
         // Media
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
-        public MediaPlayer playerBattleMusic = new MediaPlayer();
-        public MediaPlayer buttonPlayer = new MediaPlayer();
-        public MediaPlayer hitPlayer = new MediaPlayer();
+        public MediaPlayer playerBattleMusic = new();
+        public MediaPlayer buttonPlayer = new();
+        public MediaPlayer hitPlayer = new();
 
         // Other variables:
         private int pokemonIndex = 0;
@@ -120,7 +120,7 @@ namespace Avans_PokeBattles.Client
         /// Made with help from ChatGPT!
         /// </summary>
         /// <param name="stream"></param>
-        private async Task<Pokemon> GetServerPokemon(NetworkStream stream)
+        private static async Task<Pokemon> GetServerPokemon(NetworkStream stream)
         {
             while (true)
             {

@@ -14,7 +14,7 @@ namespace Avans_PokeBattles.Server
         private NetworkStream stream2;
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
-        private PokemonLister pokemonLister = new PokemonLister();  // List of available Pokémon to pick from
+        private PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
         public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
         public UriKind standardUriKind = UriKind.Absolute; // Always get the absolute path
 
@@ -68,7 +68,7 @@ namespace Avans_PokeBattles.Server
             Pokemon blastoise = new("Blastoise", new Uri(dirPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind), Type.Water, 145, 75, blastoiseMoves);
 
             // Add Pokemon to the lister
-            pokemonLister.AddAllPokemon(new List<Pokemon> { unown, venusaur, charizard, blastoise} );
+            pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise] );
         }
 
         public void AddPlayer(TcpClient client, string clientName)
@@ -220,12 +220,12 @@ namespace Avans_PokeBattles.Server
             receiver.Close();
         }
 
-        private bool IsMoveMessage(string message)
+        private static bool IsMoveMessage(string message)
         {
             return message.StartsWith("move:");  // Simplified check for move commands (possible to be expanded upon later)
         }
 
-        private bool IsChatMessage(string message)
+        private static bool IsChatMessage(string message)
         {
             return message.StartsWith("chat:");  // Simplified check for move commands (possible to be expanded upon later)
         }
@@ -255,7 +255,7 @@ namespace Avans_PokeBattles.Server
             }
         }
 
-        private async Task SendMessage(NetworkStream stream, string message)
+        private static async Task SendMessage(NetworkStream stream, string message)
         {
             byte[] response = Encoding.UTF8.GetBytes(message);
             await stream.WriteAsync(response, 0, response.Length);
@@ -267,7 +267,7 @@ namespace Avans_PokeBattles.Server
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="pokemon"></param>
-        private async Task SendPokemon(NetworkStream stream, Pokemon pokemon)
+        private static async Task SendPokemon(NetworkStream stream, Pokemon pokemon)
         {
             // Serialize each Pokemon object
             string jsonString = JsonSerializer.Serialize(pokemon);
@@ -281,7 +281,7 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(jsonBytes);
 
             // Wait for data to be read client-side
-            await Task.Delay(100);
+            await Task.Delay(30);
         }
 
     }

@@ -13,7 +13,7 @@ namespace Avans_PokeBattles.Server
         private static readonly Dictionary<TcpClient, string> clientNames = [];
         private static bool isRunning = false;
 
-        public async void Start()
+        public static async void Start()
         {
             listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
@@ -28,13 +28,13 @@ namespace Avans_PokeBattles.Server
             }
         }
 
-        public static void Stop()
+        internal static void Stop()
         {
             isRunning = false;
             Stop(); // Stop the Server
         }
 
-        public static bool IsRunning()
+        internal static bool IsRunning()
         {
             return isRunning;
         }

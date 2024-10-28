@@ -13,7 +13,7 @@ namespace PokeBattles_UnitTesting.UnitTests
         public void JoinLobbyTest() // Unit Test: Joining a Lobby
         {
             if (Server.IsRunning() == false) // Start the Server if it wasn't running already
-                server.Start();
+                Server.Start();
 
             TcpClient client1 = new(); // Create Client 1
             client1.Connect("localhost", 8000); // Connect to Server
@@ -32,7 +32,7 @@ namespace PokeBattles_UnitTesting.UnitTests
         public void MultipleClientsTest() // Unit Test: Multiple Clients can connect to the Server
         {
             if (Server.IsRunning() == false) // Start the Server if it wasn't running already
-                server.Start();
+                Server.Start();
 
             TcpClient client1 = new TcpClient(); // Create Client 1
             client1.Connect("localhost", 8000); // Connect to Server
