@@ -41,6 +41,9 @@ namespace Avans_PokeBattles.Client
         private int pokemonIndex = 0;
         private bool isPlayerOne;
 
+        private List<Pokemon> playerPokemon = new List<Pokemon>();
+        private List<Pokemon> enemyPokemon = new List<Pokemon>();
+
         public LobbyWindow(TcpClient client, bool isPlayerOne)
         {
             InitializeComponent();
@@ -86,13 +89,24 @@ namespace Avans_PokeBattles.Client
 
                 if (message.StartsWith("PlayerTeam"))
                 {
-                    List<Pokemon> pokemon = new List<Pokemon>();
-                    for (int i = 0; i < 6; i++)
+                    if (playerPokemon.Count > 0)
                     {
-                        Pokemon p = await GetServerPokemon(stream);
-                        pokemon.Add(p);
+                        for (int i = 0; i < 6; i++)
+                        {
+                            Pokemon p = await GetServerPokemon(stream);
+                            enemyPokemon.Add(p);
+                        }
+                        DisplayTeams(enemyPokemon);
                     }
-                    DisplayTeams(pokemon);
+                    else
+                    {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            Pokemon p = await GetServerPokemon(stream);
+                            playerPokemon.Add(p);
+                        }
+                        DisplayTeams(playerPokemon);
+                    }
                 }
                 else if (message.Contains("damage dealt"))
                 {
