@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
@@ -594,7 +595,7 @@ namespace Avans_PokeBattles.Client
         {
             // Create directory path
             string dirPath = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs";
-            // Create file (at Avans_PokeBattles\Avans_PokeBattles\bin\Debug\net8.0-windows\Chatlogs directory)
+            // Create file (at Avans_PokeBattles\Avans_PokeBattles\bin\Debug\net8.0-windows7.0\Chatlogs directory)
             string currentTime = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
             string path = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + currentTime + ".txt";
             if (!File.Exists(path))
@@ -616,8 +617,16 @@ namespace Avans_PokeBattles.Client
             using (StreamWriter outputFile = new StreamWriter(path))
             {
                 outputFile.WriteLine("---Chatlog---");
+                //string logPattern = @"---Chatlog---\n[\s\S]*?---End of Chatlog---\n?$"; // Regex pattern for Chatlogs
                 foreach (string line in txtReadChat.Text.Split("\n"))
                 {
+                    //// Exclude old Chatlogs in the new Chatlog
+                    //string logText = Regex.Match(txtReadChat.Text, logPattern).Value;
+                    //if (logText != null)
+                    //{
+                    //    if (logText.Contains(line))
+                    //        continue;
+                    //}
                     outputFile.WriteLine(line);
                 } 
                 outputFile.WriteLine("---End of Chatlog---");
