@@ -47,15 +47,30 @@ namespace Avans_PokeBattles.Client
             this.isPlayerOne = isPlayerOne;
 
             // Set name
-            lblPlayer1Name.Content = isPlayerOne ? "Your Pokémon" : "Opponent's Pokémon";
-            lblPlayer2Name.Content = isPlayerOne ? "Opponent's Pokémon" : "Your Pokémon";
+            lblPlayer1Name.Content = "Your Pokémon";
+            lblPlayer2Name.Content = "Opponent's Pokémon";
 
             tcpClient = client;
             stream = tcpClient.GetStream();
 
             // Play Music
             //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            InitializeButtonStates();
             GetServerMessages();
+        }
+
+        private void InitializeButtonStates()
+        {
+            bool isPlayerTurn = isPlayerOne;
+            SetMoveButtonsState(isPlayerTurn);
+        }
+
+        private void SetMoveButtonsState(bool isEnabled)
+        {
+            btnOption1.IsEnabled = isEnabled;
+            btnOption2.IsEnabled = isEnabled;
+            btnOption3.IsEnabled = isEnabled;
+            btnOption4.IsEnabled = isEnabled;
         }
 
         private async void GetServerMessages()
@@ -148,21 +163,16 @@ namespace Avans_PokeBattles.Client
             // Example message: "Charizard fainted!"
             string faintedPokemonName = message.Split(' ')[0];
             MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            // Logic to switch Pokémon or indicate end of game can be implemented here.
-            // For example, prompt the player to select another Pokémon or show a message if no Pokémon are left.
         }
 
         private void UpdateTurnIndicator(string message)
         {
-            bool isPlayerTurn = message.Contains("player1"); 
+            bool isPlayerTurn = (message.Contains("player1") && isPlayerOne) || (message.Contains("player2") && !isPlayerOne);
+
             lblTurnIndicator.Content = isPlayerTurn ? "Your Turn" : "Opponent's Turn";
             lblTurnIndicator.Foreground = isPlayerTurn ? Brushes.Green : Brushes.Red;
 
-            btnOption1.IsEnabled = isPlayerTurn;
-            btnOption2.IsEnabled = isPlayerTurn;
-            btnOption3.IsEnabled = isPlayerTurn;
-            btnOption4.IsEnabled = isPlayerTurn;
+            SetMoveButtonsState(isPlayerTurn);
         }
         private void UpdateHealthDisplay(string message)
         {
