@@ -109,14 +109,12 @@ namespace Avans_PokeBattles.Server
 
         private List<Pokemon> AssignRandomTeam()
         {
-            // Select 6 Pokémon randomly
             List<Pokemon> teamOfPlayer = new List<Pokemon>();
             for (int i = 0; i < 6; i++)
             {
-                Pokemon randomPokemon = pokemonLister.GetRandomPokemon(); // Allow duplicate Pokemon to be in the same team
+                Pokemon randomPokemon = pokemonLister.GetRandomPokemon().DeepCopy();  // Deep copy to ensure unique instance
                 teamOfPlayer.Add(randomPokemon);
             }
-
             return teamOfPlayer;
         }
 
