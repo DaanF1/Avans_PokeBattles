@@ -1,8 +1,6 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Avans_PokeBattles.Server
 {
@@ -12,7 +10,7 @@ namespace Avans_PokeBattles.Server
         private static int port = 8000;
         private static LobbyManager lobbyManager = new LobbyManager();
         private static Lobby connectedLobby;
-        private static Dictionary<TcpClient, string> clientNames = [];
+        private static readonly Dictionary<TcpClient, string> clientNames = [];
         private static bool isRunning = false;
 
         public async void Start()
@@ -30,25 +28,25 @@ namespace Avans_PokeBattles.Server
             }
         }
 
-        public void Stop()
+        public static void Stop()
         {
             isRunning = false;
-            this.Stop(); // Stop the Server
+            Stop(); // Stop the Server
         }
 
-        public bool IsRunning()
+        public static bool IsRunning()
         {
             return isRunning;
         }
 
         // Handle individual client requests
-        private async Task HandleClientAsync(TcpClient client)
+        private static async Task HandleClientAsync(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
             byte[] buffer = new byte[10000];
             while (client.Connected)
             {
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                int bytesRead = await stream.ReadAsync(buffer);
                 if (bytesRead == 0)
                 {
                     break;
@@ -84,7 +82,7 @@ namespace Avans_PokeBattles.Server
                         // Notify the client if joining the lobby was successful
                         string responseMessage = joined ? "lobby-joined" : "lobby-full";
                         byte[] response = Encoding.UTF8.GetBytes(responseMessage);
-                        await stream.WriteAsync(response, 0, response.Length);
+                        await stream.WriteAsync(response);
 
                         // If the lobby is now full, start the game
                         if (joined && lobbyManager.GetCurrentLobby(int.Parse(lobbyId.Split('-')[1])).IsFull)
