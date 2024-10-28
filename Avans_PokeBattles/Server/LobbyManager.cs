@@ -34,12 +34,12 @@ namespace Avans_PokeBattles.Server
         }
 
         // Allow the client to join a specific lobby by its ID
-        public bool TryJoinLobby(string lobbyId, TcpClient client)
+        public bool TryJoinLobby(string lobbyId, TcpClient client, string clientName)
         {
             var lobby = lobbies.Find(l => l.LobbyId == lobbyId);
             if (lobby != null && !lobby.IsFull)
             {
-                lobby.AddPlayer(client);
+                lobby.AddPlayer(client, clientName);
                 return true;
             }
 

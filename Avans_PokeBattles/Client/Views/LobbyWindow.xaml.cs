@@ -25,6 +25,8 @@ namespace Avans_PokeBattles.Client
     {
         // Important stuff:
         private TcpClient tcpClient;
+        private string namePlayer1;
+        private string namePlayer2;
 
         // Uri prefixes for loading images
         public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -39,12 +41,13 @@ namespace Avans_PokeBattles.Client
 
         // Other variables:
         private int pokemonIndex = 0;
+        private int nameIndex = 1;
 
         public LobbyWindow(TcpClient client)
         {
             InitializeComponent();
 
-            // Set name
+            // Set name (should be overwritten later)
             lblPlayer1Name.Content = "Your team:";
             lblPlayer2Name.Content = "Oponent team:";
             tcpClient = client;
@@ -66,6 +69,26 @@ namespace Avans_PokeBattles.Client
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"CLIENT: Received from server: {message}");
 
+                // Check if the message is a Player name
+                if (message.StartsWith("Player") && !message.StartsWith("PlayerTeam"))
+                {
+                    int playerNumber = nameIndex;
+                    if (playerNumber == 1)
+                    {
+                        // Name is from Player 1
+                        string name = message.Split(':')[1].Trim('\n');
+                        namePlayer1 = name.Substring(0, 1).ToUpper() + name.Substring(1);
+                        lblPlayer1Name.Content = $"{name}'s team:";
+                    } 
+                    else
+                    {
+                        // Name is from Player 2
+                        string name = message.Split(':')[1].Trim('\n');
+                        namePlayer2 = name.Substring(0, 1).ToUpper() + name.Substring(1);
+                        lblPlayer2Name.Content = $"{name}'s team:";
+                    }
+                    nameIndex++;
+                }
                 // Check if the message is a team info message
                 if (message.StartsWith("PlayerTeam"))
                 {
@@ -83,11 +106,11 @@ namespace Avans_PokeBattles.Client
                     // Display chat message
                     if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
                     {
-                        txtReadChat.Text += $"\nOpponent: {message.Split(':')[1]}";
+                        txtReadChat.Text += $"\n{namePlayer2}: {message.Split(':')[1]}";
                     }
                     else
                     {
-                        txtReadChat.Text += $"Opponent: {message.Split(':')[1]}";
+                        txtReadChat.Text += $"{namePlayer2}: {message.Split(':')[1]}";
                     }
                 }
                 else
@@ -362,11 +385,11 @@ namespace Avans_PokeBattles.Client
             {
                 if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
                 {
-                    txtReadChat.Text += $"\nYou: {txtTypeChat.Text}";
+                    txtReadChat.Text += $"\n{namePlayer1}: {txtTypeChat.Text}";
                 }
                 else
                 {
-                    txtReadChat.Text += $"You: {txtTypeChat.Text}";
+                    txtReadChat.Text += $"{namePlayer1}: {txtTypeChat.Text}";
                 }
                 // Send chat to server
                 SendChatToServer(txtTypeChat.Text);

@@ -12,7 +12,9 @@ namespace Avans_PokeBattles.Server
     public class Lobby
     {
         private TcpClient player1;
+        private string namePlayer1;
         private TcpClient player2;
+        private string namePlayer2;
         private NetworkStream stream1;
         private NetworkStream stream2;
 
@@ -69,16 +71,18 @@ namespace Avans_PokeBattles.Server
             pokemonLister.AddPokemon(blastoise);
         }
 
-        public void AddPlayer(TcpClient client)
+        public void AddPlayer(TcpClient client, string clientName)
         {
             if (player1 == null)
             {
                 player1 = client;
+                namePlayer1 = clientName;
                 stream1 = client.GetStream();
             }
             else if (player2 == null)
             {
                 player2 = client;
+                namePlayer2 = clientName;
                 stream2 = client.GetStream();
                 IsFull = true;  // Lobby is full when both players have joined
             }
@@ -98,6 +102,9 @@ namespace Avans_PokeBattles.Server
             // Send teams to both players
             await SendTeam(stream1, player1Team, player2Team, 1);
             await SendTeam(stream2, player2Team, player1Team, 2);
+
+            await SendNames(stream1);
+            await SendNames(stream2);
 
             Console.WriteLine("LOBBY: Start-game messages sent to both players.");
 
@@ -139,6 +146,36 @@ namespace Avans_PokeBattles.Server
             foreach (Pokemon pokemon in opponentTeam)
             {
                 await SendPokemon(stream, pokemon);
+            }
+        }
+
+        private async Task SendNames(NetworkStream stream)
+        {
+            StringBuilder teamMessage = new StringBuilder();
+
+            if (stream == stream1)
+            {
+                // Sending Player 1 name:
+                teamMessage.Append($"Player 1 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer1.ToString() + "\n");
+                teamMessage.Clear();
+
+                // Sending Player 2 name:
+                teamMessage.Append($"Player 2 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer2.ToString() + "\n");
+                teamMessage.Clear();
+            } 
+            else // Inverse player numbers
+            {
+                // Sending Player 2 name:
+                teamMessage.Append($"Player 1 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer2.ToString() + "\n");
+                teamMessage.Clear();
+
+                // Sending Player 1 name:
+                teamMessage.Append($"Player 2 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer1.ToString() + "\n");
+                teamMessage.Clear();
             }
         }
 
