@@ -10,7 +10,7 @@ namespace Avans_PokeBattles.Client
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
         private readonly LobbyManager lobbyManager;
-        private string playerName = "";
+        private readonly string playerName = "";
 
         public SelectLobbyWindow(string name, TcpClient client)
         {
