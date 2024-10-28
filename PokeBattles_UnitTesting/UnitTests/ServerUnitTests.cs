@@ -51,11 +51,5 @@ namespace PokeBattles_UnitTesting.UnitTests
 
             Assert.IsTrue(true); // Test is successful
         }
-
-        //[TestMethod]
-        //public void DefaultTest()
-        //{
-        //    Assert.IsTrue(true); // Test is successful
-        //}
     }
 }
