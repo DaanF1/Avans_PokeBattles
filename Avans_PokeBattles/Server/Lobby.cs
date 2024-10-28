@@ -14,8 +14,8 @@ namespace Avans_PokeBattles.Server
         private NetworkStream stream2;
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
-        private PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
-        public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
+        private readonly PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
+        public string dirPrefix = AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
         public UriKind standardUriKind = UriKind.Absolute; // Always get the absolute path
 
         private List<Pokemon> player1Team;
@@ -118,7 +118,7 @@ namespace Avans_PokeBattles.Server
 
         private List<Pokemon> AssignRandomTeam()
         {
-            List<Pokemon> teamOfPlayer = new List<Pokemon>();
+            List<Pokemon> teamOfPlayer = [];
             for (int i = 0; i < 6; i++)
             {
                 Pokemon randomPokemon = pokemonLister.GetRandomPokemon().DeepCopy();  // Deep copy to ensure unique instance
@@ -132,7 +132,7 @@ namespace Avans_PokeBattles.Server
             return client == player1 || client == player2;
         }
 
-        private async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
+        private static async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
         {
             StringBuilder teamMessage = new StringBuilder();
 
@@ -188,33 +188,43 @@ namespace Avans_PokeBattles.Server
 
         public async Task HandleMove(string message, TcpClient sender)
         {
+            // Determine the sender's stream and the opponent's stream based on the sender
             NetworkStream senderStream = (sender == player1) ? stream1 : stream2;
             NetworkStream receiverStream = (sender == player1) ? stream2 : stream1;
+
+            // Determine which Pokémon are the attacker and defender based on whose turn it is
             Pokemon attacker = (sender == player1) ? player1Team[player1ActiveIndex] : player2Team[player2ActiveIndex];
             Pokemon defender = (sender == player1) ? player2Team[player2ActiveIndex] : player1Team[player1ActiveIndex];
 
+            // Check if it is the correct player’s turn
             if ((isPlayer1Turn && sender == player1) || (!isPlayer1Turn && sender == player2))
             {
-                string moveName = message.Substring(5);
+                // Extract the move name from the message
+                string moveName = message.Substring(5);  // Assumes message format like "move:MoveName"
+
+                // Find the selected move in the attacker’s move list
                 Move selectedMove = attacker.PokemonMoves.FirstOrDefault(m => m.MoveName == moveName);
 
                 if (selectedMove != null)
                 {
+                    // Calculate the damage dealt by the selected move and adjust the defender's health
                     int damage = CalculateDamage(attacker, selectedMove, defender);
                     defender.CurrentHealth -= damage;
-                    defender.CurrentHealth = Math.Max(defender.CurrentHealth, 0);
+                    defender.CurrentHealth = Math.Max(defender.CurrentHealth, 0);  // Prevent health from going below zero
 
+                    // Send the result message to both players, indicating the move used and the resulting HP
                     string result = $"Player {(isPlayer1Turn ? 1 : 2)} used {moveName}! {damage} damage dealt. {defender.Name} has {defender.CurrentHealth} HP left.";
                     await SendMessage(senderStream, result);
                     await SendMessage(receiverStream, result);
 
+                    // If the defender’s health reaches zero, send a fainted message
                     if (defender.CurrentHealth <= 0)
                     {
                         string faintMessage = $"{defender.Name} fainted! {(sender == player1 ? "player2" : "player1")}";
                         await SendMessage(senderStream, faintMessage);
                         await SendMessage(receiverStream, faintMessage);
 
-                        // Switch to the next Pokémon for the opponent
+                        // Check if there are additional Pokémon available for the opponent and switch to the next
                         if (sender == player1 && player2ActiveIndex < player2Team.Count - 1)
                         {
                             player2ActiveIndex++;
@@ -225,6 +235,7 @@ namespace Avans_PokeBattles.Server
                         }
                         else
                         {
+                            // If no more Pokémon are available, end the game and announce the winner
                             string endMessage = $"Game Over! Player {(sender == player1 ? 2 : 1)} wins!";
                             await SendMessage(stream1, endMessage);
                             await SendMessage(stream2, endMessage);
@@ -232,6 +243,7 @@ namespace Avans_PokeBattles.Server
                         }
                     }
 
+                    // Toggle the turn to the other player and send a message indicating whose turn it is
                     isPlayer1Turn = !isPlayer1Turn;
                     string nextTurnMessage = isPlayer1Turn ? "switch_turn:player1" : "switch_turn:player2";
                     await SendMessage(stream1, nextTurnMessage);
@@ -239,53 +251,78 @@ namespace Avans_PokeBattles.Server
                 }
                 else if (message.StartsWith("chat:"))
                 {
-                    // Send message to other player
+                    // If the message is a chat message, relay it to the other player
                     await SendMessage(receiverStream, message);
                 }
                 else
                 {
+                    // Log an error if the move is not found for the attacker
                     Console.WriteLine($"Move {moveName} not found for attacker {attacker.Name}");
                 }
             }
             else
             {
+                // If it’s not the sender's turn, inform them
                 await SendMessage(senderStream, "It's not your turn.");
             }
         }
 
+        // Asynchronously handles chat messages between players by routing the message from one player to the other.
         public async Task HandleChat(string message, TcpClient sender)
         {
+            // If player1 is the sender, send the chat message to player2
             if (sender == player1)
             {
                 await SendMessage(player2.GetStream(), message);
-            } 
+            }
+            // If player2 is the sender, send the chat message to player1
             else if (sender == player2)
             {
                 await SendMessage(player1.GetStream(), message);
             }
         }
 
+        // Calculates the damage dealt by a Pokémon's move, taking into account type effectiveness and a random multiplier.
         private int CalculateDamage(Pokemon attacker, Move move, Pokemon defender)
         {
+            // Get type effectiveness multiplier based on the types of the attack move and the defender Pokémon
             double typeEffectiveness = GetTypeEffectiveness(move.TypeOfAttack, defender.PokemonType);
+
+            // Base damage of the move
             int baseDamage = move.MoveDamage;
+
+            // Generate a random multiplier between 0.85 and 1.00 to add some variability to damage
             Random random = new();
             double randomMultiplier = random.Next(85, 101) / 100.0;
+
+            // Calculate final damage by applying type effectiveness and random multiplier
             int damage = (int)(baseDamage * typeEffectiveness * randomMultiplier);
+
+            // Ensure that damage is not negative and return it
             return Math.Max(damage, 0);
         }
 
+
+        // Determines the type effectiveness multiplier for a Pokémon's attack based on the attack type and the defender's type.
         private static double GetTypeEffectiveness(Type attackType, Type defenderType)
         {
-            if (attackType == Type.Grass && defenderType == Type.Water) return 2.0;
-            if (attackType == Type.Fire && defenderType == Type.Grass) return 2.0;
-            if (attackType == Type.Water && defenderType == Type.Fire) return 2.0;
+            // Define conditions where the attacking type has an advantage over the defending type
+            if (attackType == Type.Grass && defenderType == Type.Water) return 2.0; // Grass is super effective against Water
+            if (attackType == Type.Fire && defenderType == Type.Grass) return 2.0;  // Fire is super effective against Grass
+            if (attackType == Type.Water && defenderType == Type.Fire) return 2.0;  // Water is super effective against Fire
+
+            // If the attacking type and defending type are the same, reduce damage
             if (attackType == defenderType) return 0.5;
+
+            // Return neutral effectiveness (1.0) if none of the above conditions are met
             return 1.0;
         }
 
+
+        // Sends a UTF-8 encoded message asynchronously over the specified network stream.
         private static async Task SendMessage(NetworkStream stream, string message)
         {
+            // Encode the message into bytes and write it to the stream asynchronously
             byte[] response = Encoding.UTF8.GetBytes(message);
             await stream.WriteAsync(response);
         }
@@ -310,7 +347,7 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(jsonBytes);
 
             // Wait for data to be read client-side
-            await Task.Delay(30);
+            await Task.Delay(50);
         }
 
     }
