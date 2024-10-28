@@ -58,5 +58,14 @@ namespace Avans_PokeBattles
             Random random = new Random();
             return PokemonMoves[random.Next(PokemonMoves.Count)];
         }
+        public Pokemon DeepCopy()
+        {
+            return new Pokemon(Name, new Uri(PreviewUri), new Uri(BattleForUri), new Uri(BattleAgainstUri),
+                               PokemonType, MaxHealth, Speed,
+                               PokemonMoves.Select(move => new Move(move.MoveName, move.MoveDamage, move.MoveAccuracy, move.TypeOfAttack)).ToList())
+            {
+                CurrentHealth = this.CurrentHealth 
+            };
+        }
     }
 }

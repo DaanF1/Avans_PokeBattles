@@ -25,6 +25,7 @@ namespace Avans_PokeBattles.Client
     {
         // Important stuff:
         private TcpClient tcpClient;
+        private NetworkStream stream;
 
         // Uri prefixes for loading images
         public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -39,24 +40,47 @@ namespace Avans_PokeBattles.Client
 
         // Other variables:
         private int pokemonIndex = 0;
+        private bool isPlayerOne;
 
-        public LobbyWindow(TcpClient client)
+        private List<Pokemon> playerPokemon = new List<Pokemon>();
+        private List<Pokemon> opponentPokemon = new List<Pokemon>();
+
+        private int playerActivePokemonIndex = 0;
+        private int opponentActivePokemonIndex = 0;
+
+        public LobbyWindow(TcpClient client, bool isPlayerOne)
         {
             InitializeComponent();
+            this.isPlayerOne = isPlayerOne;
 
             // Set name
             lblPlayer1Name.Content = "Your team:";
             lblPlayer2Name.Content = "Oponent team:";
             tcpClient = client;
+            stream = tcpClient.GetStream();
 
             // Play Music
-            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            InitializeButtonStates();
             GetServerMessages();
+        }
+
+        private void InitializeButtonStates()
+        {
+            bool isPlayerTurn = isPlayerOne;
+            SetMoveButtonsState(isPlayerTurn);
+        }
+
+        private void SetMoveButtonsState(bool isEnabled)
+        {
+            btnOption1.IsEnabled = isEnabled;
+            btnOption2.IsEnabled = isEnabled;
+            btnOption3.IsEnabled = isEnabled;
+            btnOption4.IsEnabled = isEnabled;
         }
 
         private async void GetServerMessages()
         {
-            NetworkStream stream = tcpClient.GetStream();
             byte[] buffer = new byte[10000];
             while (tcpClient.Connected)
             {
@@ -66,17 +90,28 @@ namespace Avans_PokeBattles.Client
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"CLIENT: Received from server: {message}");
 
-                // Check if the message is a team info message
+                var parts = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
                 if (message.StartsWith("PlayerTeam"))
                 {
-                    List<Pokemon> pokemon = new List<Pokemon>();
-                    // Get Pokemon of both teams
-                    for (int i = 0; i < 6; i++)
+                    if (playerPokemon.Count > 0)
                     {
-                        Pokemon p = await GetServerPokemon(stream);
-                        pokemon.Add(p);
+                        for (int i = 0; i < 6; i++)
+                        {
+                            Pokemon p = await GetServerPokemon(stream);
+                            opponentPokemon.Add(p);
+                        }
+                        DisplayTeams(opponentPokemon);
                     }
-                    DisplayTeams(pokemon);
+                    else
+                    {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            Pokemon p = await GetServerPokemon(stream);
+                            playerPokemon.Add(p);
+                        }
+                        DisplayTeams(playerPokemon);
+                    }
                 }
                 else if (message.StartsWith("chat:"))
                 {
@@ -91,11 +126,26 @@ namespace Avans_PokeBattles.Client
                     }
                 }
                 else
+                else if (message.Contains("damage dealt"))
                 {
-                    // Handle other types of messages if necessary
-                    Console.WriteLine($"CLIENT: Unhandled message: {message}");
+                    ProcessMoveResult(message);
                 }
+                else if (message.Contains("fainted! player2switch_turn") || message.Contains("fainted! player1switch_turn"))
+                {
+                    ProcessFaintMessage(message);
+                    UpdateTurnIndicator(message);
+                }
+                else if (message.Contains("fainted"))
+                {
+                    ProcessFaintMessage(message);
+                }
+                else if (message.StartsWith("switch_turn"))
+                {
+                    UpdateTurnIndicator(message);
+                }
+                
             }
+            Console.WriteLine("CLIENT: Connection closed or no more messages from server.");
         }
 
         /// <summary>
@@ -133,6 +183,122 @@ namespace Avans_PokeBattles.Client
             return null; // If we even get here
         }
 
+        private void ProcessMoveResult(string message)
+        {
+            // Example message: "Player 1 used Solar Beam! 30 damage dealt. Charizard has 70 HP left."
+            var parts = message.Split(new[] { "damage dealt.", " has ", " HP left." }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 3)
+            {
+                string playerIndicator = parts[0].Contains("Player 1") ? "player2" : "player1";
+                int healthRemaining = int.Parse(parts[2].Trim());
+
+                UpdateHealthDisplay($"{playerIndicator} health-update {healthRemaining}");
+            }
+        }
+
+        private void ProcessFaintMessage(string message)
+        {
+            // Example message: "Blastoise fainted! player1Game Over! Player 1 wins!"
+            string[] parts = message.Split(new[] { "fainted!", "switch_turn:", "Game Over!" }, StringSplitOptions.None);
+
+            if (parts.Length < 2) return;  // Exit if the format is unexpected
+
+            string faintedPokemonName = parts[0].Trim();
+            string faintedPlayer = parts[1].Trim();
+            bool isGameOver = message.Contains("Game Over!");
+
+            // Show message about fainted Pokï¿½mon
+            MessageBox.Show($"{faintedPokemonName} fainted!", "Pokï¿½mon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // Determine if the fainted Pokï¿½mon is the player's or the opponent's based on faintedPlayer
+            if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))
+            {
+                // Player's Pokï¿½mon fainted
+                playerActivePokemonIndex++;
+                if (playerActivePokemonIndex < playerPokemon.Count)
+                {
+                    // Display the next Pokï¿½mon
+                    DisplayActivePokemon(true);
+                }
+                else if (isGameOver)
+                {
+                    MessageBox.Show("All your Pokï¿½mon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Handle any additional game-over logic here, such as closing the game or resetting
+                }
+            }
+            else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
+            {
+                // Opponent's Pokï¿½mon fainted
+                opponentActivePokemonIndex++;
+                if (opponentActivePokemonIndex < opponentPokemon.Count)
+                {
+                    // Display the next Pokï¿½mon
+                    DisplayActivePokemon(false);
+                }
+                else if (isGameOver)
+                {
+                    MessageBox.Show("All opponent's Pokï¿½mon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Handle any additional game-over logic here, such as closing the game or resetting
+                }
+            }
+        }
+
+        private void DisplayActivePokemon(bool isPlayer)
+        {
+            if (isPlayer)
+            {
+                var activePokemon = playerPokemon[playerActivePokemonIndex];
+                Uri forGifUri = new Uri($"{dirPrefix}/Sprites/a{activePokemon.Name}For.gif", standardUriKind);
+                SetPlayer1Pokemon(forGifUri);
+                SetPlayer1PokemonHealth(activePokemon.CurrentHealth);
+                LoadPokemonAttacks(activePokemon);
+            }
+            else
+            {
+                var activePokemon = opponentPokemon[opponentActivePokemonIndex];
+                Uri againstGifUri = new Uri($"{dirPrefix}/Sprites/a{activePokemon.Name}Against.gif", standardUriKind);
+                SetPlayer2Pokemon(againstGifUri);
+                SetPlayer2PokemonHealth(activePokemon.CurrentHealth);
+            }
+        }
+
+        private void UpdateTurnIndicator(string message)
+        {
+            bool isPlayerTurn = (message.Contains("player1") && isPlayerOne) || (message.Contains("player2") && !isPlayerOne);
+
+            lblTurnIndicator.Content = isPlayerTurn ? "Your Turn" : "Opponent's Turn";
+            lblTurnIndicator.Foreground = isPlayerTurn ? Brushes.Green : Brushes.Red;
+
+            SetMoveButtonsState(isPlayerTurn);
+        }
+        private void UpdateHealthDisplay(string message)
+        {
+            var parts = message.Split(' ');
+            if (parts.Length < 3) return;
+
+            string playerIndicator = parts[0];
+            int health = int.Parse(parts[2]);
+
+            if ((playerIndicator == "player1" && isPlayerOne) || (playerIndicator == "player2" && !isPlayerOne))
+            {
+                lblP1PokemonHealth.Content = "Health: " + health;
+            }
+            else
+            {
+                lblP2PokemonHealth.Content = "Health: " + health;
+            }
+        }
+
+        private void SetPlayer1PokemonHealth(int health)
+        {
+            lblP1PokemonHealth.Content = $"Health: {health}";
+        }
+
+        private void SetPlayer2PokemonHealth(int health)
+        {
+            lblP2PokemonHealth.Content = $"Health: {health}";
+        }
+
         private void DisplayTeams(List<Pokemon> pokemon)
         {
             foreach (Pokemon poke in pokemon)
@@ -155,8 +321,8 @@ namespace Avans_PokeBattles.Client
                     case 11: P2Pokemon6Preview.Source = new BitmapImage(previewUri); break;
                 }
 
-                // Load the For.gif for the first Pokémon of Player 1 into PokemonPlayer1 MediaElement
-                if (pokemonIndex == 0) // Ensures it only sets the first Pokémon
+                // Load the For.gif for the first Pokï¿½mon of Player 1 into PokemonPlayer1 MediaElement
+                if (pokemonIndex == 0) // Ensures it only sets the first Pokï¿½mon
                 {
                     Uri forGifUri = new Uri($"{dirPrefix}/Sprites/a{poke.Name}For.gif", standardUriKind);
                     SetPlayer1Pokemon(forGifUri);
@@ -164,8 +330,8 @@ namespace Avans_PokeBattles.Client
                     LoadPokemonAttacks(poke);
                 }
 
-                // Load the Against.gif for the first Pokémon of Player 2 into PokemonPlayer2 MediaElement
-                if (pokemonIndex == 6) // Ensures it only sets the first Pokémon
+                // Load the Against.gif for the first Pokï¿½mon of Player 2 into PokemonPlayer2 MediaElement
+                if (pokemonIndex == 6) // Ensures it only sets the first Pokï¿½mon
                 {
                     Uri againstGifUri = new Uri($"{dirPrefix}/Sprites/a{poke.Name}Against.gif", standardUriKind);
                     SetPlayer2Pokemon(againstGifUri);
@@ -194,20 +360,12 @@ namespace Avans_PokeBattles.Client
             PokemonPlayer1.Play();
             Task.Run(() => { RefreshMedia1Element(); }); // Start refreshing the MediaElement
         }
-        private void SetPlayer1PokemonHealth(int health)
-        {
-            lblP1PokemonHealth.Content = "Health: " + health.ToString();
-        }
         private void SetPlayer2Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
             PokemonPlayer2.Source = pokemonUri;
             PokemonPlayer2.Play();
             Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
-        }
-        private void SetPlayer2PokemonHealth(int health)
-        {
-            lblP2PokemonHealth.Content = "Health: " + health.ToString();
         }
 
         private void LoadPokemonAttacks(Pokemon pokemon)
@@ -316,14 +474,12 @@ namespace Avans_PokeBattles.Client
         {
             try
             {
-                // Create move message format
                 string moveMessage = $"move:{moveName}";
-
-                // Convert message to bytes and send to server
                 byte[] moveBytes = Encoding.UTF8.GetBytes(moveMessage);
-                await tcpClient.GetStream().WriteAsync(moveBytes, 0, moveBytes.Length);
 
-                Console.WriteLine($"CLIENT: Sent move to server: {moveMessage}");
+                await stream.WriteAsync(moveBytes, 0, moveBytes.Length);
+
+                //Console.WriteLine($"CLIENT: Move sent to server: {moveMessage}");
             }
             catch (Exception ex)
             {
