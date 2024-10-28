@@ -42,7 +42,10 @@ namespace Avans_PokeBattles.Client
         private bool isPlayerOne;
 
         private List<Pokemon> playerPokemon = new List<Pokemon>();
-        private List<Pokemon> enemyPokemon = new List<Pokemon>();
+        private List<Pokemon> opponentPokemon = new List<Pokemon>();
+
+        private int playerActivePokemonIndex = 0;
+        private int opponentActivePokemonIndex = 0;
 
         public LobbyWindow(TcpClient client, bool isPlayerOne)
         {
@@ -87,6 +90,8 @@ namespace Avans_PokeBattles.Client
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"CLIENT: Received from server: {message}");
 
+                var parts = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
                 if (message.StartsWith("PlayerTeam"))
                 {
                     if (playerPokemon.Count > 0)
@@ -94,9 +99,9 @@ namespace Avans_PokeBattles.Client
                         for (int i = 0; i < 6; i++)
                         {
                             Pokemon p = await GetServerPokemon(stream);
-                            enemyPokemon.Add(p);
+                            opponentPokemon.Add(p);
                         }
-                        DisplayTeams(enemyPokemon);
+                        DisplayTeams(opponentPokemon);
                     }
                     else
                     {
@@ -112,6 +117,11 @@ namespace Avans_PokeBattles.Client
                 {
                     ProcessMoveResult(message);
                 }
+                else if (message.Contains("fainted!switch_turn"))
+                {
+                    ProcessFaintMessage(message);
+                    UpdateTurnIndicator(message);
+                }
                 else if (message.Contains("fainted"))
                 {
                     ProcessFaintMessage(message);
@@ -120,6 +130,7 @@ namespace Avans_PokeBattles.Client
                 {
                     UpdateTurnIndicator(message);
                 }
+                
             }
             Console.WriteLine("CLIENT: Connection closed or no more messages from server.");
         }
@@ -177,6 +188,56 @@ namespace Avans_PokeBattles.Client
             // Example message: "Charizard fainted!"
             string faintedPokemonName = message.Split(' ')[0];
             MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // Check if the fainted Pokémon is the player's or the opponent's
+            if (playerPokemon[playerActivePokemonIndex].Name == faintedPokemonName)
+            {
+                // Player's Pokémon fainted
+                playerActivePokemonIndex++;
+                if (playerActivePokemonIndex < playerPokemon.Count)
+                {
+                    // Display the next Pokémon
+                    DisplayActivePokemon(true);
+                }
+                else
+                {
+                    MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Handle game over or reset logic here
+                }
+            }
+            else if (opponentActivePokemonIndex < opponentPokemon.Count && opponentPokemon[opponentActivePokemonIndex].Name == faintedPokemonName)
+            {
+                // Opponent's Pokémon fainted
+                opponentActivePokemonIndex++;
+                if (opponentActivePokemonIndex < opponentPokemon.Count)
+                {
+                    // Display the next Pokémon
+                    DisplayActivePokemon(false);
+                }
+                else
+                {
+                    MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Handle victory or reset logic here
+                }
+            }
+        }
+        private void DisplayActivePokemon(bool isPlayer)
+        {
+            if (isPlayer)
+            {
+                var activePokemon = playerPokemon[playerActivePokemonIndex];
+                Uri forGifUri = new Uri($"{dirPrefix}/Sprites/a{activePokemon.Name}For.gif", standardUriKind);
+                SetPlayer1Pokemon(forGifUri);
+                SetPlayer1PokemonHealth(activePokemon.CurrentHealth);
+                LoadPokemonAttacks(activePokemon);
+            }
+            else
+            {
+                var activePokemon = opponentPokemon[opponentActivePokemonIndex];
+                Uri againstGifUri = new Uri($"{dirPrefix}/Sprites/a{activePokemon.Name}Against.gif", standardUriKind);
+                SetPlayer2Pokemon(againstGifUri);
+                SetPlayer2PokemonHealth(activePokemon.CurrentHealth);
+            }
         }
 
         private void UpdateTurnIndicator(string message)
