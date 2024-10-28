@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Brush = System.Windows.Media.Brush;
@@ -591,13 +592,25 @@ namespace Avans_PokeBattles.Client
         // FileIO chatlogs:
         private void btnCreateChatlog_Clicked(object sender, RoutedEventArgs e)
         {
+            // Create directory path
+            string dirPath = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs";
             // Create file (at Avans_PokeBattles\Avans_PokeBattles\bin\Debug\net8.0-windows\Chatlogs directory)
             string currentTime = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
             string path = AppDomain.CurrentDomain.BaseDirectory + "Chatlogs\\Chatlog-" + currentTime + ".txt";
             if (!File.Exists(path))
             {
-                var logFile = File.Create(path);
-                logFile.Close();
+                try
+                {
+                    var logFile = File.Create(path);
+                    logFile.Close();
+                } 
+                catch (DirectoryNotFoundException)
+                {
+                    // Create directory first
+                    Directory.CreateDirectory(dirPath);
+                    var logFile = File.Create(path);
+                    logFile.Close();
+                }
             }
             // Write to file
             using (StreamWriter outputFile = new StreamWriter(path))
