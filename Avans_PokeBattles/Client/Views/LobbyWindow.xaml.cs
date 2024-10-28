@@ -238,37 +238,37 @@ namespace Avans_PokeBattles.Client
             string faintedPlayer = parts[1].Trim();
             bool isGameOver = message.Contains("Game Over!");
 
-            // Show message about fainted Pok�mon
-            MessageBox.Show($"{faintedPokemonName} fainted!", "Pok�mon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+            // Show message about fainted Pokémon
+            MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // Determine if the fainted Pok�mon is the player's or the opponent's based on faintedPlayer
+            // Determine if the fainted Pokémon is the player's or the opponent's based on faintedPlayer
             if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))
             {
-                // Player's Pok�mon fainted
+                // Player's Pokémon fainted
                 playerActivePokemonIndex++;
                 if (playerActivePokemonIndex < playerPokemon.Count)
                 {
-                    // Display the next Pok�mon
+                    // Display the next Pokémon
                     DisplayActivePokemon(true);
                 }
                 else if (isGameOver)
                 {
-                    MessageBox.Show("All your Pok�mon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
                     // Handle any additional game-over logic here, such as closing the game or resetting
                 }
             }
             else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
             {
-                // Opponent's Pok�mon fainted
+                // Opponent's Pokémon fainted
                 opponentActivePokemonIndex++;
                 if (opponentActivePokemonIndex < opponentPokemon.Count)
                 {
-                    // Display the next Pok�mon
+                    // Display the next Pokémon
                     DisplayActivePokemon(false);
                 }
                 else if (isGameOver)
                 {
-                    MessageBox.Show("All opponent's Pok�mon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
                     // Handle any additional game-over logic here, such as closing the game or resetting
                 }
             }
@@ -356,8 +356,8 @@ namespace Avans_PokeBattles.Client
                     case 11: P2Pokemon6Preview.Source = new BitmapImage(previewUri); break;
                 }
 
-                // Load the For.gif for the first Pok�mon of Player 1 into PokemonPlayer1 MediaElement
-                if (pokemonIndex == 0) // Ensures it only sets the first Pok�mon
+                // Load the For.gif for the first Pokémon of Player 1 into PokemonPlayer1 MediaElement
+                if (pokemonIndex == 0) // Ensures it only sets the first Pokémon
                 {
                     Uri forGifUri = new($"{dirPrefix}/Sprites/a{poke.Name}For.gif", standardUriKind);
                     SetPlayer1Pokemon(forGifUri);
@@ -365,8 +365,8 @@ namespace Avans_PokeBattles.Client
                     LoadPokemonAttacks(poke);
                 }
 
-                // Load the Against.gif for the first Pok�mon of Player 2 into PokemonPlayer2 MediaElement
-                if (pokemonIndex == 6) // Ensures it only sets the first Pok�mon
+                // Load the Against.gif for the first Pokémon of Player 2 into PokemonPlayer2 MediaElement
+                if (pokemonIndex == 6) // Ensures it only sets the first Pokémon
                 {
                     Uri againstGifUri = new($"{dirPrefix}/Sprites/a{poke.Name}Against.gif", standardUriKind);
                     SetPlayer2Pokemon(againstGifUri);
