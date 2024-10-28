@@ -117,7 +117,7 @@ namespace Avans_PokeBattles.Client
                 {
                     ProcessMoveResult(message);
                 }
-                else if (message.Contains("fainted!switch_turn"))
+                else if (message.Contains("fainted! player2switch_turn") || message.Contains("fainted! player1switch_turn"))
                 {
                     ProcessFaintMessage(message);
                     UpdateTurnIndicator(message);
@@ -185,12 +185,17 @@ namespace Avans_PokeBattles.Client
 
         private void ProcessFaintMessage(string message)
         {
-            // Example message: "Charizard fainted!"
-            string faintedPokemonName = message.Split(' ')[0];
+            // Example message: "Charizard fainted! player1"
+            string[] parts = message.Split(new[] { "fainted!", "switch_turn:" }, StringSplitOptions.None);
+
+            if (parts.Length < 2) return;  // Exit if the format is unexpected
+
+            string faintedPokemonName = parts[0].Trim();
+            string faintedPlayer = parts[1].Trim();
+
             MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // Check if the fainted Pokémon is the player's or the opponent's
-            if (playerPokemon[playerActivePokemonIndex].Name == faintedPokemonName)
+            if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))
             {
                 // Player's Pokémon fainted
                 playerActivePokemonIndex++;
@@ -205,7 +210,7 @@ namespace Avans_PokeBattles.Client
                     // Handle game over or reset logic here
                 }
             }
-            else if (opponentActivePokemonIndex < opponentPokemon.Count && opponentPokemon[opponentActivePokemonIndex].Name == faintedPokemonName)
+            else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
             {
                 // Opponent's Pokémon fainted
                 opponentActivePokemonIndex++;
@@ -221,6 +226,7 @@ namespace Avans_PokeBattles.Client
                 }
             }
         }
+
         private void DisplayActivePokemon(bool isPlayer)
         {
             if (isPlayer)

@@ -176,10 +176,11 @@ namespace Avans_PokeBattles.Server
 
                     if (defender.CurrentHealth <= 0)
                     {
-                        string faintMessage = $"{defender.Name} fainted!";
+                        string faintMessage = $"{defender.Name} fainted! {(sender == player1 ? "player2" : "player1")}";
                         await SendMessage(senderStream, faintMessage);
                         await SendMessage(receiverStream, faintMessage);
 
+                        // Switch to the next Pokémon for the opponent
                         if (sender == player1 && player2ActiveIndex < player2Team.Count - 1)
                         {
                             player2ActiveIndex++;
