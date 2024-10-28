@@ -52,12 +52,5 @@ namespace PokeBattles_UnitTesting.UnitTests
             Assert.IsTrue(true); // Test is successful
             server.Stop(); // Stop the Server
         }
-
-        [TestMethod]
-        public void TestDefault() // Unit Test: Default last test to handle Server
-        {
-            Console.WriteLine("Default Unit Test: Success");
-            Assert.IsTrue(true); // Test is always successful
-        }
     }
 }
