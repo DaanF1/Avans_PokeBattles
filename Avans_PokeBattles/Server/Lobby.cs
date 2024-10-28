@@ -14,7 +14,7 @@ namespace Avans_PokeBattles.Server
         private NetworkStream stream2;
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
-        private PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
+        private readonly PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
         public string dirPrefix = AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
         public UriKind standardUriKind = UriKind.Absolute; // Always get the absolute path
 
@@ -118,7 +118,7 @@ namespace Avans_PokeBattles.Server
 
         private List<Pokemon> AssignRandomTeam()
         {
-            List<Pokemon> teamOfPlayer = new List<Pokemon>();
+            List<Pokemon> teamOfPlayer = [];
             for (int i = 0; i < 6; i++)
             {
                 Pokemon randomPokemon = pokemonLister.GetRandomPokemon().DeepCopy();  // Deep copy to ensure unique instance
@@ -132,7 +132,7 @@ namespace Avans_PokeBattles.Server
             return client == player1 || client == player2;
         }
 
-        private async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
+        private static async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
         {
             StringBuilder teamMessage = new StringBuilder();
 
