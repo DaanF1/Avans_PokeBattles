@@ -152,7 +152,7 @@ namespace Avans_PokeBattles.Server
             return message.StartsWith("move:") || message.StartsWith(" move:");  // Simplified check for move commands (possible to be expanded upon later)
         }
 
-        public async Task HandleMove(string moveMessage, TcpClient sender)
+        public async Task HandleMove(string message, TcpClient sender)
         {
             NetworkStream senderStream = (sender == player1) ? stream1 : stream2;
             NetworkStream receiverStream = (sender == player1) ? stream2 : stream1;
@@ -161,7 +161,7 @@ namespace Avans_PokeBattles.Server
 
             if ((isPlayer1Turn && sender == player1) || (!isPlayer1Turn && sender == player2))
             {
-                string moveName = moveMessage.Substring(5);
+                string moveName = message.Substring(5);
                 Move selectedMove = attacker.PokemonMoves.FirstOrDefault(m => m.MoveName == moveName);
 
                 if (selectedMove != null)
@@ -229,13 +229,13 @@ namespace Avans_PokeBattles.Server
             return Math.Max(damage, 0);
         }
 
-        private double GetTypeEffectiveness(Type attackType, Type defenderType)
+        
         private bool IsChatMessage(string message)
         {
             return message.StartsWith("chat:");  // Simplified check for move commands (possible to be expanded upon later)
         }
 
-        private async Task HandleMove(string move, NetworkStream senderStream, NetworkStream receiverStream)
+        private double GetTypeEffectiveness(Type attackType, Type defenderType)
         {
             if (attackType == Type.Grass && defenderType == Type.Water) return 2.0;
             if (attackType == Type.Fire && defenderType == Type.Grass) return 2.0;

@@ -125,7 +125,6 @@ namespace Avans_PokeBattles.Client
                         txtReadChat.Text += $"Opponent: {message.Split(':')[1]}";
                     }
                 }
-                else
                 else if (message.Contains("damage dealt"))
                 {
                     ProcessMoveResult(message);

@@ -93,6 +93,19 @@ namespace Avans_PokeBattles.Server
                         Console.WriteLine("SERVER: Client not assigned to any lobby.");
                     }
                 }
+                else if (message.StartsWith("chat:")) 
+                {
+                    var lobby = lobbyManager.GetLobbyForClient(client);
+                    if (lobby != null)
+                    {
+                        Console.WriteLine($"SERVER: Forwarding message to Lobby {lobby.LobbyId}");
+                        await lobby.HandleMove(message, client);
+                    }
+                    else
+                    {
+                        Console.WriteLine("SERVER: Client not assigned to any lobby.");
+                    }
+                }
             }
             client.Close();
         }
