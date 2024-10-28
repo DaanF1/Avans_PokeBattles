@@ -185,16 +185,19 @@ namespace Avans_PokeBattles.Client
 
         private void ProcessFaintMessage(string message)
         {
-            // Example message: "Charizard fainted! player1"
-            string[] parts = message.Split(new[] { "fainted!", "switch_turn:" }, StringSplitOptions.None);
+            // Example message: "Blastoise fainted! player1Game Over! Player 1 wins!"
+            string[] parts = message.Split(new[] { "fainted!", "switch_turn:", "Game Over!" }, StringSplitOptions.None);
 
             if (parts.Length < 2) return;  // Exit if the format is unexpected
 
             string faintedPokemonName = parts[0].Trim();
             string faintedPlayer = parts[1].Trim();
+            bool isGameOver = message.Contains("Game Over!");
 
+            // Show message about fainted Pokémon
             MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
 
+            // Determine if the fainted Pokémon is the player's or the opponent's based on faintedPlayer
             if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))
             {
                 // Player's Pokémon fainted
@@ -204,10 +207,10 @@ namespace Avans_PokeBattles.Client
                     // Display the next Pokémon
                     DisplayActivePokemon(true);
                 }
-                else
+                else if (isGameOver)
                 {
                     MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle game over or reset logic here
+                    // Handle any additional game-over logic here, such as closing the game or resetting
                 }
             }
             else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
@@ -219,10 +222,10 @@ namespace Avans_PokeBattles.Client
                     // Display the next Pokémon
                     DisplayActivePokemon(false);
                 }
-                else
+                else if (isGameOver)
                 {
                     MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle victory or reset logic here
+                    // Handle any additional game-over logic here, such as closing the game or resetting
                 }
             }
         }
