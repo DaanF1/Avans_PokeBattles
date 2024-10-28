@@ -1,15 +1,4 @@
 using Avans_PokeBattles.Server;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Type = Avans_PokeBattles.Server.Type;
 
 namespace Avans_PokeBattles

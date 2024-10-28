@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 
 namespace Avans_PokeBattles.Server
 {
     public class LobbyManager
     {
-        private List<Lobby> lobbies = new List<Lobby>();
-        private Tuple<string, string> playersInLobby;
+        private readonly List<Lobby> lobbies = [];
 
         public LobbyManager()
         {
@@ -20,7 +17,7 @@ namespace Avans_PokeBattles.Server
         // Provide the client with a list of available lobbies
         public string GetLobbyList()
         {
-            List<string> availableLobbies = new List<string>();
+            List<string> availableLobbies = [];
             foreach (var lobby in lobbies)
             {
                 if (!lobby.IsFull)
@@ -34,12 +31,12 @@ namespace Avans_PokeBattles.Server
         }
 
         // Allow the client to join a specific lobby by its ID
-        public bool TryJoinLobby(string lobbyId, TcpClient client)
+        public bool TryJoinLobby(string lobbyId, TcpClient client, string playerName)
         {
             var lobby = lobbies.Find(l => l.LobbyId == lobbyId);
             if (lobby != null && !lobby.IsFull)
             {
-                lobby.AddPlayer(client);
+                lobby.AddPlayer(client, playerName);
                 return true;
             }
 

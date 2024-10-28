@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
         mc:Ignorable="d"
-        Title="Battle" Height="450" Width="800" Loaded="LobbyWindow_Loaded" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
+        Title="Battle" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
     <Grid>
         <!-- Define Grid Rows & Columns -->
         <Grid.ColumnDefinitions>

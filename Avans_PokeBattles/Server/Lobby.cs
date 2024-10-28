@@ -1,23 +1,20 @@
-using System.Buffers.Text;
-using System.Diagnostics;
-using System.IO;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.Json;
-using System.Xml.Serialization;
 
 namespace Avans_PokeBattles.Server
 {
     public class Lobby
     {
         private TcpClient player1;
+        private string namePlayer1;
         private TcpClient player2;
+        private string namePlayer2;
         private NetworkStream stream1;
         private NetworkStream stream2;
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
-        private PokemonLister pokemonLister = new PokemonLister();  // List of available Pokémon to pick from
+        private PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
         public string dirPrefix = System.AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
         public UriKind standardUriKind = UriKind.Absolute; // Always get the absolute path
 
@@ -38,51 +35,61 @@ namespace Avans_PokeBattles.Server
 
         private void FillPokemonLister()
         {
-            List<Move> venusaurMoves = new List<Move> {
+            List<Move> unownMoves = [
+                new Move("Solar Beam", 120, 100, Type.Grass),
+                new Move("Inferno", 100, 50, Type.Fire),
+                new Move("Hidden Power", 90, 90, Type.Normal),
+                new Move("Hydro Pump", 110, 80, Type.Water)
+            ];
+            Pokemon unown = new("Unown", new Uri(dirPrefix + "Sprites/aUnownPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aUnownAgainst.gif", standardUriKind),
+                Type.Normal, 80, 110, unownMoves);
+
+            List<Move> venusaurMoves = [
                 new Move("Solar Beam", 120, 100, Type.Grass),
                 new Move("Take Down", 90, 85, Type.Normal),
                 new Move("Razor Leaf", 55, 95, Type.Grass),
                 new Move("Tackle", 40, 100, Type.Normal)
-            };
-            Pokemon venusaur = new Pokemon("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind),
-                new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/mVenusaurAgainst.gif", standardUriKind),
+            ];
+            Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "Sprites/aVenusaurPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aVenusaurAgainst.gif", standardUriKind),
                 Type.Grass, 195, 70, venusaurMoves);
 
-            List<Move> charizardMoves = new List<Move> {
+            List<Move> charizardMoves = [
                 new Move("Scratch", 40, 100, Type.Normal),
                 new Move("Inferno", 100, 50, Type.Fire),
                 new Move("Slash", 70, 100, Type.Normal),
                 new Move("Flamethrower", 90, 100, Type.Fire)
-            };
-            Pokemon charizard = new Pokemon("Charizard", new Uri(dirPrefix + "/Sprites/aCharizardPreview.png", standardUriKind),
-                new Uri(dirPrefix + "/Sprites/aCharizardFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aCharizardAgainst.gif", standardUriKind),
+            ];
+            Pokemon charizard = new("Charizard", new Uri(dirPrefix + "Sprites/aCharizardPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aCharizardAgainst.gif", standardUriKind),
                 Type.Fire, 125, 120, charizardMoves);
 
-            List<Move> blastoiseMoves = new List<Move> {
+            List<Move> blastoiseMoves = [
                 new Move("Hydro Pump", 110, 80, Type.Water),
                 new Move("Aqua Tail", 90, 90, Type.Water),
                 new Move("Tackle", 40, 100, Type.Normal),
                 new Move("Rapid Spin", 50, 100, Type.Normal)
-            };
-            Pokemon blastoise = new Pokemon("Blastoise", new Uri(dirPrefix + "/Sprites/aBlastoisePreview.png", standardUriKind),
-                new Uri(dirPrefix + "/Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(dirPrefix + "/Sprites/aBlastoiseAgainst.gif", standardUriKind),
+            ];
+            Pokemon blastoise = new("Blastoise", new Uri(dirPrefix + "Sprites/aBlastoisePreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aBlastoiseAgainst.gif", standardUriKind),
                 Type.Water, 145, 75, blastoiseMoves);
 
-            pokemonLister.AddPokemon(venusaur);
-            pokemonLister.AddPokemon(charizard);
-            pokemonLister.AddPokemon(blastoise);
+            pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise]);
         }
 
-        public void AddPlayer(TcpClient client)
+        public void AddPlayer(TcpClient client, string playerName)
         {
             if (player1 == null)
             {
                 player1 = client;
+                namePlayer1 = playerName;
                 stream1 = client.GetStream();
             }
             else if (player2 == null)
             {
                 player2 = client;
+                namePlayer2 = playerName;
                 stream2 = client.GetStream();
                 IsFull = true;  // Lobby is full when both players have joined
             }
@@ -103,8 +110,10 @@ namespace Avans_PokeBattles.Server
             await SendTeam(stream1, player1Team, player2Team, 1);
             await SendTeam(stream2, player2Team, player1Team, 2);
 
-            Console.WriteLine("LOBBY: Start-game messages sent to both players.");
+            await SendNames(stream1);
+            await SendNames(stream2);
 
+            Console.WriteLine("LOBBY: Start-game messages sent to both players.");
         }
 
         private List<Pokemon> AssignRandomTeam()
@@ -147,9 +156,34 @@ namespace Avans_PokeBattles.Server
             }
         }
 
-        private bool IsMoveMessage(string message)
+        private async Task SendNames(NetworkStream stream)
         {
-            return message.StartsWith("move:") || message.StartsWith(" move:");  // Simplified check for move commands (possible to be expanded upon later)
+            StringBuilder teamMessage = new();
+
+            if (stream == stream1)
+            {
+                // Sending Player 1 name:
+                teamMessage.Append($"Player 1 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer1.ToString() + "\n");
+                teamMessage.Clear();
+
+                // Sending Player 2 name:
+                teamMessage.Append($"Player 2 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer2.ToString() + "\n");
+                teamMessage.Clear();
+            }
+            else // Inverse player numbers
+            {
+                // Sending Player 2 name:
+                teamMessage.Append($"Player 1 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer2.ToString() + "\n");
+                teamMessage.Clear();
+
+                // Sending Player 1 name:
+                teamMessage.Append($"Player 2 name:");
+                await SendMessage(stream, teamMessage.ToString() + namePlayer1.ToString() + "\n");
+                teamMessage.Clear();
+            }
         }
 
         public async Task HandleMove(string message, TcpClient sender)
@@ -203,7 +237,7 @@ namespace Avans_PokeBattles.Server
                     await SendMessage(stream1, nextTurnMessage);
                     await SendMessage(stream2, nextTurnMessage);
                 }
-                else if (IsChatMessage(message))
+                else if (message.StartsWith("chat:"))
                 {
                     // Send message to other player
                     await SendMessage(receiverStream, message);
@@ -219,23 +253,29 @@ namespace Avans_PokeBattles.Server
             }
         }
 
+        public async Task HandleChat(string message, TcpClient sender)
+        {
+            if (sender == player1)
+            {
+                await SendMessage(player2.GetStream(), message);
+            } 
+            else if (sender == player2)
+            {
+                await SendMessage(player1.GetStream(), message);
+            }
+        }
+
         private int CalculateDamage(Pokemon attacker, Move move, Pokemon defender)
         {
             double typeEffectiveness = GetTypeEffectiveness(move.TypeOfAttack, defender.PokemonType);
             int baseDamage = move.MoveDamage;
-            Random random = new Random();
+            Random random = new();
             double randomMultiplier = random.Next(85, 101) / 100.0;
             int damage = (int)(baseDamage * typeEffectiveness * randomMultiplier);
             return Math.Max(damage, 0);
         }
 
-        
-        private bool IsChatMessage(string message)
-        {
-            return message.StartsWith("chat:");  // Simplified check for move commands (possible to be expanded upon later)
-        }
-
-        private double GetTypeEffectiveness(Type attackType, Type defenderType)
+        private static double GetTypeEffectiveness(Type attackType, Type defenderType)
         {
             if (attackType == Type.Grass && defenderType == Type.Water) return 2.0;
             if (attackType == Type.Fire && defenderType == Type.Grass) return 2.0;
@@ -244,10 +284,10 @@ namespace Avans_PokeBattles.Server
             return 1.0;
         }
 
-        private async Task SendMessage(NetworkStream stream, string message)
+        private static async Task SendMessage(NetworkStream stream, string message)
         {
             byte[] response = Encoding.UTF8.GetBytes(message);
-            await stream.WriteAsync(response, 0, response.Length);
+            await stream.WriteAsync(response);
         }
 
         /// <summary>
@@ -256,7 +296,7 @@ namespace Avans_PokeBattles.Server
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="pokemon"></param>
-        private async Task SendPokemon(NetworkStream stream, Pokemon pokemon)
+        private static async Task SendPokemon(NetworkStream stream, Pokemon pokemon)
         {
             // Serialize each Pokemon object
             string jsonString = JsonSerializer.Serialize(pokemon);
@@ -264,13 +304,13 @@ namespace Avans_PokeBattles.Server
 
             // Send the length of the message first
             byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
-            await stream.WriteAsync(lengthBytes, 0, lengthBytes.Length);
+            await stream.WriteAsync(lengthBytes);
 
             // Send the actual JSON data
-            await stream.WriteAsync(jsonBytes, 0, jsonBytes.Length);
+            await stream.WriteAsync(jsonBytes);
 
             // Wait for data to be read client-side
-            await Task.Delay(100);
+            await Task.Delay(30);
         }
 
     }

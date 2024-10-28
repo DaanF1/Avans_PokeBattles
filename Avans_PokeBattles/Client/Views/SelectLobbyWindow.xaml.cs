@@ -1,20 +1,16 @@
 ﻿using Avans_PokeBattles.Server;
-using System;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace Avans_PokeBattles.Client
 {
     public partial class SelectLobbyWindow : Window
     {
-        private TcpClient tcpClient;
-        private NetworkStream stream;
-        private LobbyManager lobbyManager;
+        private readonly TcpClient tcpClient;
+        private readonly NetworkStream stream;
+        private readonly LobbyManager lobbyManager;
         private string playerName = "";
-        private int lobbyNumber;
 
         public SelectLobbyWindow(string name, TcpClient client)
         {
@@ -39,11 +35,9 @@ namespace Avans_PokeBattles.Client
 
         private async Task JoinLobby(string lobbyId, int number)
         {
-            lobbyNumber = number;
-
             // Send a join-lobby request to the server in a format it can recognize
             byte[] buffer = Encoding.UTF8.GetBytes($"join-lobby:{lobbyId}");
-            await stream.WriteAsync(buffer, 0, buffer.Length);
+            await stream.WriteAsync(buffer);
 
             // Now wait for the "start-game" signal from the server
             await WaitForGameStart();
@@ -57,7 +51,7 @@ namespace Avans_PokeBattles.Client
             byte[] buffer = new byte[10000];
             while (tcpClient.Connected)
             {
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                int bytesRead = await stream.ReadAsync(buffer);
                 if (bytesRead == 0) break;
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);

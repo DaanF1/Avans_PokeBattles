@@ -1,14 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Avans_PokeBattles.Client
 {
@@ -17,9 +10,10 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class LoginWindow : Window
     {
-        private TcpClient tcpClient;
-        private NetworkStream stream;
-        private int port = 8000;
+        private readonly TcpClient tcpClient;
+        private readonly NetworkStream stream;
+        private readonly int port = 8000;
+
         public LoginWindow()
         {
             InitializeComponent();
@@ -43,7 +37,7 @@ namespace Avans_PokeBattles.Client
                 return;
             }
             // Make sure the name can fit in the next window
-            if (name.ToString().Count() > 9)
+            if (name.ToString().Length > 9)
             {
                 MessageBox.Show("Please enter a name shorter than 11 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;

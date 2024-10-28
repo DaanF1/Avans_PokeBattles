@@ -1,20 +1,19 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Avans_PokeBattles.Server
 {
     public class Server
     {
         private static TcpListener listener;
-        private static int port = 8000;
-        private static LobbyManager lobbyManager = new LobbyManager();
+        private static readonly int port = 8000;
+        private static LobbyManager lobbyManager = new();
         private static Lobby connectedLobby;
+        private static readonly Dictionary<TcpClient, string> clientNames = [];
         private static bool isRunning = false;
 
-        public async void Start()
+        public static async void Start()
         {
             listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
@@ -29,25 +28,25 @@ namespace Avans_PokeBattles.Server
             }
         }
 
-        public void Stop()
+        public static void Stop()
         {
             isRunning = false;
-            this.Stop(); // Stop the Server
+            Stop(); // Stop the Server
         }
 
-        public bool IsRunning()
+        public static bool IsRunning()
         {
             return isRunning;
         }
 
         // Handle individual client requests
-        private async Task HandleClientAsync(TcpClient client)
+        private static async Task HandleClientAsync(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
             byte[] buffer = new byte[10000];
             while (client.Connected)
             {
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                int bytesRead = await stream.ReadAsync(buffer);
                 if (bytesRead == 0)
                 {
                     break;
@@ -56,14 +55,30 @@ namespace Avans_PokeBattles.Server
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"SERVER: Received message: {message}");
 
+                // Handle getting names
+                if (message.StartsWith("Player name:"))
+                {
+                    string name = message.Split(':')[1].Trim();
+                    clientNames.Add(client, name);
+                }
                 // Handle join-lobby request
                 if (message.StartsWith("join-lobby"))
                 {
                     string[] splitMessage = message.Split(':');
                     if (splitMessage.Length == 2)
                     {
+                        // Get current Player name
+                        string namePlayer1 = "";
+                        int index = 0;
+                        foreach (TcpClient tcp in clientNames.Keys)
+                        {
+                            if (tcp == client)
+                                namePlayer1 = clientNames.Values.ElementAt(index);
+                            index++;
+                        }
+
                         string lobbyId = splitMessage[1];
-                        bool joined = lobbyManager.TryJoinLobby(lobbyId, client);
+                        bool joined = lobbyManager.TryJoinLobby(lobbyId, client, namePlayer1);
 
                         // Notify the client if joining the lobby was successful
                         string responseMessage = joined ? "lobby-joined" : "lobby-full";
@@ -99,7 +114,7 @@ namespace Avans_PokeBattles.Server
                     if (lobby != null)
                     {
                         Console.WriteLine($"SERVER: Forwarding message to Lobby {lobby.LobbyId}");
-                        await lobby.HandleMove(message, client);
+                        await lobby.HandleChat(message, client);
                     }
                     else
                     {

@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
-
-namespace Avans_PokeBattles.Server
+﻿namespace Avans_PokeBattles.Server
 {
     public class PokemonLister
     {
         // List with all availible pokemon
-        private List<Pokemon> pokemonList = new List<Pokemon>();
+        private readonly List<Pokemon> pokemonList = [];
 
         public PokemonLister() { }
 
@@ -19,6 +12,16 @@ namespace Avans_PokeBattles.Server
             // Add new Pokemon to the list
             if (!pokemonList.Contains(newPokemon))
                 pokemonList.Add(newPokemon);
+        }
+
+        public void AddAllPokemon(List<Pokemon> listPokemon)
+        {
+            foreach (Pokemon pokemon in listPokemon)
+            {
+                // Add new Pokemon to the list
+                if (!pokemonList.Contains(pokemon))
+                    pokemonList.Add(pokemon);
+            }
         }
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace Avans_PokeBattles.Server
         /// </summary>
         public Pokemon GetRandomPokemon()
         {
-            Random random = new Random();
+            Random random = new();
             Pokemon randomPokemon = pokemonList[random.Next(pokemonList.Count)];
             if (randomPokemon.Name == "Unown")
                 return GetRandomPokemon();
