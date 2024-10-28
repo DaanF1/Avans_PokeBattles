@@ -12,11 +12,13 @@ namespace Avans_PokeBattles.Server
         private static int port = 8000;
         private static LobbyManager lobbyManager = new LobbyManager();
         private static Lobby connectedLobby;
+        private static bool isRunning = false;
 
         public async void Start()
         {
             listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
+            isRunning = true;
             Console.WriteLine("SERVER: Server started. Waiting for connections...");
 
             while (true)
@@ -29,7 +31,13 @@ namespace Avans_PokeBattles.Server
 
         public void Stop()
         {
+            isRunning = false;
             this.Stop(); // Stop the Server
+        }
+
+        public bool IsRunning()
+        {
+            return isRunning;
         }
 
         // Handle individual client requests
