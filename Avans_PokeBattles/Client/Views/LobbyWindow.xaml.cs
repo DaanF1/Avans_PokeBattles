@@ -17,35 +17,37 @@ namespace Avans_PokeBattles.Client
     /// </summary>
     public partial class LobbyWindow : Window
     {
-        // Important stuff:
+        // TCP client and network stream for communication with the server
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
+
+        // Names of players for display
         private string namePlayer1;
         private string namePlayer2;
 
-        // Uri prefixes for loading images
+        // Uri configuration for loading images
         public string dirPrefix = AppDomain.CurrentDomain.BaseDirectory;
         public UriKind standardUriKind = UriKind.Absolute;
 
-        // Media
+        // Media controls for music and sound effects
         public MediaState PPlayer1State;
         public MediaState PPlayer2State;
         public MediaPlayer playerBattleMusic = new();
         public MediaPlayer buttonPlayer = new();
         public MediaPlayer hitPlayer = new();
 
-        // Other variables:
+        // Variables to track the Pokémon and player turns
         private int pokemonIndex = 0;
         private int nameIndex = 1;
         private readonly bool isPlayerOne;
 
-        // Pokemon lists & searching:
+        // Lists to hold Pokémon objects for each player
         private readonly List<Pokemon> playerPokemon = [];
         private readonly List<Pokemon> opponentPokemon = [];
         private int playerActivePokemonIndex = 0;
         private int opponentActivePokemonIndex = 0;
 
-        // Separators
+        // Separators used to parse server messages
         private static readonly string[] failtedSeparator = ["fainted!", "switch_turn:", "Game Over!"];
         private static readonly string[] damageHpSeparator = ["damage dealt.", " has ", " HP left."];
 
@@ -70,12 +72,14 @@ namespace Avans_PokeBattles.Client
             GetServerMessages();
         }
 
+        // Initializes button states for attack options based on player's turn
         private void InitializeButtonStates()
         {
             bool isPlayerTurn = isPlayerOne;
             SetMoveButtonsState(isPlayerTurn);
         }
 
+        // Enables or disables move buttons depending on the player's turn
         private void SetMoveButtonsState(bool isEnabled)
         {
             btnOption1.IsEnabled = isEnabled;
@@ -84,6 +88,7 @@ namespace Avans_PokeBattles.Client
             btnOption4.IsEnabled = isEnabled;
         }
 
+        // Continuously receives messages from the server while connected
         private async void GetServerMessages()
         {
             byte[] buffer = new byte[10000];
@@ -97,20 +102,20 @@ namespace Avans_PokeBattles.Client
 
                 var parts = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                // Check if the message is a Player name
+                // Handle player name assignment if message starts with "Player"
                 if (message.StartsWith("Player") && !message.StartsWith("PlayerTeam") && !message.StartsWith("Player 1 used") && !message.StartsWith("Player 2 used"))
                 {
                     int playerNumber = nameIndex;
                     if (playerNumber == 1)
                     {
-                        // Name is from Player 1
+                        // Set name for Player 1
                         string name = message.Split(':')[1].Trim('\n');
                         namePlayer1 = string.Concat(name.Substring(0, 1).ToUpper(), name.AsSpan(1));
                         lblPlayer1Name.Content = $"{namePlayer1}'s team:";
                     }
                     else
                     {
-                        // Name is from Player 2
+                        // Set name for Player 2
                         string name = message.Split(':')[1].Trim('\n');
                         namePlayer2 = string.Concat(name.Substring(0, 1).ToUpper(), name.AsSpan(1));
                         lblPlayer2Name.Content = $"{namePlayer2}'s team:";
@@ -119,6 +124,7 @@ namespace Avans_PokeBattles.Client
                 }
                 else if (message.StartsWith("PlayerTeam"))
                 {
+                    // Handles initialization of player and opponent Pokémon teams
                     if (playerPokemon.Count > 0)
                     {
                         for (int i = 0; i < 6; i++)
@@ -140,7 +146,7 @@ namespace Avans_PokeBattles.Client
                 }
                 else if (message.StartsWith("chat:"))
                 {
-                    // Display chat message
+                    // Display incoming chat message in the chat box
                     if (!string.IsNullOrWhiteSpace(txtReadChat.Text))
                     {
                         txtReadChat.Text += $"\n{namePlayer2}: {message.Split(':')[1]}";
@@ -167,7 +173,6 @@ namespace Avans_PokeBattles.Client
                 {
                     UpdateTurnIndicator(message);
                 }
-                
             }
             Console.WriteLine("CLIENT: Connection closed or no more messages from server.");
         }
@@ -207,9 +212,11 @@ namespace Avans_PokeBattles.Client
             return null; // If we even get here
         }
 
+
+        // Process the damage message received from the server and update health displays
         private void ProcessMoveResult(string message)
         {
-            // Example message: "Player 1 used Solar Beam! 30 damage dealt. Charizard has 70 HP left."
+            // Parse the message using the damageHpSeparator array
             var parts = message.Split(damageHpSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length >= 3)
             {
@@ -267,6 +274,7 @@ namespace Avans_PokeBattles.Client
             }
         }
 
+        // Displays the active Pokémon's GIF and updates health and move buttons for the player or opponent
         private void DisplayActivePokemon(bool isPlayer)
         {
             if (isPlayer)
@@ -286,6 +294,7 @@ namespace Avans_PokeBattles.Client
             }
         }
 
+        // Updates the turn indicator display based on the current player's turn
         private void UpdateTurnIndicator(string message)
         {
             bool isPlayerTurn = (message.Contains("player1") && isPlayerOne) || (message.Contains("player2") && !isPlayerOne);
@@ -296,6 +305,7 @@ namespace Avans_PokeBattles.Client
             SetMoveButtonsState(isPlayerTurn);
         }
 
+        // Updates the health display for the current Pokémon
         private void UpdateHealthDisplay(string message)
         {
             var parts = message.Split(' ');
