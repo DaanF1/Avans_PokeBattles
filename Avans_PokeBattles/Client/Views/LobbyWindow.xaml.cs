@@ -111,15 +111,13 @@ namespace Avans_PokeBattles.Client
                     if (playerNumber == 1)
                     {
                         // Set name for Player 1
-                        string name = message.Split(':')[1].Trim('\n');
-                        namePlayer1 = string.Concat(name.Substring(0, 1).ToUpper(), name.AsSpan(1));
+                        namePlayer1 = message.Split(':')[1].Trim('\n');
                         lblPlayer1Name.Content = $"{namePlayer1}'s team:";
                     }
                     else
                     {
                         // Set name for Player 2
-                        string name = message.Split(':')[1].Trim('\n');
-                        namePlayer2 = string.Concat(name.Substring(0, 1).ToUpper(), name.AsSpan(1));
+                        namePlayer2 = message.Split(':')[1].Trim('\n');
                         lblPlayer2Name.Content = $"{namePlayer2}'s team:";
                     }
                     nameIndex++;
@@ -257,6 +255,10 @@ namespace Avans_PokeBattles.Client
                 {
                     MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
                     // Handle any additional game-over logic here, such as closing the game or resetting
+                    SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
+                    lobbyWindow.Show();
+                    playerBattleMusic.Stop();
+                    this.Close();
                 }
             }
             else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
@@ -272,6 +274,10 @@ namespace Avans_PokeBattles.Client
                 {
                     MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
                     // Handle any additional game-over logic here, such as closing the game or resetting
+                    SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
+                    lobbyWindow.Show();
+                    playerBattleMusic.Stop();
+                    this.Close();
                 }
             }
         }
