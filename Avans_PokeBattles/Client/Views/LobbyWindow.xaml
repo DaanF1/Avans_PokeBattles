@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
+        xmlns:wpfanimated="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
         Title="Battle" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
     <Grid>
@@ -50,13 +51,23 @@
                 <!-- Current Player Pokemon -->
                 <Label Name="lblP1PokemonHealth" Content="Health: X" Height="25" Width="100" Canvas.Left="50" Canvas.Bottom="150" Foreground="White" />
                 <Border Background="Black" Canvas.Left="50" Canvas.Bottom="50">
-                    <MediaElement Name="PokemonPlayer1"  Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP1_MediaEnded" MediaFailed="PP1_MediaFailed" />
+                    <!-- <MediaElement Name="PokemonPlayer1"  Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP1_MediaEnded" MediaFailed="PP1_MediaFailed" /> -->
+                    <Image x:Name="PokemonPlayer1"
+                        wpfanimated:ImageBehavior.AnimateInDesignMode="False"
+                        wpfanimated:ImageBehavior.AutoStart="True"              
+                        Height="100"
+                        Width="100" />
                 </Border>
-
+                
                 <!-- Opponent Player Pokemon -->
                 <Label Name="lblP2PokemonHealth" Content="Health: X" Height="25" Width="100"  Canvas.Top="25" Canvas.Right="50" Foreground="White" />
                 <Border Background="Black" Canvas.Top="50" Canvas.Right="50">
-                    <MediaElement Name="PokemonPlayer2" Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP2_MediaEndend" MediaFailed="PP2_MediaFailed" />
+                    <!-- <MediaElement Name="PokemonPlayer2" Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP2_MediaEndend" MediaFailed="PP2_MediaFailed" /> -->
+                    <Image x:Name="PokemonPlayer2"
+                        wpfanimated:ImageBehavior.AnimateInDesignMode="False"
+                        wpfanimated:ImageBehavior.AutoStart="True"              
+                        Height="100"
+                        Width="100" />
                 </Border>
 
                 <!-- Action Buttons -->
