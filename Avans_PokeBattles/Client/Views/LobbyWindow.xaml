@@ -41,7 +41,7 @@
 
 
             <!-- Game View (inner) -->
-            <Canvas Name="cvGameView" Canvas.Left="100" Height="350" Width="425" Background="Black">
+            <Canvas Name="cvGameView" Canvas.Left="100" Height="350" Width="425" Background="Black" >
                 <Label Name="lblRound" FontSize="18" FontWeight="Bold" Content="Round: X" Foreground="White" />
 
                 <!-- Turn Indicator -->
@@ -53,10 +53,11 @@
                 <Border Background="Black" Canvas.Left="50" Canvas.Bottom="50">
                     <!-- <MediaElement Name="PokemonPlayer1"  Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP1_MediaEnded" MediaFailed="PP1_MediaFailed" /> -->
                     <Image x:Name="PokemonPlayer1"
-                        wpfanimated:ImageBehavior.AnimateInDesignMode="False"
-                        wpfanimated:ImageBehavior.AutoStart="True"              
-                        Height="100"
-                        Width="100" />
+                           wpfanimated:ImageBehavior.RepeatBehavior="Forever"
+                           wpfanimated:ImageBehavior.AnimateInDesignMode="False"
+                           wpfanimated:ImageBehavior.AutoStart="True"
+                           Height="100"
+                           Width="100" />
                 </Border>
                 
                 <!-- Opponent Player Pokemon -->
@@ -64,10 +65,11 @@
                 <Border Background="Black" Canvas.Top="50" Canvas.Right="50">
                     <!-- <MediaElement Name="PokemonPlayer2" Visibility="Visible" LoadedBehavior="Play" UnloadedBehavior="Manual" Stretch="None" Height="100" Width="100" MediaEnded="PP2_MediaEndend" MediaFailed="PP2_MediaFailed" /> -->
                     <Image x:Name="PokemonPlayer2"
-                        wpfanimated:ImageBehavior.AnimateInDesignMode="False"
-                        wpfanimated:ImageBehavior.AutoStart="True"              
-                        Height="100"
-                        Width="100" />
+                           wpfanimated:ImageBehavior.RepeatBehavior="Forever"
+                           wpfanimated:ImageBehavior.AnimateInDesignMode="False"
+                           wpfanimated:ImageBehavior.AutoStart="True"              
+                           Height="100"
+                           Width="100" />
                 </Border>
 
                 <!-- Action Buttons -->

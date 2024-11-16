@@ -347,7 +347,7 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(jsonBytes);
 
             // Wait for data to be read client-side
-            await Task.Delay(50);
+            await Task.Delay(500);
         }
 
     }

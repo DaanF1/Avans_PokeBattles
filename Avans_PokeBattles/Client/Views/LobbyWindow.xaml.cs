@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WpfAnimatedGif;
 using Brush = System.Windows.Media.Brush;
 
 namespace Avans_PokeBattles.Client
@@ -388,17 +389,13 @@ namespace Avans_PokeBattles.Client
         private void SetPlayer1Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
-            PokemonPlayer1.Source = pokemonUri;
-            PokemonPlayer1.Play();
-            Task.Run(() => { RefreshMedia1Element(); }); // Start refreshing the MediaElement
+            ImageBehavior.SetAnimatedSource(PokemonPlayer1, new BitmapImage(pokemonUri));
         }
 
         private void SetPlayer2Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
-            PokemonPlayer2.Source = pokemonUri;
-            PokemonPlayer2.Play();
-            Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
+            ImageBehavior.SetAnimatedSource(PokemonPlayer2, new BitmapImage(pokemonUri));
         }
 
         private void LoadPokemonAttacks(Pokemon pokemon)
@@ -429,34 +426,6 @@ namespace Avans_PokeBattles.Client
                 default:
                     return null;
             }
-        }
-
-        // Media:
-        private void PP1_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            // Replay gif animation
-            PokemonPlayer1.RenderSize = new Size(50, 50);
-            PPlayer1State = MediaState.Stop;
-            PokemonPlayer1.Position = new TimeSpan(0, 0, 1);
-            PokemonPlayer1.Play();
-        }
-
-        private void PP1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            Console.WriteLine("CLIENT: Could not load in .gif file!");
-        }
-
-        private void PP2_MediaEndend(object sender, RoutedEventArgs e)
-        {
-            // Replay gif animation
-            PokemonPlayer2.RenderSize = new Size(50, 50);
-            PPlayer2State = MediaState.Stop;
-            PokemonPlayer2.Position = new TimeSpan(0, 0, 1);
-            PokemonPlayer2.Play();
-        }
-        private void PP2_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            Console.WriteLine("CLIENT: Could not load in .gif file!");
         }
 
         /// <summary>
@@ -701,43 +670,6 @@ namespace Avans_PokeBattles.Client
             else {
                 txtReadChat.Text += $"\nServer: No recent chatlog found!";
             }
-        }
-
-        // Helper methods for refreshing MediaElements:
-        private void RefreshMedia1Element()
-        {
-            // Update event for MediaElement of Player 1
-            while (PPlayer1State == MediaState.Manual || PPlayer1State == MediaState.Play)
-            {
-                PPlayer1State = GetMediaState(PokemonPlayer1);
-                // TODO: Prevent gif from leaving dots around
-            }
-        }
-        private void RefreshMedia2Element()
-        {
-            // Update event for MediaElement of Player 2
-            while (PPlayer2State == MediaState.Manual || PPlayer2State == MediaState.Play)
-            {
-                PPlayer2State = GetMediaState(PokemonPlayer2);
-                // TODO: Prevent gif from leaving dots around
-            }
-        }
-
-        /// <summary>
-        /// Helper method to get the state of the MediaElement
-        /// From StackOverflow: https://stackoverflow.com/questions/4338951/how-do-i-determine-if-mediaelement-is-playing
-        /// </summary>
-        /// <param name="myMedia"></param>
-        /// <returns></returns>
-        private MediaState GetMediaState(MediaElement myMedia)
-        {
-            FieldInfo? hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object? helperObject = hlp.GetValue(myMedia);
-            FieldInfo? stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-            MediaState? state = (MediaState)stateField.GetValue(helperObject);
-            if (!state.Equals(null))
-                return (MediaState)state;
-            return MediaState.Stop;
         }
 
     }
