@@ -35,47 +35,101 @@ namespace Avans_PokeBattles.Server
 
         private void FillPokemonLister()
         {
+            // unown
             List<Move> unownMoves = [
                 new Move("Solar Beam", 120, 100, Type.Grass),
                 new Move("Inferno", 100, 50, Type.Fire),
                 new Move("Hidden Power", 90, 90, Type.Normal),
                 new Move("Hydro Pump", 110, 80, Type.Water)
             ];
-            Pokemon unown = new("Unown", new Uri(dirPrefix + "Sprites/aUnownPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aUnownAgainst.gif", standardUriKind),
+            Pokemon unown = new("Unown", 
+                new Uri(dirPrefix + "Sprites/aUnownPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aUnownAgainst.gif", standardUriKind),
                 Type.Normal, 80, 110, unownMoves);
 
+            // venusaur
             List<Move> venusaurMoves = [
                 new Move("Solar Beam", 120, 100, Type.Grass),
                 new Move("Take Down", 90, 85, Type.Normal),
                 new Move("Razor Leaf", 55, 95, Type.Grass),
                 new Move("Tackle", 40, 100, Type.Normal)
             ];
-            Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "Sprites/aVenusaurPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aVenusaurAgainst.gif", standardUriKind),
+            Pokemon venusaur = new("Venusaur", 
+                new Uri(dirPrefix + "Sprites/aVenusaurPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aVenusaurAgainst.gif", standardUriKind),
                 Type.Grass, 195, 70, venusaurMoves);
 
+            // charizard
             List<Move> charizardMoves = [
                 new Move("Scratch", 40, 100, Type.Normal),
                 new Move("Inferno", 100, 50, Type.Fire),
                 new Move("Slash", 70, 100, Type.Normal),
                 new Move("Flamethrower", 90, 100, Type.Fire)
             ];
-            Pokemon charizard = new("Charizard", new Uri(dirPrefix + "Sprites/aCharizardPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aCharizardAgainst.gif", standardUriKind),
+            Pokemon charizard = new("Charizard", 
+                new Uri(dirPrefix + "Sprites/aCharizardPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aCharizardAgainst.gif", standardUriKind),
                 Type.Fire, 125, 120, charizardMoves);
 
+            // blastoise
             List<Move> blastoiseMoves = [
                 new Move("Hydro Pump", 110, 80, Type.Water),
                 new Move("Aqua Tail", 90, 90, Type.Water),
                 new Move("Tackle", 40, 100, Type.Normal),
                 new Move("Rapid Spin", 50, 100, Type.Normal)
             ];
-            Pokemon blastoise = new("Blastoise", new Uri(dirPrefix + "Sprites/aBlastoisePreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind), new Uri(dirPrefix + "Sprites/aBlastoiseAgainst.gif", standardUriKind),
+            Pokemon blastoise = new("Blastoise", 
+                new Uri(dirPrefix + "Sprites/aBlastoisePreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aBlastoiseAgainst.gif", standardUriKind),
                 Type.Water, 145, 75, blastoiseMoves);
 
-            pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise]);
+            // pikachu
+            List<Move> pikachuMoves = new List<Move>
+            {
+                new Move("Thunderbolt", 90, 100, Type.Normal),
+                new Move("Quick Attack", 40, 100, Type.Normal),
+                new Move("Iron Tail", 100, 75, Type.Normal),
+                new Move("Electro Ball", 80, 100, Type.Normal)
+            };
+            Pokemon pikachu = new Pokemon("Pikachu",
+                new Uri(dirPrefix + "Sprites/aPikachuPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aPikachuFor.gif", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aPikachuAgainst.gif", standardUriKind),
+                Type.Normal, 100, 120, pikachuMoves);
+
+            // snorlax
+            List<Move> snorlaxMoves = new List<Move>
+            {
+                new Move("Body Slam", 85, 100, Type.Normal),
+                new Move("Rest", 0, 100, Type.Normal),
+                new Move("Hyper Beam", 150, 90, Type.Normal),
+                new Move("Headbutt", 70, 100, Type.Normal)
+            };
+            Pokemon snorlax = new Pokemon("Snorlax",
+                new Uri(dirPrefix + "Sprites/aSnorlaxPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aSnorlaxFor.gif", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aSnorlaxAgainst.gif", standardUriKind),
+                Type.Normal, 200, 30, snorlaxMoves);
+
+            // gengar
+            List<Move> gengarMoves = new List<Move>
+            {
+                new Move("Shadow Ball", 80, 100, Type.Normal),
+                new Move("Dream Eater", 100, 100, Type.Normal),
+                new Move("Sludge Bomb", 90, 100, Type.Normal),
+                new Move("Nightmare", 0, 100, Type.Normal)
+            };
+            Pokemon gengar = new Pokemon("Gengar",
+                new Uri(dirPrefix + "Sprites/aGengarPreview.png", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aGengarFor.gif", standardUriKind),
+                new Uri(dirPrefix + "Sprites/aGengarAgainst.gif", standardUriKind),
+                Type.Normal, 150, 110, gengarMoves);
+
+            pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise, pikachu, snorlax, gengar]);
         }
 
         public void AddPlayer(TcpClient client, string playerName)

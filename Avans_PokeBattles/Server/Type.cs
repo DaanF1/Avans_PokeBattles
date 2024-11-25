@@ -12,5 +12,8 @@ namespace Avans_PokeBattles.Server
         Fire,
         Grass,
         Normal,
+        Electric,
+        Ghost,
+        Psychic
     }
 }
