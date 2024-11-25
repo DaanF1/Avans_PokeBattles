@@ -36,64 +36,68 @@ namespace Avans_PokeBattles.Server
         private void FillPokemonLister()
         {
             // unown
-            List<Move> unownMoves = [
-                new Move("Solar Beam", 120, 100, Type.Grass),
-                new Move("Inferno", 100, 50, Type.Fire),
-                new Move("Hidden Power", 90, 90, Type.Normal),
-                new Move("Hydro Pump", 110, 80, Type.Water)
-            ];
-            Pokemon unown = new("Unown", 
+            List<Move> unownMoves = new List<Move>
+            {
+                new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0),
+                new Move("Inferno", 100, 50, Type.Fire, StatusEffect.Burn, 30), // 30% chance to burn
+                new Move("Hidden Power", 90, 90, Type.Normal, StatusEffect.None, 0),
+                new Move("Hydro Pump", 110, 80, Type.Water, StatusEffect.None, 0)
+            };
+            Pokemon unown = new("Unown",
                 new Uri(dirPrefix + "Sprites/aUnownPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aUnownAgainst.gif", standardUriKind),
                 Type.Normal, 80, 110, unownMoves);
 
             // venusaur
-            List<Move> venusaurMoves = [
-                new Move("Solar Beam", 120, 100, Type.Grass),
-                new Move("Take Down", 90, 85, Type.Normal),
-                new Move("Razor Leaf", 55, 95, Type.Grass),
-                new Move("Tackle", 40, 100, Type.Normal)
-            ];
-            Pokemon venusaur = new("Venusaur", 
+            List<Move> venusaurMoves = new List<Move>
+            {
+                new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0),
+                new Move("Take Down", 90, 85, Type.Normal, StatusEffect.None, 0),
+                new Move("Razor Leaf", 55, 95, Type.Grass, StatusEffect.Poison, 100), // 20% chance to poison
+                new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0)
+            };
+            Pokemon venusaur = new("Venusaur",
                 new Uri(dirPrefix + "Sprites/aVenusaurPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aVenusaurAgainst.gif", standardUriKind),
                 Type.Grass, 195, 70, venusaurMoves);
 
             // charizard
-            List<Move> charizardMoves = [
-                new Move("Scratch", 40, 100, Type.Normal),
-                new Move("Inferno", 100, 50, Type.Fire),
-                new Move("Slash", 70, 100, Type.Normal),
-                new Move("Flamethrower", 90, 100, Type.Fire)
-            ];
-            Pokemon charizard = new("Charizard", 
+            List<Move> charizardMoves = new List<Move>
+            {
+                new Move("Scratch", 40, 100, Type.Normal, StatusEffect.None, 0),
+                new Move("Inferno", 100, 50, Type.Fire, StatusEffect.Burn, 100), // 30% chance to burn
+                new Move("Slash", 70, 100, Type.Normal, StatusEffect.None, 0),
+                new Move("Flamethrower", 90, 100, Type.Fire, StatusEffect.Burn, 10) // 10% chance to burn
+            };
+            Pokemon charizard = new("Charizard",
                 new Uri(dirPrefix + "Sprites/aCharizardPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aCharizardAgainst.gif", standardUriKind),
                 Type.Fire, 125, 120, charizardMoves);
 
             // blastoise
-            List<Move> blastoiseMoves = [
-                new Move("Hydro Pump", 110, 80, Type.Water),
-                new Move("Aqua Tail", 90, 90, Type.Water),
-                new Move("Tackle", 40, 100, Type.Normal),
-                new Move("Rapid Spin", 50, 100, Type.Normal)
-            ];
-            Pokemon blastoise = new("Blastoise", 
+            List<Move> blastoiseMoves = new List<Move>
+            {
+                new Move("Hydro Pump", 110, 80, Type.Water, StatusEffect.None, 0),
+                new Move("Aqua Tail", 90, 90, Type.Water, StatusEffect.None, 0),
+                new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0),
+                new Move("Rapid Spin", 50, 100, Type.Normal, StatusEffect.None, 0)
+            };
+            Pokemon blastoise = new("Blastoise",
                 new Uri(dirPrefix + "Sprites/aBlastoisePreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind), 
+                new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aBlastoiseAgainst.gif", standardUriKind),
                 Type.Water, 145, 75, blastoiseMoves);
 
             // pikachu
             List<Move> pikachuMoves = new List<Move>
             {
-                new Move("Thunderbolt", 90, 100, Type.Normal),
-                new Move("Quick Attack", 40, 100, Type.Normal),
-                new Move("Iron Tail", 100, 75, Type.Normal),
-                new Move("Electro Ball", 80, 100, Type.Normal)
+                new Move("Thunderbolt", 90, 100, Type.Normal, StatusEffect.Paralysis, 100), // 30% chance to paralyze
+                new Move("Quick Attack", 40, 100, Type.Normal, StatusEffect.None, 0),
+                new Move("Iron Tail", 100, 75, Type.Normal, StatusEffect.None, 0),
+                new Move("Electro Ball", 80, 100, Type.Normal, StatusEffect.None, 0)
             };
             Pokemon pikachu = new Pokemon("Pikachu",
                 new Uri(dirPrefix + "Sprites/aPikachuPreview.png", standardUriKind),
@@ -104,10 +108,10 @@ namespace Avans_PokeBattles.Server
             // snorlax
             List<Move> snorlaxMoves = new List<Move>
             {
-                new Move("Body Slam", 85, 100, Type.Normal),
-                new Move("Rest", 0, 100, Type.Normal),
-                new Move("Hyper Beam", 150, 90, Type.Normal),
-                new Move("Headbutt", 70, 100, Type.Normal)
+                new Move("Body Slam", 85, 100, Type.Normal, StatusEffect.Paralysis, 100), // 30% chance to paralyze
+                new Move("Rest", 0, 100, Type.Normal, StatusEffect.None, 0), // No status effect, but restores HP
+                new Move("Hyper Beam", 150, 90, Type.Normal, StatusEffect.None, 0),
+                new Move("Headbutt", 70, 100, Type.Normal, StatusEffect.None, 0)
             };
             Pokemon snorlax = new Pokemon("Snorlax",
                 new Uri(dirPrefix + "Sprites/aSnorlaxPreview.png", standardUriKind),
@@ -118,10 +122,10 @@ namespace Avans_PokeBattles.Server
             // gengar
             List<Move> gengarMoves = new List<Move>
             {
-                new Move("Shadow Ball", 80, 100, Type.Normal),
-                new Move("Dream Eater", 100, 100, Type.Normal),
-                new Move("Sludge Bomb", 90, 100, Type.Normal),
-                new Move("Nightmare", 0, 100, Type.Normal)
+                new Move("Shadow Ball", 80, 100, Type.Normal, StatusEffect.None, 0),
+                new Move("Dream Eater", 100, 100, Type.Normal, StatusEffect.Sleep, 100), // 100% chance to put target to sleep
+                new Move("Sludge Bomb", 90, 100, Type.Normal, StatusEffect.Poison, 30), // 30% chance to poison
+                new Move("Nightmare", 0, 100, Type.Normal, StatusEffect.None, 0) 
             };
             Pokemon gengar = new Pokemon("Gengar",
                 new Uri(dirPrefix + "Sprites/aGengarPreview.png", standardUriKind),
@@ -129,7 +133,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aGengarAgainst.gif", standardUriKind),
                 Type.Normal, 150, 110, gengarMoves);
 
-            pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise, pikachu, snorlax, gengar]);
+            pokemonLister.AddAllPokemon(new List<Pokemon> { unown, venusaur, charizard, blastoise, pikachu, snorlax, gengar });
         }
 
         public void AddPlayer(TcpClient client, string playerName)
@@ -242,43 +246,41 @@ namespace Avans_PokeBattles.Server
 
         public async Task HandleMove(string message, TcpClient sender)
         {
-            // Determine the sender's stream and the opponent's stream based on the sender
             NetworkStream senderStream = (sender == player1) ? stream1 : stream2;
             NetworkStream receiverStream = (sender == player1) ? stream2 : stream1;
 
-            // Determine which Pokémon are the attacker and defender based on whose turn it is
             Pokemon attacker = (sender == player1) ? player1Team[player1ActiveIndex] : player2Team[player2ActiveIndex];
             Pokemon defender = (sender == player1) ? player2Team[player2ActiveIndex] : player1Team[player1ActiveIndex];
 
-            // Check if it is the correct player’s turn
             if ((isPlayer1Turn && sender == player1) || (!isPlayer1Turn && sender == player2))
             {
-                // Extract the move name from the message
-                string moveName = message.Substring(5);  // Assumes message format like "move:MoveName"
-
-                // Find the selected move in the attacker’s move list
+                string moveName = message.Substring(5);
                 Move selectedMove = attacker.PokemonMoves.FirstOrDefault(m => m.MoveName == moveName);
 
                 if (selectedMove != null)
                 {
-                    // Calculate the damage dealt by the selected move and adjust the defender's health
                     int damage = CalculateDamage(attacker, selectedMove, defender);
                     defender.CurrentHealth -= damage;
-                    defender.CurrentHealth = Math.Max(defender.CurrentHealth, 0);  // Prevent health from going below zero
+                    defender.CurrentHealth = Math.Max(defender.CurrentHealth, 0);
 
-                    // Send the result message to both players, indicating the move used and the resulting HP
                     string result = $"Player {(isPlayer1Turn ? 1 : 2)} used {moveName}! {damage} damage dealt. {defender.Name} has {defender.CurrentHealth} HP left.";
                     await SendMessage(senderStream, result);
                     await SendMessage(receiverStream, result);
 
-                    // If the defender’s health reaches zero, send a fainted message
+                    if (selectedMove.Effect != StatusEffect.None && new Random().Next(0, 100) < selectedMove.EffectChance)
+                    {
+                        defender.ApplyStatusEffect(selectedMove.Effect, 2); // Example duration of 2 turns
+                        string effectMessage = $"{defender.Name} is now {selectedMove.Effect}!";
+                        await SendMessage(senderStream, effectMessage);
+                        await SendMessage(receiverStream, effectMessage);
+                    }
+
                     if (defender.CurrentHealth <= 0)
                     {
                         string faintMessage = $"{defender.Name} fainted! {(sender == player1 ? "player2" : "player1")}";
                         await SendMessage(senderStream, faintMessage);
                         await SendMessage(receiverStream, faintMessage);
 
-                        // Check if there are additional Pokémon available for the opponent and switch to the next
                         if (sender == player1 && player2ActiveIndex < player2Team.Count - 1)
                         {
                             player2ActiveIndex++;
@@ -289,7 +291,6 @@ namespace Avans_PokeBattles.Server
                         }
                         else
                         {
-                            // If no more Pokémon are available, end the game and announce the winner
                             string endMessage = $"Game Over! Player {(sender == player1 ? 2 : 1)} wins!";
                             await SendMessage(stream1, endMessage);
                             await SendMessage(stream2, endMessage);
@@ -297,26 +298,14 @@ namespace Avans_PokeBattles.Server
                         }
                     }
 
-                    // Toggle the turn to the other player and send a message indicating whose turn it is
                     isPlayer1Turn = !isPlayer1Turn;
                     string nextTurnMessage = isPlayer1Turn ? "switch_turn:player1" : "switch_turn:player2";
                     await SendMessage(stream1, nextTurnMessage);
                     await SendMessage(stream2, nextTurnMessage);
                 }
-                else if (message.StartsWith("chat:"))
-                {
-                    // If the message is a chat message, relay it to the other player
-                    await SendMessage(receiverStream, message);
-                }
-                else
-                {
-                    // Log an error if the move is not found for the attacker
-                    Console.WriteLine($"Move {moveName} not found for attacker {attacker.Name}");
-                }
             }
             else
             {
-                // If it’s not the sender's turn, inform them
                 await SendMessage(senderStream, "It's not your turn.");
             }
         }
