@@ -36,27 +36,26 @@ namespace Avans_PokeBattles.Server
         private void FillPokemonLister()
         {
             // unown
-            List<Move> unownMoves = new List<Move>
-            {
+            List<Move> unownMoves =
+            [
                 new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0),
                 new Move("Inferno", 100, 50, Type.Fire, StatusEffect.Burn, 30), // 30% chance to burn
                 new Move("Hidden Power", 90, 90, Type.Normal, StatusEffect.None, 0),
                 new Move("Hydro Pump", 110, 80, Type.Water, StatusEffect.None, 0)
-            };
+            ];
             Pokemon unown = new("Unown",
                 new Uri(dirPrefix + "Sprites/aUnownPreview.png", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aUnownAgainst.gif", standardUriKind),
                 Type.Normal, 80, 110, unownMoves);
-
             // venusaur
-            List<Move> venusaurMoves = new List<Move>
-            {
+            List<Move> venusaurMoves =
+            [
                 new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0),
                 new Move("Take Down", 90, 85, Type.Normal, StatusEffect.None, 0),
-                new Move("Razor Leaf", 55, 95, Type.Grass, StatusEffect.Poison, 100), // 20% chance to poison
+                new Move("Razor Leaf", 55, 95, Type.Grass, StatusEffect.Poison, 20), // 20% chance to poison
                 new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0)
-            };
+            ];
             Pokemon venusaur = new("Venusaur",
                 new Uri(dirPrefix + "Sprites/aVenusaurPreview.png", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind),
@@ -64,13 +63,13 @@ namespace Avans_PokeBattles.Server
                 Type.Grass, 195, 70, venusaurMoves);
 
             // charizard
-            List<Move> charizardMoves = new List<Move>
-            {
+            List<Move> charizardMoves =
+            [
                 new Move("Scratch", 40, 100, Type.Normal, StatusEffect.None, 0),
-                new Move("Inferno", 100, 50, Type.Fire, StatusEffect.Burn, 100), // 30% chance to burn
+                new Move("Inferno", 100, 50, Type.Fire, StatusEffect.Burn, 30), // 30% chance to burn
                 new Move("Slash", 70, 100, Type.Normal, StatusEffect.None, 0),
                 new Move("Flamethrower", 90, 100, Type.Fire, StatusEffect.Burn, 10) // 10% chance to burn
-            };
+            ];
             Pokemon charizard = new("Charizard",
                 new Uri(dirPrefix + "Sprites/aCharizardPreview.png", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind),
@@ -78,13 +77,13 @@ namespace Avans_PokeBattles.Server
                 Type.Fire, 125, 120, charizardMoves);
 
             // blastoise
-            List<Move> blastoiseMoves = new List<Move>
-            {
+            List<Move> blastoiseMoves =
+            [
                 new Move("Hydro Pump", 110, 80, Type.Water, StatusEffect.None, 0),
                 new Move("Aqua Tail", 90, 90, Type.Water, StatusEffect.None, 0),
                 new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0),
                 new Move("Rapid Spin", 50, 100, Type.Normal, StatusEffect.None, 0)
-            };
+            ];
             Pokemon blastoise = new("Blastoise",
                 new Uri(dirPrefix + "Sprites/aBlastoisePreview.png", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind),
@@ -92,48 +91,48 @@ namespace Avans_PokeBattles.Server
                 Type.Water, 145, 75, blastoiseMoves);
 
             // pikachu
-            List<Move> pikachuMoves = new List<Move>
-            {
-                new Move("Thunderbolt", 90, 100, Type.Normal, StatusEffect.Paralysis, 100), // 30% chance to paralyze
+            List<Move> pikachuMoves =
+            [
+                new Move("Thunderbolt", 90, 100, Type.Normal, StatusEffect.Paralysis, 30), // 30% chance to paralyze
                 new Move("Quick Attack", 40, 100, Type.Normal, StatusEffect.None, 0),
                 new Move("Iron Tail", 100, 75, Type.Normal, StatusEffect.None, 0),
                 new Move("Electro Ball", 80, 100, Type.Normal, StatusEffect.None, 0)
-            };
-            Pokemon pikachu = new Pokemon("Pikachu",
+            ];
+            Pokemon pikachu = new("Pikachu",
                 new Uri(dirPrefix + "Sprites/aPikachuPreview.png", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aPikachuFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aPikachuAgainst.gif", standardUriKind),
                 Type.Normal, 100, 120, pikachuMoves);
 
             // snorlax
-            List<Move> snorlaxMoves = new List<Move>
-            {
-                new Move("Body Slam", 85, 100, Type.Normal, StatusEffect.Paralysis, 100), // 30% chance to paralyze
-                new Move("Rest", 0, 100, Type.Normal, StatusEffect.None, 0), // No status effect, but restores HP
+            List<Move> snorlaxMoves =
+            [
+                new Move("Body Slam", 85, 100, Type.Normal, StatusEffect.Paralysis, 30), // 30% chance to paralyze
+                new Move("Rest", 0, 100, Type.Normal, StatusEffect.None, 100), // No status effect, but restores HP
                 new Move("Hyper Beam", 150, 90, Type.Normal, StatusEffect.None, 0),
                 new Move("Headbutt", 70, 100, Type.Normal, StatusEffect.None, 0)
-            };
-            Pokemon snorlax = new Pokemon("Snorlax",
+            ];
+            Pokemon snorlax = new("Snorlax",
                 new Uri(dirPrefix + "Sprites/aSnorlaxPreview.png", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aSnorlaxFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aSnorlaxAgainst.gif", standardUriKind),
                 Type.Normal, 200, 30, snorlaxMoves);
 
             // gengar
-            List<Move> gengarMoves = new List<Move>
-            {
+            List<Move> gengarMoves =
+            [
                 new Move("Shadow Ball", 80, 100, Type.Normal, StatusEffect.None, 0),
                 new Move("Dream Eater", 100, 100, Type.Normal, StatusEffect.Sleep, 100), // 100% chance to put target to sleep
                 new Move("Sludge Bomb", 90, 100, Type.Normal, StatusEffect.Poison, 30), // 30% chance to poison
                 new Move("Nightmare", 0, 100, Type.Normal, StatusEffect.None, 0) 
-            };
-            Pokemon gengar = new Pokemon("Gengar",
+            ];
+            Pokemon gengar = new("Gengar",
                 new Uri(dirPrefix + "Sprites/aGengarPreview.png", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aGengarFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aGengarAgainst.gif", standardUriKind),
                 Type.Normal, 150, 110, gengarMoves);
 
-            pokemonLister.AddAllPokemon(new List<Pokemon> { unown, venusaur, charizard, blastoise, pikachu, snorlax, gengar });
+            pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise, pikachu, snorlax, gengar]);
         }
 
         public void AddPlayer(TcpClient client, string playerName)
