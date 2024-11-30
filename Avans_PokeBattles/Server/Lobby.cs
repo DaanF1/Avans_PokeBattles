@@ -252,13 +252,32 @@ namespace Avans_PokeBattles.Server
             Pokemon attacker = (sender == player1) ? player1Team[player1ActiveIndex] : player2Team[player2ActiveIndex];
             Pokemon defender = (sender == player1) ? player2Team[player2ActiveIndex] : player1Team[player1ActiveIndex];
 
+            // Check if it's the sender's turn
             if ((isPlayer1Turn && sender == player1) || (!isPlayer1Turn && sender == player2))
             {
+                // Check status effect of the attacker
+                if (!attacker.HandleStatusEffect())
+                {
+                    // Notify both players that the turn is skipped due to status effect
+                    string statusMessage = $"{attacker.Name} is affected by {attacker.CurrentStatus} and cannot move!";
+                    await SendMessage(senderStream, statusMessage);
+                    await SendMessage(receiverStream, statusMessage);
+
+                    // Switch turn
+                    isPlayer1Turn = !isPlayer1Turn;
+                    string nextTurnMessage = isPlayer1Turn ? "switch_turn:player1" : "switch_turn:player2";
+                    await SendMessage(stream1, nextTurnMessage);
+                    await SendMessage(stream2, nextTurnMessage);
+                    return;
+                }
+
+                // Process move logic (existing code)
                 string moveName = message.Substring(5);
                 Move selectedMove = attacker.PokemonMoves.FirstOrDefault(m => m.MoveName == moveName);
 
                 if (selectedMove != null)
                 {
+                    // Existing move logic
                     int damage = CalculateDamage(attacker, selectedMove, defender);
                     defender.CurrentHealth -= damage;
                     defender.CurrentHealth = Math.Max(defender.CurrentHealth, 0);
@@ -277,7 +296,7 @@ namespace Avans_PokeBattles.Server
 
                     if (defender.CurrentHealth <= 0)
                     {
-                        string faintMessage = $"{defender.Name} fainted! {(sender == player1 ? "player2" : "player1")}";
+                        string faintMessage = $"{defender.Name} fainted!";
                         await SendMessage(senderStream, faintMessage);
                         await SendMessage(receiverStream, faintMessage);
 
@@ -291,13 +310,14 @@ namespace Avans_PokeBattles.Server
                         }
                         else
                         {
-                            string endMessage = $"Game Over! Player {(sender == player1 ? 2 : 1)} wins!";
+                            string endMessage = $"Game Over! Player {(sender == player1 ? 1 : 2)} wins!";
                             await SendMessage(stream1, endMessage);
                             await SendMessage(stream2, endMessage);
                             return;
                         }
                     }
 
+                    // Switch turn
                     isPlayer1Turn = !isPlayer1Turn;
                     string nextTurnMessage = isPlayer1Turn ? "switch_turn:player1" : "switch_turn:player2";
                     await SendMessage(stream1, nextTurnMessage);

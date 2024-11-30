@@ -44,9 +44,9 @@ namespace Avans_PokeBattles
             }
         }
 
-        public void HandleStatusEffect()
+        public bool HandleStatusEffect()
         {
-            if (CurrentStatus == StatusEffect.None) return;
+            if (CurrentStatus == StatusEffect.None) return true;
 
             switch (CurrentStatus)
             {
@@ -67,7 +67,7 @@ namespace Avans_PokeBattles
                     if (random.Next(0, 100) < 25) // 25% chance to be fully paralyzed
                     {
                         Console.WriteLine($"{Name} is paralyzed and cannot move!");
-                        return; // Skip turn
+                        return false; // Skip turn
                     }
                     break;
 
@@ -76,7 +76,7 @@ namespace Avans_PokeBattles
                     {
                         Console.WriteLine($"{Name} is asleep and cannot move!");
                         StatusDuration--;
-                        return; // Skip turn
+                        return false; // Skip turn
                     }
                     break;
 
@@ -88,7 +88,7 @@ namespace Avans_PokeBattles
                         Console.WriteLine($"{Name} thawed out!");
                         CurrentStatus = StatusEffect.None;
                     }
-                    break;
+                    return false; // Skip turn unless thawed
             }
 
             StatusDuration--;
@@ -97,7 +97,10 @@ namespace Avans_PokeBattles
                 Console.WriteLine($"{Name}'s {CurrentStatus} effect has worn off!");
                 CurrentStatus = StatusEffect.None;
             }
+
+            return true;
         }
+
         /// <summary>
         /// Gets a move based on the position of the move in the list
         /// </summary>
