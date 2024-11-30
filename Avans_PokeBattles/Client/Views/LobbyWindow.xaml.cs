@@ -65,9 +65,6 @@ namespace Avans_PokeBattles.Client
             tcpClient = client;
             stream = tcpClient.GetStream();
 
-            // Play music
-            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
-
             // Ínitialize buttons
             InitializeButtonStates();
 
@@ -126,16 +123,8 @@ namespace Avans_PokeBattles.Client
                 else if (message.StartsWith("PlayerTeam"))
                 {
                     // Handles initialization of player and opponent Pokémon teams
-                    if (playerPokemon.Count > 0)
-                    {
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Pokemon p = await GetServerPokemon(stream);
-                            opponentPokemon.Add(p);
-                        }
-                        DisplayTeams(opponentPokemon);
-                    }
-                    else
+                    // A Players own Pokemon are always loaded in first
+                    if (playerPokemon.Count == 0)
                     {
                         for (int i = 0; i < 6; i++)
                         {
@@ -143,6 +132,18 @@ namespace Avans_PokeBattles.Client
                             playerPokemon.Add(p);
                         }
                         DisplayTeams(playerPokemon);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            Pokemon p = await GetServerPokemon(stream);
+                            opponentPokemon.Add(p);
+                        }
+                        DisplayTeams(opponentPokemon);
+
+                        // When all Pokemon are received, play the battle music
+                        PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
                     }
                 }
                 else if (message.StartsWith("chat:"))
