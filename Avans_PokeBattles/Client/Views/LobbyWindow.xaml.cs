@@ -66,7 +66,7 @@ namespace Avans_PokeBattles.Client
             stream = tcpClient.GetStream();
 
             // Play music
-            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
 
             // Ínitialize buttons
             InitializeButtonStates();
@@ -161,16 +161,12 @@ namespace Avans_PokeBattles.Client
                 {
                     ProcessMoveResult(message);
                 }
-                else if (message.Contains("fainted! player2switch_turn") || message.Contains("fainted! player1switch_turn"))
+                else if (message.Contains("fainted!switch_turn"))
                 {
                     ProcessFaintMessage(message);
                     UpdateTurnIndicator(message);
                 }
-                else if (message.Contains("fainted"))
-                {
-                    ProcessFaintMessage(message);
-                }
-                else if (message.StartsWith("switch_turn"))
+                else if (message.Contains("switch_turn"))
                 {
                     UpdateTurnIndicator(message);
                 }
@@ -230,19 +226,20 @@ namespace Avans_PokeBattles.Client
 
         private void ProcessFaintMessage(string message)
         {
-            // Example message: "Blastoise fainted! player1Game Over! Player 1 wins!"
-            string[] parts = message.Split(failtedSeparator, StringSplitOptions.None);
+            // Example message: "Charizard fainted!switch_turn:player2" or "Blastoise fainted! player1Game Over! Player 1 wins!"
 
-            if (parts.Length < 2) return;  // Exit if the format is unexpected
+            // Use a regex to extract the Pokémon name and player (if present)
+            var match = Regex.Match(message, @"^(?<pokemon>.+?) fainted!(?:switch_turn:(?<player>player[12]))?");
+            if (!match.Success) return; // Exit if the format is unexpected
 
-            string faintedPokemonName = parts[0].Trim();
-            string faintedPlayer = parts[1].Trim();
+            string faintedPokemonName = match.Groups["pokemon"].Value.Trim();
+            string faintedPlayer = match.Groups["player"].Success ? match.Groups["player"].Value.Trim() : null;
             bool isGameOver = message.Contains("Game Over!");
 
             // Show message about fainted Pokémon
             MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // Determine if the fainted Pokémon is the player's or the opponent's based on faintedPlayer
+            // Determine if the fainted Pokémon belongs to the player or the opponent
             if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))
             {
                 // Player's Pokémon fainted
@@ -255,11 +252,8 @@ namespace Avans_PokeBattles.Client
                 else if (isGameOver)
                 {
                     MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle any additional game-over logic here, such as closing the game or resetting
-                    SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
-                    lobbyWindow.Show();
-                    playerBattleMusic.Stop();
-                    this.Close();
+                    // Handle game-over logic
+                    NavigateToLobby();
                 }
             }
             else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
@@ -274,13 +268,19 @@ namespace Avans_PokeBattles.Client
                 else if (isGameOver)
                 {
                     MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle any additional game-over logic here, such as closing the game or resetting
-                    SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
-                    lobbyWindow.Show();
-                    playerBattleMusic.Stop();
-                    this.Close();
+                    // Handle game-over logic
+                    NavigateToLobby();
                 }
             }
+        }
+
+        // Helper method to navigate to the lobby window
+        private void NavigateToLobby()
+        {
+            SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
+            lobbyWindow.Show();
+            playerBattleMusic.Stop();
+            this.Close();
         }
 
         // Displays the active Pokémon's GIF and updates health and move buttons for the player or opponent
