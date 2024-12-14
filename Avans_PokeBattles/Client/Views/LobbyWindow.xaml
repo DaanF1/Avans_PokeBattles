@@ -42,8 +42,7 @@
 
             <!-- Game View (inner) -->
             <Canvas Name="cvGameView" Canvas.Left="100" Height="350" Width="425" Background="Black" >
-                <Label Name="lblRound" FontSize="18" FontWeight="Bold" Content="Round: X" Foreground="White" />
-
+                
                 <!-- Turn Indicator -->
                 <Label Name="lblTurnIndicator" Content="Turn: Player X" FontSize="16" FontWeight="Bold" Foreground="White" 
                        Canvas.Left="260" Canvas.Bottom="100" />

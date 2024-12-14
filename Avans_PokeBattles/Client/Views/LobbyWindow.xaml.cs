@@ -68,6 +68,9 @@ namespace Avans_PokeBattles.Client
             // Ínitialize buttons
             InitializeButtonStates();
 
+            // Initialiaze turn indicator
+            InitializeTurnIndicator();
+
             // Start waiting for Server messages
             GetServerMessages();
         }
@@ -76,6 +79,17 @@ namespace Avans_PokeBattles.Client
         private void InitializeButtonStates()
         {
             bool isPlayerTurn = isPlayerOne;
+            SetMoveButtonsState(isPlayerTurn);
+        }
+
+        private void InitializeTurnIndicator()
+        {
+            // Player 1 starts the game by default
+            bool isPlayerTurn = isPlayerOne;
+            lblTurnIndicator.Content = isPlayerTurn ? "Your Turn" : "Opponent's Turn";
+            lblTurnIndicator.Foreground = isPlayerTurn ? Brushes.Green : Brushes.Red;
+
+            // Enable or disable move buttons based on turn
             SetMoveButtonsState(isPlayerTurn);
         }
 

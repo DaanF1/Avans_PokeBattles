@@ -122,7 +122,7 @@ namespace Avans_PokeBattles
             return new Pokemon(Name, new Uri(PreviewUri), new Uri(BattleForUri), new Uri(BattleAgainstUri),
                                PokemonType, MaxHealth, Speed,
                                PokemonMoves.Select(move =>
-                                   new Move(move.MoveName, move.MoveDamage, move.MoveAccuracy, move.TypeOfAttack, move.Effect, move.EffectChance)).ToList())
+                                   new Move(move.MoveName, move.MoveDamage, move.MoveAccuracy, move.TypeOfAttack, move.Effect, move.EffectChance, move.HealingAmount)).ToList())
             {
                 CurrentHealth = this.CurrentHealth,
                 CurrentStatus = this.CurrentStatus, // Copy current status
