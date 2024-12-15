@@ -15,6 +15,7 @@ namespace Avans_PokeBattles.Client
         private readonly NetworkStream stream;
         private readonly LobbyManager lobbyManager;
         private readonly string playerName = "";
+        public LoadingWindow loadingWindow = new LoadingWindow("Waiting for another player."); // Make loading window accessable
 
         public SelectLobbyWindow(string name, TcpClient client)
         {
@@ -77,26 +78,21 @@ namespace Avans_PokeBattles.Client
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"Received message from server: {message}");
 
-                // Initialize waiting window
-                var loadingWindow = new LoadingWindow("Waiting for another player.");
-
                 // Check the server message type and respond accordingly
                 if (message == "lobby-joined")
                 {
                     // Server confirmed the player has joined the lobby
                     Console.WriteLine("Joined lobby successfully. Waiting for other player...");
-                    loadingWindow.Show();
+                    this.loadingWindow.Show(); // Show the waiting window (embedded in class so that we cannot lose this instance)
                 }
                 else if (message == "lobby-full")
                 {
                     // The lobby is full, waiting for the game to begin
                     Console.WriteLine("Lobby is full. Waiting for the game to start...");
-                    loadingWindow.Close();
                 }
                 else if (message.StartsWith("start-game"))
                 {
                     // The server sends "start-game" when the game is ready to begin
-
                     // Determine if this player is Player 1 or Player 2 based on the message content
                     bool isPlayerOne = message == "start-game:player1";
 
@@ -107,29 +103,22 @@ namespace Avans_PokeBattles.Client
                         var gameWindow = new LobbyWindow(tcpClient, isPlayerOne);
                         var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
                         await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 24000);
-                        
+
                         // Close the current SelectLobbyWindow
                         this.Close();
                     });
                     break; // Exit loop once game starts
                 }
             }
-
             // Console log when the connection is closed or no more messages from server
             Console.WriteLine("Connection closed or no more messages from server.");
+            this.loadingWindow.Close(); // Close loading window (Because the lobby is full))
         }
-
-        //private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, bool show)
-        //{
-        //    if (show)
-        //        loadingWindow.Show();
-        //    else 
-        //        loadingWindow.Hide();
-        //}
 
         private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, LobbyWindow gameWindow, bool isPlayerOne, int timeInMilliSeconds)
         {
             loadingWindow.Show(); // Show the waiting window
+            this.IsEnabled = false; // Disable window to prevent joining another lobby while waiting for pokemon to load in
             await Task.Delay(timeInMilliSeconds); // Wait X time
             // After waiting, close loading window and show the game window
             loadingWindow.Close();

@@ -157,7 +157,8 @@ namespace Avans_PokeBattles.Client
                         }
                         DisplayTeams(opponentPokemon);
 
-                        if (isPlayerOne) // Player 1 should wait on Player 2 before music starts, because Player 1 is loaded in first
+                        // Player 1 should wait on Player 2 before music starts, because Player 1 is loaded in first
+                        if (isPlayerOne) // Await makes sure Player 1 can still receive commands while waiting!
                             await Task.Delay(12000); // This delay also shows the loading window for a longer amount of time!
 
                         // When all Pokemon are received, play the battle music
