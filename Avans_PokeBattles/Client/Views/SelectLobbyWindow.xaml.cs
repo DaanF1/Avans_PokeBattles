@@ -83,6 +83,7 @@ namespace Avans_PokeBattles.Client
                 {
                     // Server confirmed the player has joined the lobby
                     Console.WriteLine("Joined lobby successfully. Waiting for other player...");
+                    this.IsEnabled = false; // Disable window to prevent joining another lobby while waiting for pokemon to load in
                     this.loadingWindow.Show(); // Show the waiting window (embedded in class so that we cannot lose this instance)
                 }
                 else if (message == "lobby-full")
@@ -118,7 +119,6 @@ namespace Avans_PokeBattles.Client
         private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, LobbyWindow gameWindow, bool isPlayerOne, int timeInMilliSeconds)
         {
             loadingWindow.Show(); // Show the waiting window
-            this.IsEnabled = false; // Disable window to prevent joining another lobby while waiting for pokemon to load in
             await Task.Delay(timeInMilliSeconds); // Wait X time
             // After waiting, close loading window and show the game window
             loadingWindow.Close();
