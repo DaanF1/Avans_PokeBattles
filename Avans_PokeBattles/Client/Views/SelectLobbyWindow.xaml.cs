@@ -1,7 +1,11 @@
-﻿using Avans_PokeBattles.Server;
+﻿using Avans_PokeBattles.Client.Views;
+using Avans_PokeBattles.Server;
+using System.IO.IsolatedStorage;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 
 namespace Avans_PokeBattles.Client
 {
@@ -73,17 +77,21 @@ namespace Avans_PokeBattles.Client
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"Received message from server: {message}");
 
-                // Check the server message type and respond accordingly
+                // Initialize waiting window
+                var loadingWindow = new LoadingWindow("Waiting for another player.");
 
+                // Check the server message type and respond accordingly
                 if (message == "lobby-joined")
                 {
                     // Server confirmed the player has joined the lobby
                     Console.WriteLine("Joined lobby successfully. Waiting for other player...");
+                    loadingWindow.Show();
                 }
                 else if (message == "lobby-full")
                 {
                     // The lobby is full, waiting for the game to begin
                     Console.WriteLine("Lobby is full. Waiting for the game to start...");
+                    loadingWindow.Close();
                 }
                 else if (message.StartsWith("start-game"))
                 {
@@ -93,12 +101,13 @@ namespace Avans_PokeBattles.Client
                     bool isPlayerOne = message == "start-game:player1";
 
                     // Invoke UI actions on the main thread to start the game window
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    await Application.Current.Dispatcher.InvokeAsync(async () =>
                     {
                         // Create and show the LobbyWindow for the game
                         var gameWindow = new LobbyWindow(tcpClient, isPlayerOne);
-                        gameWindow.Show();
-
+                        var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
+                        await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 24000);
+                        
                         // Close the current SelectLobbyWindow
                         this.Close();
                     });
@@ -108,6 +117,23 @@ namespace Avans_PokeBattles.Client
 
             // Console log when the connection is closed or no more messages from server
             Console.WriteLine("Connection closed or no more messages from server.");
+        }
+
+        //private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, bool show)
+        //{
+        //    if (show)
+        //        loadingWindow.Show();
+        //    else 
+        //        loadingWindow.Hide();
+        //}
+
+        private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, LobbyWindow gameWindow, bool isPlayerOne, int timeInMilliSeconds)
+        {
+            loadingWindow.Show(); // Show the waiting window
+            await Task.Delay(timeInMilliSeconds); // Wait X time
+            // After waiting, close loading window and show the game window
+            loadingWindow.Close();
+            gameWindow.Show();
         }
     }
 }

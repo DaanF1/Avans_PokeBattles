@@ -35,7 +35,7 @@ namespace Avans_PokeBattles.Server
 
         private void FillPokemonLister()
         {
-            // unown
+            // Unown
             List<Move> unownMoves =
             [
                 new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0, 0),
@@ -48,7 +48,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aUnownAgainst.gif", standardUriKind),
                 Type.Normal, 80, 110, unownMoves);
-            // venusaur
+            // Venusaur
             List<Move> venusaurMoves =
             [
                 new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0, 0),
@@ -61,8 +61,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aVenusaurAgainst.gif", standardUriKind),
                 Type.Grass, 195, 70, venusaurMoves);
-
-            // charizard
+            // Charizard
             List<Move> charizardMoves =
             [
                 new Move("Scratch", 40, 100, Type.Normal, StatusEffect.None, 0, 0),
@@ -75,8 +74,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aCharizardAgainst.gif", standardUriKind),
                 Type.Fire, 125, 120, charizardMoves);
-
-            // blastoise
+            // Blastoise
             List<Move> blastoiseMoves =
             [
                 new Move("Hydro Pump", 110, 80, Type.Water, StatusEffect.None, 0, 0),
@@ -89,8 +87,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aBlastoiseAgainst.gif", standardUriKind),
                 Type.Water, 145, 75, blastoiseMoves);
-
-            // pikachu
+            // Pikachu
             List<Move> pikachuMoves =
             [
                 new Move("Thunderbolt", 90, 100, Type.Normal, StatusEffect.Paralysis, 30, 0), // 30% chance to paralyze
@@ -103,8 +100,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aPikachuFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aPikachuAgainst.gif", standardUriKind),
                 Type.Normal, 100, 120, pikachuMoves);
-
-            // snorlax
+            // Snorlax
             List<Move> snorlaxMoves =
             [
                 new Move("Body Slam", 85, 100, Type.Normal, StatusEffect.Paralysis, 30, 0), // 30% chance to paralyze
@@ -117,8 +113,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aSnorlaxFor.gif", standardUriKind),
                 new Uri(dirPrefix + "Sprites/aSnorlaxAgainst.gif", standardUriKind),
                 Type.Normal, 200, 30, snorlaxMoves);
-
-            // gengar
+            // Gengar
             List<Move> gengarMoves =
             [
                 new Move("Shadow Ball", 80, 100, Type.Normal, StatusEffect.None, 0, 0),
@@ -132,6 +127,7 @@ namespace Avans_PokeBattles.Server
                 new Uri(dirPrefix + "Sprites/aGengarAgainst.gif", standardUriKind),
                 Type.Normal, 150, 110, gengarMoves);
 
+            // Add all Pokemon to Lister
             pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise, pikachu, snorlax, gengar]);
         }
 
@@ -422,7 +418,7 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(jsonBytes);
 
             // Wait for data to be read client-side
-            await Task.Delay(500);
+            await Task.Delay(1000); // Loading a single Pokemon takes around 1 second
         }
 
     }

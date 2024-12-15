@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using WpfAnimatedGif;
 using Brush = System.Windows.Media.Brush;
 
@@ -65,7 +66,7 @@ namespace Avans_PokeBattles.Client
             tcpClient = client;
             stream = tcpClient.GetStream();
 
-            // Ínitialize buttons
+            // Initialize buttons
             InitializeButtonStates();
 
             // Initialiaze turn indicator
@@ -155,6 +156,9 @@ namespace Avans_PokeBattles.Client
                             opponentPokemon.Add(p);
                         }
                         DisplayTeams(opponentPokemon);
+
+                        if (isPlayerOne) // Player 1 should wait on Player 2 before music starts, because Player 1 is loaded in first
+                            await Task.Delay(12000); // This delay also shows the loading window for a longer amount of time!
 
                         // When all Pokemon are received, play the battle music
                         PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
