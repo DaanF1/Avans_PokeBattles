@@ -419,7 +419,7 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(jsonBytes);
 
             // Wait for data to be read client-side
-            await Task.Delay(1000); // Loading a single Pokemon takes around 1 second
+            await Task.Delay(1100); // Loading a single Pokemon takes around 1 second
         }
 
     }

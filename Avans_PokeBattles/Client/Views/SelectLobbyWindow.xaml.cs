@@ -103,7 +103,7 @@ namespace Avans_PokeBattles.Client
                         // Create and show the LobbyWindow for the game
                         var gameWindow = new LobbyWindow(tcpClient, isPlayerOne);
                         var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
-                        await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 24000);
+                        await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 25000); // 24 pokemon * 1100ms
 
                         // Close the current SelectLobbyWindow
                         this.Close();
