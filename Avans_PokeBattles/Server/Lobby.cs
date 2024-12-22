@@ -161,6 +161,7 @@ namespace Avans_PokeBattles.Server
             await SendMessage(stream2, "start-game:player2");
 
             // Send teams to both players
+            await Task.Delay(1000); // Wait before sending Pokemon, because one Player might still be in the SelectLobbyWindow
             await SendTeam(stream1, player1Team, player2Team, 1);
             await SendTeam(stream2, player2Team, player1Team, 2);
 

@@ -67,6 +67,7 @@ namespace Avans_PokeBattles.Client
         {
             // Buffer to store incoming server messages
             byte[] buffer = new byte[10000];
+            bool isPlayerOne = false;
 
             // Continuously read messages from the server while connected
             while (tcpClient.Connected)
@@ -95,7 +96,7 @@ namespace Avans_PokeBattles.Client
                 {
                     // The server sends "start-game" when the game is ready to begin
                     // Determine if this player is Player 1 or Player 2 based on the message content
-                    bool isPlayerOne = message == "start-game:player1";
+                    isPlayerOne = message == "start-game:player1";
 
                     // Invoke UI actions on the main thread to start the game window
                     await Application.Current.Dispatcher.InvokeAsync(async () =>
@@ -105,8 +106,7 @@ namespace Avans_PokeBattles.Client
                         var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
                         await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 25000); // 24 pokemon * 1100ms
 
-                        // Close the current SelectLobbyWindow
-                        this.Close();
+                        this.Close(); // Close the current SelectLobbyWindow
                     });
                     break; // Exit loop once game starts
                 }
