@@ -34,7 +34,8 @@ namespace Avans_PokeBattles.Server
 
         public void AddPokemonToTeam(Pokemon pokemon)
         {
-           this.Team.Add(pokemon);
+            if (this.Team.Count >= 6)
+                this.Team.Add(pokemon);
         }
 
         public void RemovePokemonFromTeam(Pokemon pokemon)

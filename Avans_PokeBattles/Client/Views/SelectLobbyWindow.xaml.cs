@@ -49,7 +49,7 @@ namespace Avans_PokeBattles.Client
         private void btnTeam_Click(object sender, RoutedEventArgs e)
         {
             // Go to create team window
-            var createTeamWindow = new CreateTeamWindow(playerProfile, tcpClient);
+            var createTeamWindow = new CreateTeamWindow(playerProfile, tcpClient, Server.Server.GetPokemonLister());
             createTeamWindow.Show();
             this.Close();
         }

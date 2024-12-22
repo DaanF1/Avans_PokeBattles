@@ -12,7 +12,6 @@ namespace Avans_PokeBattles.Client
     public partial class LoginWindow : Window
     {
         private readonly TcpClient tcpClient;
-        private readonly NetworkStream stream;
         private readonly int port = 8000;
 
         public LoginWindow()
@@ -20,7 +19,6 @@ namespace Avans_PokeBattles.Client
             InitializeComponent();
 
             this.tcpClient = new TcpClient("127.0.0.1", port);
-            this.stream = tcpClient.GetStream();
         }
 
         private void txtName_PreviewMouseDown(object sender, MouseButtonEventArgs e)
