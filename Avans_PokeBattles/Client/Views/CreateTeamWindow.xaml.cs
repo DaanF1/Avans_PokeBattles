@@ -94,7 +94,7 @@ namespace Avans_PokeBattles.Client.Views
             try
             {
                 var teamNames = string.Join(",", selectedTeam.ConvertAll(p => p.Name));
-                string message = $"create team:{teamNames}";
+                string message = $"create-team:{teamNames}";
                 byte[] buffer = Encoding.UTF8.GetBytes(message);
                 stream.Write(buffer);
 
