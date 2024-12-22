@@ -11,6 +11,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Avans_PokeBattles.Server;
 using WpfAnimatedGif;
 using Brush = System.Windows.Media.Brush;
 
@@ -23,6 +24,7 @@ namespace Avans_PokeBattles.Client
     {
         // TCP client and network stream for communication with the server
         private readonly TcpClient tcpClient;
+        private readonly Profile profile;
         private readonly NetworkStream stream;
 
         // Names of players for display
@@ -55,10 +57,11 @@ namespace Avans_PokeBattles.Client
         private static readonly string[] failtedSeparator = ["fainted!", "switch_turn:", "Game Over!"];
         private static readonly string[] damageHpSeparator = ["damage dealt.", " has ", " HP left."];
 
-        public LobbyWindow(TcpClient client, bool isPlayerOne)
+        public LobbyWindow(Profile playerProfile, TcpClient client, bool isPlayerOne)
         {
             InitializeComponent();
             this.isPlayerOne = isPlayerOne;
+            this.profile = playerProfile;
 
             // Set name template (Should be overwritten later)
             lblPlayer1Name.Content = "Your team:";
@@ -297,7 +300,7 @@ namespace Avans_PokeBattles.Client
         // Helper method to navigate to the lobby window
         private void NavigateToLobby()
         {
-            SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
+            var lobbyWindow = new SelectLobbyWindow(profile, tcpClient);
             lobbyWindow.Show();
             playerBattleMusic.Stop();
             this.Close();

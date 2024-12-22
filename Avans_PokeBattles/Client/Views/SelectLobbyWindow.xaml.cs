@@ -14,10 +14,10 @@ namespace Avans_PokeBattles.Client
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
         private readonly LobbyManager lobbyManager;
-        private readonly string playerName = "";
+        private readonly Profile playerProfile;
         public LoadingWindow loadingWindow = new LoadingWindow("Waiting for another player."); // Make loading window accessable
 
-        public SelectLobbyWindow(string name, TcpClient client)
+        public SelectLobbyWindow(Profile profile, TcpClient client)
         {
             InitializeComponent();
 
@@ -29,8 +29,8 @@ namespace Avans_PokeBattles.Client
             this.lobbyManager = Server.Server.GetLobbymanager();
 
             // Set the player’s name and update the label with this information
-            this.playerName = name;
-            lblName.Content = "Name: " + this.playerName;
+            this.playerProfile = profile;
+            lblName.Content = "Name: " + profile.GetName();
         }
 
         // Event handler triggered when the SelectLobbyWindow is loaded
@@ -46,6 +46,13 @@ namespace Avans_PokeBattles.Client
         private async void btnJoinLobby2_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-2", 2);
         private async void btnJoinLobby3_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-3", 3);
 
+        private void btnTeam_Click(object sender, RoutedEventArgs e)
+        {
+            // Go to create team window
+            var createTeamWindow = new CreateTeamWindow(playerProfile, tcpClient);
+            createTeamWindow.Show();
+            this.Close();
+        }
 
         // Method to handle joining a specified lobby
         private async Task JoinLobby(string lobbyId, int number)
@@ -102,7 +109,7 @@ namespace Avans_PokeBattles.Client
                     await Application.Current.Dispatcher.InvokeAsync(async () =>
                     {
                         // Create and show the LobbyWindow for the game
-                        var gameWindow = new LobbyWindow(tcpClient, isPlayerOne);
+                        var gameWindow = new LobbyWindow(playerProfile, tcpClient, isPlayerOne);
                         var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
                         await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 25000); // 24 pokemon * 1100ms
 
@@ -124,5 +131,6 @@ namespace Avans_PokeBattles.Client
             loadingWindow.Close();
             gameWindow.Show();
         }
+
     }
 }

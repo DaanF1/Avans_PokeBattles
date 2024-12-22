@@ -2,6 +2,7 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using Avans_PokeBattles.Server;
 
 namespace Avans_PokeBattles.Client
 {
@@ -42,12 +43,12 @@ namespace Avans_PokeBattles.Client
                 MessageBox.Show("Please enter a name shorter than 11 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            // Send the players name to the server
-            byte[] buffer = Encoding.UTF8.GetBytes("Player name: " + name);
-            stream.Write(buffer, 0, buffer.Length);
+            // Create ProfileManager
+            ProfileManager profileManager = new ProfileManager();
+            Profile profile = profileManager.GetOrCreateProfile(name);
 
             // Show the select lobby window and close the current window
-            var selectLobbyWindow = new SelectLobbyWindow(name, tcpClient);
+            var selectLobbyWindow = new SelectLobbyWindow(profile, tcpClient);
             selectLobbyWindow.Show();
             this.Close();
         }

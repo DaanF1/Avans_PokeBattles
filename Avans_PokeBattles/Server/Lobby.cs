@@ -15,15 +15,14 @@ namespace Avans_PokeBattles.Server
         private NetworkStream stream2;
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
-        private readonly PokemonLister pokemonLister = new();  // List of available Pokémon to pick from
-        public string dirPrefix = AppDomain.CurrentDomain.BaseDirectory; // Directory prefix for files
-        public UriKind standardUriKind = UriKind.Absolute; // Always get the absolute path
+        private readonly PokemonLister pokemonLister;  // List of available Pokémon to pick from
 
         private List<Pokemon> player1Team;
         private List<Pokemon> player2Team;
         private int player1ActiveIndex = 0;
         private int player2ActiveIndex = 0;
 
+        private static readonly ProfileManager profileManager = new ProfileManager();
         public string LobbyId { get; private set; }
         public bool IsFull { get; private set; }
 
@@ -31,106 +30,10 @@ namespace Avans_PokeBattles.Server
         {
             LobbyId = lobbyId;
             IsFull = false;
-            FillPokemonLister();  // Fill Pokémon lister with all available Pokemon
+
+            pokemonLister = Server.GetPokemonLister();
         }
 
-        private void FillPokemonLister()
-        {
-            // Unown
-            List<Move> unownMoves =
-            [
-                new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0, 0),
-                new Move("Inferno", 100, 50, Type.Fire, StatusEffect.Burn, 30, 0), // 30% chance to burn
-                new Move("Hidden Power", 90, 90, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Hydro Pump", 110, 80, Type.Water, StatusEffect.None, 0, 0)
-            ];
-            Pokemon unown = new("Unown",
-                new Uri(dirPrefix + "Sprites/aUnownPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aUnownFor.gif", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aUnownAgainst.gif", standardUriKind),
-                Type.Normal, 80, 110, unownMoves);
-            // Venusaur
-            List<Move> venusaurMoves =
-            [
-                new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0, 0),
-                new Move("Take Down", 90, 85, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Razor Leaf", 55, 95, Type.Grass, StatusEffect.Poison, 20, 0), // 20% chance to poison
-                new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0, 0)
-            ];
-            Pokemon venusaur = new("Venusaur",
-                new Uri(dirPrefix + "Sprites/aVenusaurPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aVenusaurFor.gif", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aVenusaurAgainst.gif", standardUriKind),
-                Type.Grass, 195, 70, venusaurMoves);
-            // Charizard
-            List<Move> charizardMoves =
-            [
-                new Move("Scratch", 40, 100, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Inferno", 100, 50, Type.Fire, StatusEffect.Burn, 30, 0), // 30% chance to burn
-                new Move("Slash", 70, 100, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Flamethrower", 90, 100, Type.Fire, StatusEffect.Burn, 10, 0) // 10% chance to burn
-            ];
-            Pokemon charizard = new("Charizard",
-                new Uri(dirPrefix + "Sprites/aCharizardPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aCharizardFor.gif", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aCharizardAgainst.gif", standardUriKind),
-                Type.Fire, 125, 120, charizardMoves);
-            // Blastoise
-            List<Move> blastoiseMoves =
-            [
-                new Move("Hydro Pump", 110, 80, Type.Water, StatusEffect.None, 0, 0),
-                new Move("Aqua Tail", 90, 90, Type.Water, StatusEffect.None, 0, 0),
-                new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Rapid Spin", 50, 100, Type.Normal, StatusEffect.None, 0, 0)
-            ];
-            Pokemon blastoise = new("Blastoise",
-                new Uri(dirPrefix + "Sprites/aBlastoisePreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aBlastoiseFor.gif", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aBlastoiseAgainst.gif", standardUriKind),
-                Type.Water, 145, 75, blastoiseMoves);
-            // Pikachu
-            List<Move> pikachuMoves =
-            [
-                new Move("Thunderbolt", 90, 100, Type.Normal, StatusEffect.Paralysis, 30, 0), // 30% chance to paralyze
-                new Move("Quick Attack", 40, 100, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Iron Tail", 100, 75, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Electro Ball", 80, 100, Type.Normal, StatusEffect.None, 0, 0)
-            ];
-            Pokemon pikachu = new("Pikachu",
-                new Uri(dirPrefix + "Sprites/aPikachuPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aPikachuFor.gif", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aPikachuAgainst.gif", standardUriKind),
-                Type.Normal, 100, 120, pikachuMoves);
-            // Snorlax
-            List<Move> snorlaxMoves =
-            [
-                new Move("Body Slam", 85, 100, Type.Normal, StatusEffect.Paralysis, 30, 0), // 30% chance to paralyze
-                new Move("Rest", 0, 100, Type.Normal, StatusEffect.None, 100, 100), // No status effect, but restores HP
-                new Move("Hyper Beam", 150, 90, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Headbutt", 70, 100, Type.Normal, StatusEffect.None, 0, 0)
-            ];
-            Pokemon snorlax = new("Snorlax",
-                new Uri(dirPrefix + "Sprites/aSnorlaxPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aSnorlaxFor.gif", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aSnorlaxAgainst.gif", standardUriKind),
-                Type.Normal, 200, 30, snorlaxMoves);
-            // Gengar
-            List<Move> gengarMoves =
-            [
-                new Move("Shadow Ball", 80, 100, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Dream Eater", 100, 100, Type.Normal, StatusEffect.Sleep, 100, 0), // 100% chance to put target to sleep
-                new Move("Sludge Bomb", 90, 100, Type.Normal, StatusEffect.Poison, 30, 0), // 30% chance to poison
-                new Move("Nightmare", 0, 100, Type.Normal, StatusEffect.None, 0, 0)
-            ];
-            Pokemon gengar = new("Gengar",
-                new Uri(dirPrefix + "Sprites/aGengarPreview.png", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aGengarFor.gif", standardUriKind),
-                new Uri(dirPrefix + "Sprites/aGengarAgainst.gif", standardUriKind),
-                Type.Normal, 150, 110, gengarMoves);
-
-            // Add all Pokemon to Lister
-            pokemonLister.AddAllPokemon([unown, venusaur, charizard, blastoise, pikachu, snorlax, gengar]);
-        }
 
         public void AddPlayer(TcpClient client, string playerName)
         {
@@ -152,8 +55,8 @@ namespace Avans_PokeBattles.Server
         public async void StartGame()
         {
             // Assign random teams of 6 Pokémon to both players (allowing duplicates)
-            player1Team = AssignRandomTeam();
-            player2Team = AssignRandomTeam();
+            player1Team = profileManager.GetProfile(namePlayer1)?.GetTeam() ?? new List<Pokemon>();
+            player2Team = profileManager.GetProfile(namePlayer2)?.GetTeam() ?? new List<Pokemon>();
 
             Console.WriteLine("LOBBY: Sending 'start-game' signal to both players...");
 
@@ -318,7 +221,20 @@ namespace Avans_PokeBattles.Server
                             }
                             else
                             {
-                                string endMessage = $"Game Over! Player {(sender == player1 ? 1 : 2)} wins!";
+                                string endMessage;
+                                if (player1Team.Count == 0)
+                                {
+                                    profileManager.GetProfile(namePlayer2).IncrementWins();
+                                    profileManager.GetProfile(namePlayer1).IncrementLosses(); // Lol L verliezer
+                                    endMessage = $"Game Over! Player 2 ({namePlayer2}) wins";
+                                }
+                                else
+                                {
+                                    profileManager.GetProfile(namePlayer1).IncrementWins();
+                                    profileManager.GetProfile(namePlayer2).IncrementLosses(); // Lol L verliezer
+                                    endMessage = $"Game Over! Player 1 ({namePlayer1}) wins";
+                                }
+
                                 await SendMessage(stream1, endMessage);
                                 await SendMessage(stream2, endMessage);
                                 return;
