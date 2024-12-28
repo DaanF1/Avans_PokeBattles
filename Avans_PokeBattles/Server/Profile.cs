@@ -10,13 +10,15 @@ namespace Avans_PokeBattles.Server
     public class Profile
     {
         private string Name { get; set; }
+        private TcpClient TcpClient { get; set; }
         private List<Pokemon> Team { get; set; }
         private int Wins { get; set; }
         private int Losses { get; set; }
 
-        public Profile(string name) 
+        public Profile(string name, TcpClient client) 
         { 
             this.Name = name;
+            this.TcpClient = client;
             this.Team = new List<Pokemon>();
             this.Wins = 0;
             this.Losses = 0;
@@ -55,6 +57,11 @@ namespace Avans_PokeBattles.Server
         public string GetName()
         {
             return this.Name;
+        }
+
+        public TcpClient GetTcpCLient()
+        {
+            return this.TcpClient;
         }
 
         public List<Pokemon> GetTeam()

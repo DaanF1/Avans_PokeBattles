@@ -1,4 +1,4 @@
-﻿using System.Net.Sockets;
+using System.Net.Sockets;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -42,10 +42,10 @@ namespace Avans_PokeBattles.Client
                 return;
             }
             // Create ProfileManager
-            Profile profile = ProfileManager.Instance.GetOrCreateProfile(name);
+            Profile profile = ProfileManager.Instance.GetOrCreateProfile(name, tcpClient);
 
             // Show the select lobby window and close the current window
-            var selectLobbyWindow = new SelectLobbyWindow(profile, tcpClient);
+            var selectLobbyWindow = new SelectLobbyWindow(profile);
             selectLobbyWindow.Show();
             this.Close();
         }

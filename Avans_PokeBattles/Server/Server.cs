@@ -10,7 +10,6 @@ namespace Avans_PokeBattles.Server
         private static readonly int port = 8000;
         private static LobbyManager lobbyManager = new();
         private static Lobby connectedLobby;
-        private static readonly Dictionary<TcpClient, string> clientNames = [];
         private static readonly ProfileManager profileManager = ProfileManager.Instance;
         private static readonly PokemonLister pokemonLister = new PokemonLister();
         private static bool isRunning = false;
@@ -74,17 +73,10 @@ namespace Avans_PokeBattles.Server
                     if (splitMessage.Length == 2)
                     {
                         // Get current Player name
-                        string namePlayer1 = "";
-                        int index = 0;
-                        foreach (TcpClient tcp in clientNames.Keys)
-                        {
-                            if (tcp == client)
-                                namePlayer1 = clientNames.Values.ElementAt(index);
-                            index++;
-                        }
+                        string playerName = profileManager.GetProfileViaTcpClient(client).GetName();
 
                         string lobbyId = splitMessage[1];
-                        bool joined = lobbyManager.TryJoinLobby(lobbyId, client, namePlayer1);
+                        bool joined = lobbyManager.TryJoinLobby(lobbyId, client, playerName);
 
                         // Notify the client if joining the lobby was successful
                         string responseMessage = joined ? "lobby-joined" : "lobby-full";
@@ -107,7 +99,7 @@ namespace Avans_PokeBattles.Server
                     string name = parts[1];
                     string[] pokemonNames = parts[2].Split(",");
 
-                    var profile = profileManager.GetOrCreateProfile(name);
+                    var profile = profileManager.GetOrCreateProfile(name, client);
                     profile.RemoveTeam();
 
                     foreach (var pokemonName in pokemonNames) 
@@ -210,10 +202,10 @@ namespace Avans_PokeBattles.Server
             // Pikachu
             List<Move> pikachuMoves =
             [
-                new Move("Thunderbolt", 90, 100, Type.Normal, StatusEffect.Paralysis, 30, 0), // 30% chance to paralyze
+                new Move("Thunderbolt", 90, 100, Type.Electric, StatusEffect.Paralysis, 30, 0), // 30% chance to paralyze
                 new Move("Quick Attack", 40, 100, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Iron Tail", 100, 75, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Electro Ball", 80, 100, Type.Normal, StatusEffect.None, 0, 0)
+                new Move("Iron Tail", 100, 75, Type.Steel, StatusEffect.None, 0, 0),
+                new Move("Electro Ball", 80, 100, Type.Electric, StatusEffect.None, 0, 0)
             ];
             Pokemon pikachu = new("Pikachu",
                 new Uri(dirPrefix + "Sprites/aPikachuPreview.png", standardUriKind),
@@ -236,10 +228,10 @@ namespace Avans_PokeBattles.Server
             // Gengar
             List<Move> gengarMoves =
             [
-                new Move("Shadow Ball", 80, 100, Type.Normal, StatusEffect.None, 0, 0),
-                new Move("Dream Eater", 100, 100, Type.Normal, StatusEffect.Sleep, 100, 0), // 100% chance to put target to sleep
-                new Move("Sludge Bomb", 90, 100, Type.Normal, StatusEffect.Poison, 30, 0), // 30% chance to poison
-                new Move("Nightmare", 0, 100, Type.Normal, StatusEffect.None, 0, 0)
+                new Move("Shadow Ball", 80, 100, Type.Ghost, StatusEffect.None, 0, 0),
+                new Move("Dream Eater", 100, 100, Type.Ghost, StatusEffect.Sleep, 100, 0), // 100% chance to put target to sleep
+                new Move("Sludge Bomb", 90, 100, Type.Ghost, StatusEffect.Poison, 30, 0), // 30% chance to poison
+                new Move("Nightmare", 0, 100, Type.Ghost, StatusEffect.None, 0, 0)
             ];
             Pokemon gengar = new("Gengar",
                 new Uri(dirPrefix + "Sprites/aGengarPreview.png", standardUriKind),

@@ -54,19 +54,19 @@ namespace Avans_PokeBattles.Server
 
         public async void StartGame()
         {
-            // Assign random teams of 6 Pokémon to both players (allowing duplicates)
-            player1Team = profileManager.GetProfile(namePlayer1)?.GetTeam() ?? new List<Pokemon>();
-            player2Team = profileManager.GetProfile(namePlayer2)?.GetTeam() ?? new List<Pokemon>();
+            //// Assign random teams of 6 Pokémon to both players (allowing duplicates)
+            //player1Team = profileManager.GetProfile(namePlayer1)?.GetTeam() ?? new List<Pokemon>();
+            //player2Team = profileManager.GetProfile(namePlayer2)?.GetTeam() ?? new List<Pokemon>();
 
             Console.WriteLine("LOBBY: Sending 'start-game' signal to both players...");
 
             await SendMessage(stream1, "start-game:player1");
             await SendMessage(stream2, "start-game:player2");
 
-            // Send teams to both players
-            await Task.Delay(1000); // Wait before sending Pokemon, because one Player might still be in the SelectLobbyWindow
-            await SendTeam(stream1, player1Team, player2Team, 1);
-            await SendTeam(stream2, player2Team, player1Team, 2);
+            //// Send teams to both players
+            //await Task.Delay(1000); // Wait before sending Pokemon, because one Player might still be in the SelectLobbyWindow
+            //await SendTeam(stream1, player1Team, player2Team, 1);
+            //await SendTeam(stream2, player2Team, player1Team, 2);
 
             await SendNames(stream1);
             await SendNames(stream2);
@@ -74,45 +74,45 @@ namespace Avans_PokeBattles.Server
             Console.WriteLine("LOBBY: Start-game messages sent to both players.");
         }
 
-        private List<Pokemon> AssignRandomTeam()
-        {
-            List<Pokemon> teamOfPlayer = [];
-            for (int i = 0; i < 6; i++)
-            {
-                Pokemon randomPokemon = pokemonLister.GetRandomPokemon().DeepCopy();  // Deep copy to ensure unique instance
-                teamOfPlayer.Add(randomPokemon);
-            }
-            return teamOfPlayer;
-        }
+        //private List<Pokemon> AssignRandomTeam()
+        //{
+        //    List<Pokemon> teamOfPlayer = [];
+        //    for (int i = 0; i < 6; i++)
+        //    {
+        //        Pokemon randomPokemon = pokemonLister.GetRandomPokemon().DeepCopy();  // Deep copy to ensure unique instance
+        //        teamOfPlayer.Add(randomPokemon);
+        //    }
+        //    return teamOfPlayer;
+        //}
 
         public bool HasClient(TcpClient client)
         {
             return client == player1 || client == player2;
         }
 
-        private static async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
-        {
-            StringBuilder teamMessage = new StringBuilder();
+        //private static async Task SendTeam(NetworkStream stream, List<Pokemon> playerTeam, List<Pokemon> opponentTeam, int playerNumber)
+        //{
+        //    StringBuilder teamMessage = new StringBuilder();
 
-            // Indicate sending a Player's team:
-            teamMessage.Append($"PlayerTeam {playerNumber} team:\n");
-            await SendMessage(stream, teamMessage.ToString());
+        //    // Indicate sending a Player's team:
+        //    teamMessage.Append($"PlayerTeam {playerNumber} team:\n");
+        //    await SendMessage(stream, teamMessage.ToString());
 
-            // Send the team now:
-            foreach (Pokemon pokemon in playerTeam)
-            {
-                await SendPokemon(stream, pokemon);
-            }
+        //    // Send the team now:
+        //    foreach (Pokemon pokemon in playerTeam)
+        //    {
+        //        await SendPokemon(stream, pokemon);
+        //    }
 
-            // Indicate sending the opponent's team:
-            teamMessage.Append($"Opponent team:\n");
-            await SendMessage(stream, teamMessage.ToString());
+        //    // Indicate sending the opponent's team:
+        //    teamMessage.Append($"Opponent team:\n");
+        //    await SendMessage(stream, teamMessage.ToString());
 
-            foreach (Pokemon pokemon in opponentTeam)
-            {
-                await SendPokemon(stream, pokemon);
-            }
-        }
+        //    foreach (Pokemon pokemon in opponentTeam)
+        //    {
+        //        await SendPokemon(stream, pokemon);
+        //    }
+        //}
 
         private async Task SendNames(NetworkStream stream)
         {
@@ -125,6 +125,8 @@ namespace Avans_PokeBattles.Server
                 await SendMessage(stream, teamMessage.ToString() + namePlayer1.ToString() + "\n");
                 teamMessage.Clear();
 
+                await Task.Delay(1000);
+
                 // Sending Player 2 name:
                 teamMessage.Append($"Player 2 name:");
                 await SendMessage(stream, teamMessage.ToString() + namePlayer2.ToString() + "\n");
@@ -136,6 +138,8 @@ namespace Avans_PokeBattles.Server
                 teamMessage.Append($"Player 1 name:");
                 await SendMessage(stream, teamMessage.ToString() + namePlayer2.ToString() + "\n");
                 teamMessage.Clear();
+
+                await Task.Delay(1000);
 
                 // Sending Player 1 name:
                 teamMessage.Append($"Player 2 name:");
@@ -299,6 +303,9 @@ namespace Avans_PokeBattles.Server
             if (attackType == Type.Grass && defenderType == Type.Water) return 2.0; // Grass is super effective against Water
             if (attackType == Type.Fire && defenderType == Type.Grass) return 2.0;  // Fire is super effective against Grass
             if (attackType == Type.Water && defenderType == Type.Fire) return 2.0;  // Water is super effective against Fire
+            if (attackType == Type.Electric && defenderType == Type.Water) return 2.0;  // Electric is super effective against Water
+            if (attackType == Type.Normal && defenderType == Type.Ghost) return 2.0;  // Normal is super effective against Ghost
+            if (attackType == Type.Ghost && defenderType == Type.Ghost) return 2.0;  // Ghost is super effective against Ghost
 
             // If the attacking type and defending type are the same, reduce damage
             if (attackType == defenderType) return 0.5;
@@ -316,28 +323,28 @@ namespace Avans_PokeBattles.Server
             await stream.WriteAsync(response);
         }
 
-        /// <summary>
-        /// This helper method sends a Json serialized Pokemon to the client
-        /// Made with help from ChatGPT!
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="pokemon"></param>
-        private static async Task SendPokemon(NetworkStream stream, Pokemon pokemon)
-        {
-            // Serialize each Pokemon object
-            string jsonString = JsonSerializer.Serialize(pokemon);
-            byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
+        ///// <summary>
+        ///// This helper method sends a Json serialized Pokemon to the client
+        ///// Made with help from ChatGPT!
+        ///// </summary>
+        ///// <param name="stream"></param>
+        ///// <param name="pokemon"></param>
+        //private static async Task SendPokemon(NetworkStream stream, Pokemon pokemon)
+        //{
+        //    // Serialize each Pokemon object
+        //    string jsonString = JsonSerializer.Serialize(pokemon);
+        //    byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
 
-            // Send the length of the message first
-            byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
-            await stream.WriteAsync(lengthBytes);
+        //    // Send the length of the message first
+        //    byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
+        //    await stream.WriteAsync(lengthBytes);
 
-            // Send the actual JSON data
-            await stream.WriteAsync(jsonBytes);
+        //    // Send the actual JSON data
+        //    await stream.WriteAsync(jsonBytes);
 
-            // Wait for data to be read client-side
-            await Task.Delay(2000); // Loading a single Pokemon takes around 1 second
-        }
+        //    // Wait for data to be read client-side
+        //    await Task.Delay(2000); // Loading a single Pokemon takes around 1 second
+        //}
 
     }
 }

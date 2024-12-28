@@ -17,13 +17,13 @@ namespace Avans_PokeBattles.Client
         private readonly Profile playerProfile;
         public LoadingWindow loadingWindow = new LoadingWindow("Waiting for another player."); // Make loading window accessable
 
-        public SelectLobbyWindow(Profile profile, TcpClient client)
+        public SelectLobbyWindow(Profile profile)
         {
             InitializeComponent();
 
             // Set up the TCP client and network stream with the provided client
-            this.tcpClient = client;
-            this.stream = client.GetStream();
+            this.tcpClient = profile.GetTcpCLient();
+            this.stream = profile.GetTcpCLient().GetStream();
 
             // Retrieve the lobby manager instance from the server
             this.lobbyManager = Server.Server.GetLobbymanager();
@@ -49,9 +49,8 @@ namespace Avans_PokeBattles.Client
         private void btnTeam_Click(object sender, RoutedEventArgs e)
         {
             // Go to create team window
-            var createTeamWindow = new CreateTeamWindow(playerProfile, tcpClient, Server.Server.GetPokemonLister());
+            var createTeamWindow = new CreateTeamWindow(playerProfile, Server.Server.GetPokemonLister());
             createTeamWindow.Show();
-            //this.Close();
         }
 
         // Method to handle joining a specified lobby
@@ -105,16 +104,21 @@ namespace Avans_PokeBattles.Client
                     // Determine if this player is Player 1 or Player 2 based on the message content
                     isPlayerOne = message == "start-game:player1";
 
-                    // Invoke UI actions on the main thread to start the game window
-                    await Application.Current.Dispatcher.InvokeAsync(async () =>
-                    {
-                        // Create and show the LobbyWindow for the game
-                        var gameWindow = new LobbyWindow(playerProfile, tcpClient, isPlayerOne);
-                        var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
-                        await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 48000); // 24 pokemon * 2000ms
+                    var gameWindow = new LobbyWindow(playerProfile, isPlayerOne);
+                    gameWindow.Show();
+                    this.Close();
 
-                        this.Close(); // Close the current SelectLobbyWindow
-                    });
+                    // Invoke UI actions on the main thread to start the game window
+                    //await Application.Current.Dispatcher.InvokeAsync(async () =>
+                    //{
+                    //    // Create and show the LobbyWindow for the game
+                    //    var gameWindow = new LobbyWindow(playerProfile, tcpClient, isPlayerOne);
+                    //    gameWindow.Show();
+                    //    //var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
+                    //    //await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 48000); // 24 pokemon * 2000ms
+
+                    //    this.Close(); // Close the current SelectLobbyWindow
+                    //});
                     break; // Exit loop once game starts
                 }
             }
@@ -123,14 +127,14 @@ namespace Avans_PokeBattles.Client
             this.loadingWindow.Close(); // Close loading window (Because the lobby is full))
         }
 
-        private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, LobbyWindow gameWindow, bool isPlayerOne, int timeInMilliSeconds)
-        {
-            loadingWindow.Show(); // Show the waiting window
-            await Task.Delay(timeInMilliSeconds); // Wait X time
-            // After waiting, close loading window and show the game window
-            loadingWindow.Close();
-            gameWindow.Show();
-        }
+        //private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, LobbyWindow gameWindow, bool isPlayerOne, int timeInMilliSeconds)
+        //{
+        //    loadingWindow.Show(); // Show the waiting window
+        //    await Task.Delay(timeInMilliSeconds); // Wait X time
+        //    // After waiting, close loading window and show the game window
+        //    loadingWindow.Close();
+        //    gameWindow.Show();
+        //}
 
     }
 }

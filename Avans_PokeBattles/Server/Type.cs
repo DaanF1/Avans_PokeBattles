@@ -14,6 +14,7 @@ namespace Avans_PokeBattles.Server
         Normal,
         Electric,
         Ghost,
-        Psychic
+        Psychic,
+        Steel
     }
 }

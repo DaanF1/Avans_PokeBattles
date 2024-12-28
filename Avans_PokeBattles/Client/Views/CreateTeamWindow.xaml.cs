@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -27,13 +27,13 @@ namespace Avans_PokeBattles.Client.Views
         private readonly PokemonLister pokemonLister;
         private readonly List<Pokemon> selectedTeam;
 
-        public CreateTeamWindow(Profile profile, TcpClient client, PokemonLister lister)
+        public CreateTeamWindow(Profile profile, PokemonLister lister)
         {
             InitializeComponent();
 
             this.playerProfile = profile;
-            this.playerClient = client;
-            this.stream = client.GetStream();
+            this.playerClient = profile.GetTcpCLient();
+            this.stream = profile.GetTcpCLient().GetStream();
             this.pokemonLister = lister;
             this.selectedTeam = new List<Pokemon>();
 
@@ -45,6 +45,7 @@ namespace Avans_PokeBattles.Client.Views
         private void ConfigureTeamListBox()
         {
             listTeam.DisplayMemberPath = "Name";
+            cmbSelectPokemon.SelectedIndex = 0;
         }
 
         private void LoadAvailablePokemon()
@@ -57,7 +58,7 @@ namespace Avans_PokeBattles.Client.Views
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
             // Go to select lobby window
-            var lobbyWindow = new SelectLobbyWindow(playerProfile, playerClient);
+            var lobbyWindow = new SelectLobbyWindow(playerProfile);
             lobbyWindow.Show();
             this.Close();
         }
@@ -110,10 +111,9 @@ namespace Avans_PokeBattles.Client.Views
                 else
                 {
                     // Fallback in case SelectLobbyWindow doesn't exist
-                    var newLobbyWindow = new SelectLobbyWindow(playerProfile, playerClient);
+                    var newLobbyWindow = new SelectLobbyWindow(playerProfile);
                     newLobbyWindow.Show();
                 }
-
                 this.Close();
             }
             catch (Exception ex)
