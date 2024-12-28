@@ -22,7 +22,7 @@ namespace Avans_PokeBattles.Server
         private int player1ActiveIndex = 0;
         private int player2ActiveIndex = 0;
 
-        private static readonly ProfileManager profileManager = new ProfileManager();
+        private static readonly ProfileManager profileManager = ProfileManager.Instance;
         public string LobbyId { get; private set; }
         public bool IsFull { get; private set; }
 

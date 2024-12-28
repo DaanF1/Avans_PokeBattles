@@ -42,8 +42,7 @@ namespace Avans_PokeBattles.Client
                 return;
             }
             // Create ProfileManager
-            ProfileManager profileManager = new ProfileManager();
-            Profile profile = profileManager.GetOrCreateProfile(name);
+            Profile profile = ProfileManager.Instance.GetOrCreateProfile(name);
 
             // Show the select lobby window and close the current window
             var selectLobbyWindow = new SelectLobbyWindow(profile, tcpClient);

@@ -8,12 +8,15 @@ namespace Avans_PokeBattles.Server
 {
     public class ProfileManager
     {
+        private static readonly ProfileManager _instance = new ProfileManager();
         private readonly Dictionary<string, Profile> profiles;
 
         public ProfileManager()
         {
             profiles = new Dictionary<string, Profile>();
         }
+
+        public static ProfileManager Instance => _instance;
 
         public Profile GetOrCreateProfile(string playerName)
         {

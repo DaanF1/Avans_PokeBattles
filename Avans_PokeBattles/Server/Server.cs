@@ -11,7 +11,7 @@ namespace Avans_PokeBattles.Server
         private static LobbyManager lobbyManager = new();
         private static Lobby connectedLobby;
         private static readonly Dictionary<TcpClient, string> clientNames = [];
-        private static readonly ProfileManager profileManager = new ProfileManager();
+        private static readonly ProfileManager profileManager = ProfileManager.Instance;
         private static readonly PokemonLister pokemonLister = new PokemonLister();
         private static bool isRunning = false;
         public static string dirPrefix = AppDomain.CurrentDomain.BaseDirectory; 
