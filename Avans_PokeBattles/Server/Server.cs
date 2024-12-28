@@ -104,8 +104,10 @@ namespace Avans_PokeBattles.Server
                 {
                     //Format: create-team:pokemon1,pokemon2,pokemon3,...
                     string[] parts = message.Split(":");
-                    string[] pokemonNames = parts[1].Split(",");
-                    var profile = profileManager.GetOrCreateProfile(clientNames[client]);
+                    string name = parts[1];
+                    string[] pokemonNames = parts[2].Split(",");
+
+                    var profile = profileManager.GetOrCreateProfile(name);
                     profile.RemoveTeam();
 
                     foreach (var pokemonName in pokemonNames) 

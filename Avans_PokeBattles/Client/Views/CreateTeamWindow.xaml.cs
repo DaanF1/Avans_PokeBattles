@@ -96,12 +96,9 @@ namespace Avans_PokeBattles.Client.Views
             try
             {
                 var teamNames = string.Join(",", selectedTeam.ConvertAll(p => p.Name));
-                string message = $"create-team:{teamNames}";
+                string message = $"create-team:{playerProfile.GetName()}:{teamNames}";
                 byte[] buffer = Encoding.UTF8.GetBytes(message);
                 stream.Write(buffer);
-
-                playerProfile.RemoveTeam();
-                selectedTeam.ForEach(pokemon => playerProfile.AddPokemonToTeam(pokemon));
                 MessageBox.Show("Team selected and sent to the server!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 this.Hide();

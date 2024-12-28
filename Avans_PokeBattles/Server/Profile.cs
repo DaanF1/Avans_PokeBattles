@@ -46,7 +46,10 @@ namespace Avans_PokeBattles.Server
 
         public void RemoveTeam()
         {
-            this.Team.ForEach(pokemon => { this.RemovePokemonFromTeam(pokemon); });
+            if (this.Team.Count > 0)
+            {
+                this.Team.ForEach(pokemon => { this.RemovePokemonFromTeam(pokemon); });
+            }
         }
 
         public string GetName()
