@@ -99,7 +99,7 @@ namespace Avans_PokeBattles.Server
                     string name = parts[1];
                     string[] pokemonNames = parts[2].Split(",");
 
-                    var profile = profileManager.GetOrCreateProfile(name, client);
+                    var profile = profileManager.CreateProfile(name, client);
                     profile.RemoveTeam();
 
                     foreach (var pokemonName in pokemonNames) 
@@ -230,7 +230,7 @@ namespace Avans_PokeBattles.Server
             [
                 new Move("Shadow Ball", 80, 100, Type.Ghost, StatusEffect.None, 0, 0),
                 new Move("Dream Eater", 100, 100, Type.Ghost, StatusEffect.Sleep, 100, 0), // 100% chance to put target to sleep
-                new Move("Sludge Bomb", 90, 100, Type.Ghost, StatusEffect.Poison, 30, 0), // 30% chance to poison
+                new Move("Sludge Bomb", 90, 100, Type.Toxic, StatusEffect.Poison, 30, 0), // 30% chance to poison
                 new Move("Nightmare", 0, 100, Type.Ghost, StatusEffect.None, 0, 0)
             ];
             Pokemon gengar = new("Gengar",

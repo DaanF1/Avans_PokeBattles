@@ -265,6 +265,7 @@ namespace Avans_PokeBattles.Server
             if (attackType == Type.Electric && defenderType == Type.Water) return 2.0;  // Electric is super effective against Water
             if (attackType == Type.Normal && defenderType == Type.Ghost) return 2.0;  // Normal is super effective against Ghost
             if (attackType == Type.Ghost && defenderType == Type.Ghost) return 2.0;  // Ghost is super effective against Ghost
+            if (attackType == Type.Toxic && defenderType == Type.Steel) return 2.0;  // Toxic is super effective against Steel
 
             // If the attacking type and defending type are the same, reduce damage
             if (attackType == defenderType) return 0.5;

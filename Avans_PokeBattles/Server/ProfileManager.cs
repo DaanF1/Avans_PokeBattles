@@ -20,13 +20,14 @@ namespace Avans_PokeBattles.Server
 
         public static ProfileManager Instance => _instance;
 
-        public Profile GetOrCreateProfile(string playerName, TcpClient client)
+        public Profile CreateProfile(string playerName, TcpClient client)
         {
+            Profile profileToCreate = new Profile(playerName, client);
             if (!profiles.ContainsKey(playerName))
             {
-                profiles[playerName] = new Profile(playerName, client);
+                profiles[playerName] = profileToCreate;
             }
-            return profiles[playerName];
+            return profileToCreate;
         }
 
         public Profile GetProfile(string playerName)

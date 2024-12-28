@@ -36,6 +36,7 @@ namespace Avans_PokeBattles.Client
             listTeam.Items.Clear();
             listTeam.DisplayMemberPath = "Name"; // Display Name of Pokemon in list
             
+            // Only allow team to be set once
             if (profile.GetTeam().Count == 6)
                 btnTeam.IsEnabled = false;
 

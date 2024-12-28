@@ -15,6 +15,7 @@ namespace Avans_PokeBattles.Server
         Electric,
         Ghost,
         Psychic,
-        Steel
+        Steel,
+        Toxic
     }
 }
