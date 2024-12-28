@@ -15,7 +15,6 @@ namespace Avans_PokeBattles.Server
         private NetworkStream stream2;
 
         private bool isPlayer1Turn = true;  // Track whose turn it is
-        private readonly PokemonLister pokemonLister;  // List of available Pokémon to pick from
 
         private List<Pokemon> player1Team;
         private List<Pokemon> player2Team;
@@ -30,8 +29,6 @@ namespace Avans_PokeBattles.Server
         {
             LobbyId = lobbyId;
             IsFull = false;
-
-            pokemonLister = Server.GetPokemonLister();
         }
 
 

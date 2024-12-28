@@ -38,7 +38,7 @@ namespace Avans_PokeBattles.Client
             // Make sure the name can fit in the next window
             if (name.ToString().Length > 9)
             {
-                MessageBox.Show("Please enter a name shorter than 11 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Please enter a name shorter than 10 characters!", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             // Create ProfileManager

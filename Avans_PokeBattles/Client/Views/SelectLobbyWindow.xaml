@@ -5,12 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
         mc:Ignorable="d"
-        Title="Select a Lobby" Height="180" Width="200" Loaded="SelectLobbyWindow_Loaded" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" >
+        Title="Select a Lobby" Height="200" Width="250" Loaded="SelectLobbyWindow_Loaded" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" >
     <Grid>
-        <Label Name="lblName" Content="Name: " Width="135" Height="25" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" />
-        <Button Name="btnLobby1" Content="Join Lobby 1" HorizontalAlignment="Center" Margin="0,32,0,0" VerticalAlignment="Top" Click="btnJoinLobby1_Click" />
-        <Button Name="btnLobby2" Content="Join Lobby 2" HorizontalAlignment="Center" Margin="0,57,0,0" VerticalAlignment="Top" Click="btnJoinLobby2_Click" />
-        <Button Name="btnLobby3" Content="Join Lobby 3" HorizontalAlignment="Center" Margin="0,82,0,0" VerticalAlignment="Top" Click="btnJoinLobby3_Click" />
-        <Button Name="btnTeam" Content="View Team" HorizontalAlignment="Center" Margin="0,112,0,0" VerticalAlignment="Top" Click="btnTeam_Click" Width="100" />
+        <Label Name="lblName" Content="Name: " Width="135" Height="25" HorizontalAlignment="Left" Margin="5,0,0,5" VerticalAlignment="Top" />
+        <Button Name="btnLobby1" Content="Join Lobby 1" HorizontalAlignment="Left" Margin="35,35,0,0" VerticalAlignment="Top" Click="btnJoinLobby1_Click" />
+        <Button Name="btnLobby2" Content="Join Lobby 2" HorizontalAlignment="Left" Margin="35,60,0,0" VerticalAlignment="Top" Click="btnJoinLobby2_Click" />
+        <Button Name="btnLobby3" Content="Join Lobby 3" HorizontalAlignment="Left" Margin="35,85,0,0" VerticalAlignment="Top" Click="btnJoinLobby3_Click" />
+        <Button Name="btnTeam" Content="Assign Team" HorizontalAlignment="Left" Margin="20,125,0,0" VerticalAlignment="Top" Click="btnTeam_Click" Width="100" />
+
+        <Label Name="lblTeam" Content="Assigned Team: " Width="100" Height="30" HorizontalAlignment="Right" Margin="5,0,5,5" VerticalAlignment="Top" />
+        <ListView x:Name="listTeam" HorizontalAlignment="Right" Margin="20,10,15,5" Width="85" Height="125" Visibility="Visible" IsEnabled="False"/>
     </Grid>
 </Window>
