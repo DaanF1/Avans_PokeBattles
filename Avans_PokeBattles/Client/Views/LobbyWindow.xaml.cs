@@ -417,6 +417,8 @@ namespace Avans_PokeBattles.Client
                     return Brushes.DarkGray;
                 case Server.Type.Psychic:
                     return Brushes.Pink;
+                case Server.Type.Toxic:
+                    return Brushes.MediumPurple;
                 default:
                     return Brushes.LightGray;
             }

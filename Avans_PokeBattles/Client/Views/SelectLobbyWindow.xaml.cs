@@ -1,5 +1,6 @@
 ﻿using Avans_PokeBattles.Client.Views;
 using Avans_PokeBattles.Server;
+using System.Diagnostics.Eventing.Reader;
 using System.IO.IsolatedStorage;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -31,6 +32,18 @@ namespace Avans_PokeBattles.Client
             // Set the player’s name and update the label with this information
             this.playerProfile = profile;
             lblName.Content = "Name: " + profile.GetName();
+
+            listTeam.Items.Clear();
+            listTeam.DisplayMemberPath = "Name"; // Display Name of Pokemon in list
+            
+            // Only allow team to be set once
+            if (profile.GetTeam().Count == 6)
+                btnTeam.IsEnabled = false;
+
+            if (profile.GetTeam().Count > 0)
+            {
+                profile.GetTeam().ForEach(p=>listTeam.Items.Add(p));
+            }
         }
 
         // Event handler triggered when the SelectLobbyWindow is loaded
@@ -42,15 +55,41 @@ namespace Avans_PokeBattles.Client
 
         // Asynchronous event handlers for the Join Lobby buttons
         // Each button calls the JoinLobby method with a specific lobby ID and number
-        private async void btnJoinLobby1_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-1", 1);
-        private async void btnJoinLobby2_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-2", 2);
-        private async void btnJoinLobby3_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-3", 3);
+        private async void btnJoinLobby1_Click(object sender, RoutedEventArgs e)
+        {
+            if (playerProfile.GetTeam().Count != 6)
+            {
+                MessageBox.Show("Cannot join a Lobby without a full team!", "Invalid Join", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            await JoinLobby("Lobby-1", 1);
+        }
+        private async void btnJoinLobby2_Click(object sender, RoutedEventArgs e)
+        {
+            if (playerProfile.GetTeam().Count != 6)
+            {
+                MessageBox.Show("Cannot join a Lobby without a full team!", "Invalid Join", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            await JoinLobby("Lobby-2", 2);
+        }
+
+        private async void btnJoinLobby3_Click(object sender, RoutedEventArgs e)
+        {
+            if (playerProfile.GetTeam().Count != 6)
+            {
+                MessageBox.Show("Cannot join a Lobby without a full team!", "Invalid Join", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            await JoinLobby("Lobby-3", 3);
+        }
 
         private void btnTeam_Click(object sender, RoutedEventArgs e)
         {
             // Go to create team window
             var createTeamWindow = new CreateTeamWindow(playerProfile, Server.Server.GetPokemonLister());
             createTeamWindow.Show();
+            this.Hide();
         }
 
         // Method to handle joining a specified lobby
@@ -104,16 +143,17 @@ namespace Avans_PokeBattles.Client
                     // Determine if this player is Player 1 or Player 2 based on the message content
                     isPlayerOne = message == "start-game:player1";
 
+                    this.loadingWindow.Close(); // Close loading window (Because the lobby is full))
+
                     var gameWindow = new LobbyWindow(playerProfile, isPlayerOne);
                     gameWindow.Show();
-                    this.Close();
+                    this.Hide();
 
                     break; // Exit loop once game starts
                 }
             }
             // Console log when the connection is closed or no more messages from server
             Console.WriteLine("Connection closed or no more messages from server.");
-            this.loadingWindow.Close(); // Close loading window (Because the lobby is full))
         }
 
     }
