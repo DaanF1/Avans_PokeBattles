@@ -32,8 +32,8 @@ namespace Avans_PokeBattles.Client.Views
             InitializeComponent();
 
             this.playerProfile = profile;
-            this.playerClient = profile.GetTcpCLient();
-            this.stream = profile.GetTcpCLient().GetStream();
+            this.playerClient = profile.GetTcpClient();
+            this.stream = profile.GetTcpClient().GetStream();
             this.pokemonLister = lister;
             this.selectedTeam = new List<Pokemon>();
 

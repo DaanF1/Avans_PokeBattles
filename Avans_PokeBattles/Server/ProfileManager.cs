@@ -39,7 +39,7 @@ namespace Avans_PokeBattles.Server
             EndPoint endPoint = client.Client.RemoteEndPoint;
             foreach (Profile getProfile in profiles.Values)
             {
-                TcpClient tcpClient = getProfile.GetTcpCLient();
+                TcpClient tcpClient = getProfile.GetTcpClient();
                 if (tcpClient != null)
                 {
                     EndPoint local = tcpClient.Client.LocalEndPoint;

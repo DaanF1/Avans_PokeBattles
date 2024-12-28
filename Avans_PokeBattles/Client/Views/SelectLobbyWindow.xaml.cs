@@ -22,8 +22,8 @@ namespace Avans_PokeBattles.Client
             InitializeComponent();
 
             // Set up the TCP client and network stream with the provided client
-            this.tcpClient = profile.GetTcpCLient();
-            this.stream = profile.GetTcpCLient().GetStream();
+            this.tcpClient = profile.GetTcpClient();
+            this.stream = profile.GetTcpClient().GetStream();
 
             // Retrieve the lobby manager instance from the server
             this.lobbyManager = Server.Server.GetLobbymanager();
@@ -108,17 +108,6 @@ namespace Avans_PokeBattles.Client
                     gameWindow.Show();
                     this.Close();
 
-                    // Invoke UI actions on the main thread to start the game window
-                    //await Application.Current.Dispatcher.InvokeAsync(async () =>
-                    //{
-                    //    // Create and show the LobbyWindow for the game
-                    //    var gameWindow = new LobbyWindow(playerProfile, tcpClient, isPlayerOne);
-                    //    gameWindow.Show();
-                    //    //var loadingPokemonWindow = new LoadingWindow("Waiting for pokemon to load in.");
-                    //    //await ShowWaitingWindowTime(loadingPokemonWindow, gameWindow, isPlayerOne, 48000); // 24 pokemon * 2000ms
-
-                    //    this.Close(); // Close the current SelectLobbyWindow
-                    //});
                     break; // Exit loop once game starts
                 }
             }
@@ -126,15 +115,6 @@ namespace Avans_PokeBattles.Client
             Console.WriteLine("Connection closed or no more messages from server.");
             this.loadingWindow.Close(); // Close loading window (Because the lobby is full))
         }
-
-        //private async Task ShowWaitingWindowTime(LoadingWindow loadingWindow, LobbyWindow gameWindow, bool isPlayerOne, int timeInMilliSeconds)
-        //{
-        //    loadingWindow.Show(); // Show the waiting window
-        //    await Task.Delay(timeInMilliSeconds); // Wait X time
-        //    // After waiting, close loading window and show the game window
-        //    loadingWindow.Close();
-        //    gameWindow.Show();
-        //}
 
     }
 }

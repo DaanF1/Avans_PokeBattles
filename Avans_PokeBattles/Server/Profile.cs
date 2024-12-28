@@ -59,7 +59,7 @@ namespace Avans_PokeBattles.Server
             return this.Name;
         }
 
-        public TcpClient GetTcpCLient()
+        public TcpClient GetTcpClient()
         {
             return this.TcpClient;
         }

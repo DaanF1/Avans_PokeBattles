@@ -66,7 +66,7 @@ namespace Avans_PokeBattles.Client
             // Set name template (Should be overwritten later)
             lblPlayer1Name.Content = "Your team:";
             lblPlayer2Name.Content = "Oponent team:";
-            tcpClient = playerProfile.GetTcpCLient();
+            tcpClient = playerProfile.GetTcpClient();
             stream = tcpClient.GetStream();
 
             // Initialize buttons
@@ -167,36 +167,6 @@ namespace Avans_PokeBattles.Client
                     }
                     nameIndex++;
                 }
-                //else if (message.StartsWith("PlayerTeam"))
-                //{
-                //    // Handles initialization of player and opponent Pokémon teams
-                //    // A Players own Pokemon are always loaded in first
-                //    if (playerPokemon.Count == 0)
-                //    {
-                //        for (int i = 0; i < 6; i++)
-                //        {
-                //            Pokemon p = await GetServerPokemon(stream);
-                //            playerPokemon.Add(p);
-                //        }
-                //        DisplayTeams(playerPokemon);
-                //    }
-                //    else
-                //    {
-                //        for (int i = 0; i < 6; i++)
-                //        {
-                //            Pokemon p = await GetServerPokemon(stream);
-                //            opponentPokemon.Add(p);
-                //        }
-                //        DisplayTeams(opponentPokemon);
-
-                //        // Player 1 should wait on Player 2 before music starts, because Player 1 is loaded in first
-                //        if (isPlayerOne) // Await makes sure Player 1 can still receive commands while waiting!
-                //            await Task.Delay(12000); // This delay also shows the loading window for a longer amount of time!
-
-                //        // When all Pokemon are received, play the battle music
-                //        PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
-                //    }
-                //}
                 else if (message.StartsWith("chat:"))
                 {
                     // Display incoming chat message in the chat box
@@ -225,42 +195,6 @@ namespace Avans_PokeBattles.Client
             }
             Console.WriteLine("CLIENT: Connection closed or no more messages from server.");
         }
-
-        ///// <summary>
-        ///// Helper method to read serialized Pokemon objects.
-        ///// Made with help from ChatGPT!
-        ///// </summary>
-        ///// <param name="stream"></param>
-        //private static async Task<Pokemon> GetServerPokemon(NetworkStream stream)
-        //{
-        //    while (true)
-        //    {
-        //        // Read the length of the incoming message
-        //        byte[] lengthBytes = new byte[4];
-        //        int bytesRead = await stream.ReadAsync(lengthBytes);
-        //        if (bytesRead == 0) break; // End of stream
-
-        //        int messageLength = BitConverter.ToInt32(lengthBytes, 0);
-
-        //        // Read the actual message
-        //        byte[] jsonBytes = new byte[messageLength];
-        //        bytesRead = await stream.ReadAsync(jsonBytes);
-        //        if (bytesRead == 0) break; // End of stream
-
-        //        // Convert the JSON bytes to a string
-        //        string jsonString = Encoding.UTF8.GetString(jsonBytes);
-
-        //        // Deserialize the JSON string to a Pokemon object
-        //        Pokemon receivedPokemon = JsonSerializer.Deserialize<Pokemon>(jsonString);
-
-        //        // Display the deserialized object
-        //        Console.WriteLine($"CLIENT: Received Pokemon: Name={receivedPokemon.Name}, Health={receivedPokemon.CurrentHealth}");
-
-        //        return receivedPokemon;
-        //    }
-        //    return null; // If we even get here
-        //}
-
 
         // Process the damage message received from the server and update health displays
         private void ProcessMoveResult(string message)
