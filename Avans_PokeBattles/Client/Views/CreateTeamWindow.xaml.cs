@@ -39,6 +39,7 @@ namespace Avans_PokeBattles.Client.Views
 
             LoadAvailablePokemon();
             ConfigureTeamListBox();
+            LoadPreviousTeam();
         }
 
         private void ConfigureTeamListBox()
@@ -91,6 +92,7 @@ namespace Avans_PokeBattles.Client.Views
                 MessageBox.Show("Please select exactly 6 Pokémon to proceed.", "Invalid Team", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
             try
             {
                 var teamNames = string.Join(",", selectedTeam.ConvertAll(p => p.Name));
@@ -98,11 +100,23 @@ namespace Avans_PokeBattles.Client.Views
                 byte[] buffer = Encoding.UTF8.GetBytes(message);
                 stream.Write(buffer);
 
-                MessageBox.Show("Team selected and sent to the server!", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
+                playerProfile.RemoveTeam();
+                selectedTeam.ForEach(pokemon => playerProfile.AddPokemonToTeam(pokemon));
+                MessageBox.Show("Team selected and sent to the server!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Go back to selectlobbywindow
-                var lobbyWindow = new SelectLobbyWindow(playerProfile, playerClient);
-                lobbyWindow.Show();
+                this.Hide();
+                var lobbyWindow = Application.Current.Windows.OfType<SelectLobbyWindow>().FirstOrDefault();
+                if (lobbyWindow != null)
+                {
+                    lobbyWindow.Show();
+                }
+                else
+                {
+                    // Fallback in case SelectLobbyWindow doesn't exist
+                    var newLobbyWindow = new SelectLobbyWindow(playerProfile, playerClient);
+                    newLobbyWindow.Show();
+                }
+
                 this.Close();
             }
             catch (Exception ex)
@@ -115,6 +129,12 @@ namespace Avans_PokeBattles.Client.Views
         {
             listTeam.ItemsSource = null;
             listTeam.ItemsSource = selectedTeam;
+        }
+
+        private void LoadPreviousTeam()
+        {
+            playerProfile.GetTeam().ForEach(pokemon=>selectedTeam.Add(pokemon));
+            RefreshTeamList();
         }
 
     }

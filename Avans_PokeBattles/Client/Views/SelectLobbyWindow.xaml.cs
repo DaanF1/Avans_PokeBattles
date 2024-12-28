@@ -51,7 +51,7 @@ namespace Avans_PokeBattles.Client
             // Go to create team window
             var createTeamWindow = new CreateTeamWindow(playerProfile, tcpClient, Server.Server.GetPokemonLister());
             createTeamWindow.Show();
-            this.Close();
+            //this.Close();
         }
 
         // Method to handle joining a specified lobby
