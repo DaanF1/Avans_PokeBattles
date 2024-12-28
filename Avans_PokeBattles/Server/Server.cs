@@ -99,7 +99,7 @@ namespace Avans_PokeBattles.Server
                     string name = parts[1];
                     string[] pokemonNames = parts[2].Split(",");
 
-                    var profile = profileManager.CreateProfile(name, client);
+                    var profile = profileManager.GetProfile(name);
                     profile.RemoveTeam();
 
                     foreach (var pokemonName in pokemonNames) 
