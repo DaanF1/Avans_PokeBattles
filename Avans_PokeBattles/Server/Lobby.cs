@@ -109,6 +109,12 @@ namespace Avans_PokeBattles.Server
             NetworkStream senderStream = (sender == player1) ? stream1 : stream2;
             NetworkStream receiverStream = (sender == player1) ? stream2 : stream1;
 
+            var player1Profile = profileManager.GetProfile(namePlayer1);
+            var player2Profile = profileManager.GetProfile(namePlayer2);
+
+            player1Team = player1Profile.GetTeam();
+            player2Team = player2Profile.GetTeam();
+
             Pokemon attacker = (sender == player1) ? player1Team[player1ActiveIndex] : player2Team[player2ActiveIndex];
             Pokemon defender = (sender == player1) ? player2Team[player2ActiveIndex] : player1Team[player1ActiveIndex];
 
