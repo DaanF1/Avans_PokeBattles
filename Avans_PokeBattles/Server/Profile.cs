@@ -69,5 +69,15 @@ namespace Avans_PokeBattles.Server
             return this.Team;
         }
 
+        public int GetWins()
+        {
+            return this.Wins;
+        }
+
+        public int GetLosses()
+        {
+            return this.Losses;
+        }
+
     }
 }
