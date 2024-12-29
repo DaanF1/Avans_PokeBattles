@@ -31,15 +31,27 @@ namespace Avans_PokeBattles.Client
 
             // Set the player’s name and update the label with this information
             this.playerProfile = profile;
-            lblName.Content = "Name: " + profile.GetName();
+            lblName.Content = $"Name: {profile.GetName()}";
 
-            listTeam.Items.Clear();
+            // Set Wins & Losses
+            if (profile.GetWins() > 999999999)
+                lblWins.Content = $"Wins: 999999999";
+            else
+                lblWins.Content = $"Wins: {profile.GetWins()}";
+
+            if (profile.GetLosses() > 999999999)
+                lblLosses.Content = $"Losses: 999999999";
+            else
+                lblLosses.Content = $"Losses: {profile.GetLosses()}";
+
+            listTeam.Items.Clear(); // Clear the list to fill with new Team
             listTeam.DisplayMemberPath = "Name"; // Display Name of Pokemon in list
             
             // Only allow team to be set once
             if (profile.GetTeam().Count == 6)
                 btnTeam.IsEnabled = false;
 
+            // Re-add Pokemon to list
             if (profile.GetTeam().Count > 0)
             {
                 profile.GetTeam().ForEach(p=>listTeam.Items.Add(p));

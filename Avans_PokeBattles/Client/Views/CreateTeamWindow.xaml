@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="Create Team" Height="325" Width="250" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid>
+        <!-- Border Lines -->
+        <Line X1="1" X2="233" Y1="1" Y2="1" Stroke="Red" />
+        <Line X1="233" X2="233" Y1="1" Y2="285" Stroke="Red" />
+        <Line X1="233" X2="1" Y1="285" Y2="285" Stroke="Red" />
+        <Line X1="1" X2="1" Y1="285" Y2="1" Stroke="Red" />
+
         <Label Content="Add Pokemon:" HorizontalAlignment="Center" Margin="5,5,5,5" VerticalAlignment="Top" />
         <ComboBox x:Name="cmbSelectPokemon" HorizontalAlignment="Center" Margin="30,30,30,50" VerticalAlignment="Top" Width="100" DropDownClosed="cmbSelectPokemon_ItemSelected" />
 
@@ -14,10 +20,8 @@
         <ListBox x:Name="listTeam" HorizontalAlignment="Center" VerticalAlignment="Center" Height="125" Width="100" SelectionChanged="TeamPokemonSelected" />
 
         <!-- Buttons -->
-
         <Button x:Name="btnDeleteSelected" Content="Remove Pokemon" HorizontalAlignment="Left" Margin="15,60,15,40" VerticalAlignment="Bottom" Width="100" Height="30" Click="btnDeleteSelected_Click"/>
         <Button x:Name="btnDeleteTeam" Content="Remove Team" HorizontalAlignment="Right" Margin="15,60,15,40" VerticalAlignment="Bottom" Width="100" Height="30" Click="btnDeleteTeam_Click"/>
-        
         <Button x:Name="btnSelectTeam" Content="Confirm Team" HorizontalAlignment="Center" Margin="20,5,20,5" VerticalAlignment="Bottom" Width="125" Height="30" Click="btnSelectTeam_Click"/>
     </Grid>
 </Window>
