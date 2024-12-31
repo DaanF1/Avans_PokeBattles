@@ -1,7 +1,11 @@
 using System.IO;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Text;
 using System.Text.Json;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Avans_PokeBattles.Server
 {
@@ -152,11 +156,15 @@ namespace Avans_PokeBattles.Server
                     }
                     else // Handle damaging moves
                     {
-                        int damage = CalculateDamage(attacker, selectedMove, defender);
+                        var tuple = CalculateDamage(attacker, selectedMove, defender);
+                        int damage = tuple.Item1;
+                        double effectiveness = tuple.Item2;
                         defender.CurrentHealth -= damage;
                         defender.CurrentHealth = Math.Max(defender.CurrentHealth, 0);
 
                         string result = $"Player {(isPlayer1Turn ? 1 : 2)} used {moveName}! {damage} damage dealt. {defender.Name} has {defender.CurrentHealth} HP left.";
+                        if (effectiveness >= 2)
+                            result = $"Player {(isPlayer1Turn ? 1 : 2)} used {moveName}! Move was Super Effective! {damage} damage dealt. {defender.Name} has {defender.CurrentHealth} HP left.";
                         await SendMessage(senderStream, result);
                         await SendMessage(receiverStream, result);
 
@@ -235,7 +243,7 @@ namespace Avans_PokeBattles.Server
         }
 
         // Calculates the damage dealt by a Pokémon's move, taking into account type effectiveness and a random multiplier.
-        private int CalculateDamage(Pokemon attacker, Move move, Pokemon defender)
+        private Tuple<int, double> CalculateDamage(Pokemon attacker, Move move, Pokemon defender)
         {
             // Get type effectiveness multiplier based on the types of the attack move and the defender Pokémon
             double typeEffectiveness = GetTypeEffectiveness(move.TypeOfAttack, defender.PokemonType);
@@ -251,9 +259,9 @@ namespace Avans_PokeBattles.Server
             int damage = (int)(baseDamage * typeEffectiveness * randomMultiplier);
 
             // Ensure that damage is not negative and return it
-            return Math.Max(damage, 0);
+            var tuple = Tuple.Create(Math.Max(damage, 0), typeEffectiveness);
+            return tuple;
         }
-
 
         // Determines the type effectiveness multiplier for a Pokémon's attack based on the attack type and the defender's type.
         private static double GetTypeEffectiveness(Type attackType, Type defenderType)
