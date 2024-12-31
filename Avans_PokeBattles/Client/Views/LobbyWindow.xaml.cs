@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
@@ -42,6 +43,7 @@ namespace Avans_PokeBattles.Client
         public MediaPlayer playerBattleMusic = new();
         public MediaPlayer buttonPlayer = new();
         public MediaPlayer hitPlayer = new();
+        public MediaPlayer criticalHitPlayer = new();
 
         // Variables to track the Pokémon and player turns
         private int pokemonIndex = 0;
@@ -181,6 +183,10 @@ namespace Avans_PokeBattles.Client
                 }
                 else if (message.Contains("damage dealt"))
                 {
+                    if (message.Contains("Super Effective"))
+                        PlayMusic(buttonPlayer, dirPrefix + "/Sounds/CriticalHit.wav", 25, false);
+                    else
+                        PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
                     ProcessMoveResult(message);
                 }
                 else if (message.Contains("fainted!switch_turn"))
@@ -450,27 +456,6 @@ namespace Avans_PokeBattles.Client
             // Set time to zero (replay/ loop)
             playerBattleMusic.Position = TimeSpan.Zero;
             playerBattleMusic.Play();
-        }
-
-        // Preview sound of attacks:
-        private void btnOption1_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption2_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption3_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption4_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
         }
 
         // Hit events:
