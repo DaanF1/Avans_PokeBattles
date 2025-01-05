@@ -79,7 +79,7 @@ namespace Avans_PokeBattles.Client
             GetServerMessages();
 
             //// When all Pokemon are received, play the battle music
-            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
         }
 
         // Initializes button states for attack options based on player's turn
@@ -204,10 +204,10 @@ namespace Avans_PokeBattles.Client
 
         private void ProcessFaintMessage(string message)
         {
-            // Example message: "Charizard fainted!switch_turn:player2" or "Blastoise fainted! player1Game Over! Player 1 wins!"
+            // Example messages:
+            // "Charizard fainted!switch_turn:player2" or "Blastoise fainted!Game Over! player1 wins"
 
             // Use a regex to extract the Pokémon name and player (if present)
-            // Blastoise fainted!Game Over! player1 wins
             var match = Regex.Match(message, @"^(?<pokemon>.+?) fainted!(?:switch_turn:(?<player>player[12]))?");
             bool isGameOver = false;
 
@@ -227,15 +227,15 @@ namespace Avans_PokeBattles.Client
                 // Player's Pokémon fainted
                 playerActivePokemonIndex++;
 
-                if (playerActivePokemonIndex < playerPokemon.Count)
-                {
-                    var nextPokemon = playerPokemon[playerActivePokemonIndex];
-                    DisplayActivePokemon(true);
-                }
-                else if (isGameOver)
+                if (isGameOver)
                 {
                     MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
                     NavigateToLobby();
+                }
+                else if (playerActivePokemonIndex < playerPokemon.Count)
+                {
+                    var nextPokemon = playerPokemon[playerActivePokemonIndex];
+                    DisplayActivePokemon(true);
                 }
             }
             else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
@@ -243,27 +243,23 @@ namespace Avans_PokeBattles.Client
                 // Opponent's Pokémon fainted
                 opponentActivePokemonIndex++;
 
-                if (opponentActivePokemonIndex < opponentPokemon.Count)
-                {
-                    var nextPokemon = opponentPokemon[opponentActivePokemonIndex];
-                    DisplayActivePokemon(false);
-                }
-                else if (isGameOver)
+                if (isGameOver)
                 {
                     MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
                     NavigateToLobby();
                 }
-            }
-
-            if (isGameOver)
-            {
-
+                else if (opponentActivePokemonIndex < opponentPokemon.Count)
+                {
+                    var nextPokemon = opponentPokemon[opponentActivePokemonIndex];
+                    DisplayActivePokemon(false);
+                }
             }
         }
 
         // Helper method to navigate to the lobby window
         private void NavigateToLobby()
         {
+            profile.RemoveTeam();
             var lobbyWindow = new SelectLobbyWindow(profile);
             lobbyWindow.Show();
             playerBattleMusic.Stop();
