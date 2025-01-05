@@ -67,7 +67,7 @@ namespace Avans_PokeBattles.Client
 
             // Set name template (Should be overwritten later)
             lblPlayer1Name.Content = "Your team:";
-            lblPlayer2Name.Content = "Oponent team:";
+            lblPlayer2Name.Content = "Opponent team:";
             tcpClient = playerProfile.GetTcpClient();
             stream = tcpClient.GetStream();
 
@@ -183,6 +183,7 @@ namespace Avans_PokeBattles.Client
                 }
                 else if (message.Contains("fainted!"))
                 {
+                    SetMoveButtonsState(false); // Temporarily disable clicking a move
                     ProcessFaintMessage(message);
                     UpdateTurnIndicator(message);
                 }
@@ -225,7 +226,11 @@ namespace Avans_PokeBattles.Client
                 isGameOver = true;
             }
 
-            MessageBox.Show($"{faintedPokemonName} has fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+            var mes = MessageBox.Show($"{faintedPokemonName} has fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (mes == MessageBoxResult.OK)
+            {
+                SetMoveButtonsState(true); // Only select a move again after clicking the messagebox
+            }
 
             // Determine if the fainted Pokémon belongs to the player or the opponent
             if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))

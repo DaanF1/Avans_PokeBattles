@@ -165,10 +165,6 @@ namespace Avans_PokeBattles.Client
                     break; // Exit loop once game starts
                 }
             }
-            if (!tcpClient.Connected)
-            {
-                tcpClient.Connect("127.0.0.1", port);
-            }
             // Console log when the connection is closed or no more messages from server
             Console.WriteLine("Connection closed or no more messages from server.");
         }
