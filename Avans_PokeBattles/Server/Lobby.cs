@@ -193,17 +193,17 @@ namespace Avans_PokeBattles.Server
                             else
                             {
                                 string endMessage;
-                                if (player1Team.Count == 0)
+                                if (player1ActiveIndex == 5)
                                 {
                                     profileManager.GetProfile(namePlayer2).IncrementWins();
                                     profileManager.GetProfile(namePlayer1).IncrementLosses(); // Lol L verliezer
-                                    endMessage = $"Game Over! Player 2 ({namePlayer2}) wins";
+                                    endMessage = $"Game Over! player2 wins";
                                 }
                                 else
                                 {
                                     profileManager.GetProfile(namePlayer1).IncrementWins();
                                     profileManager.GetProfile(namePlayer2).IncrementLosses(); // Lol L verliezer
-                                    endMessage = $"Game Over! Player 1 ({namePlayer1}) wins";
+                                    endMessage = $"Game Over! player1 wins";
                                 }
 
                                 await SendMessage(stream1, endMessage);

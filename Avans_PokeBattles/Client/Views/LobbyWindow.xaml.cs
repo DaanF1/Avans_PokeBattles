@@ -80,7 +80,7 @@ namespace Avans_PokeBattles.Client
             // Start waiting for Server messages
             GetServerMessages();
 
-            // When all Pokemon are received, play the battle music
+            //// When all Pokemon are received, play the battle music
             PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
         }
 
@@ -123,50 +123,42 @@ namespace Avans_PokeBattles.Client
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"CLIENT: Received from server: {message}");
 
-                var parts = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
                 // Handle player name assignment if message starts with "Player"
                 if (message.StartsWith("Player") && !message.StartsWith("PlayerTeam") && !message.StartsWith("Player 1 used") && !message.StartsWith("Player 2 used"))
                 {
-                    int playerNumber = nameIndex;
-                    if (playerNumber == 1)
+                    string[] parts = message.Split(':');
+                    string playerName = parts[1].Trim('\n');
+                    if (nameIndex == 1)
                     {
                         // Set name for Player 1
-                        namePlayer1 = message.Split(':')[1].Trim('\n');
+                        namePlayer1 = playerName;
                         lblPlayer1Name.Content = $"{namePlayer1}'s team:";
-
-                        // Initialize Player 2
-                        List<Pokemon> thisPlayersPokemon = profile.GetTeam();
-                        if (isPlayerOne)
-                        {
-                            playerPokemon = profileManager.GetProfile(namePlayer1).GetTeam();
-                            DisplayTeams(playerPokemon);
-                        }
-                        else
-                        {
-                            opponentPokemon = profileManager.GetProfile(namePlayer1).GetTeam();
-                            DisplayTeams(opponentPokemon);
-                        }
                     }
                     else
                     {
                         // Set name for Player 2
-                        namePlayer2 = message.Split(':')[1].Trim('\n');
+                        namePlayer2 = playerName;
                         lblPlayer2Name.Content = $"{namePlayer2}'s team:";
+                    }
 
-                        // Initialize Player 2
-                        List<Pokemon> thisPlayersPokemon = profile.GetTeam();
+                    // Reassign teams after both player names are known
+                    if (!string.IsNullOrEmpty(namePlayer1) && !string.IsNullOrEmpty(namePlayer2))
+                    {
                         if (isPlayerOne)
                         {
-                            opponentPokemon = profileManager.GetProfile(namePlayer2).GetTeam();
-                            DisplayTeams(opponentPokemon);
+                            playerPokemon = profileManager.GetProfile(namePlayer1).GetTeam(); // Player 1's team
+                            opponentPokemon = profileManager.GetProfile(namePlayer2).GetTeam(); // Player 2's team
                         }
                         else
                         {
-                            playerPokemon = profileManager.GetProfile(namePlayer2).GetTeam();
-                            DisplayTeams(playerPokemon);
+                            playerPokemon = profileManager.GetProfile(namePlayer1).GetTeam(); // Player 2's team
+                            opponentPokemon = profileManager.GetProfile(namePlayer2).GetTeam(); // Player 1's team
                         }
+
+                        DisplayTeams(playerPokemon); 
+                        DisplayTeams(opponentPokemon);
                     }
+
                     nameIndex++;
                 }
                 else if (message.StartsWith("chat:"))
@@ -189,7 +181,7 @@ namespace Avans_PokeBattles.Client
                         PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
                     ProcessMoveResult(message);
                 }
-                else if (message.Contains("fainted!switch_turn"))
+                else if (message.Contains("fainted!"))
                 {
                     ProcessFaintMessage(message);
                     UpdateTurnIndicator(message);
@@ -218,50 +210,54 @@ namespace Avans_PokeBattles.Client
 
         private void ProcessFaintMessage(string message)
         {
-            // Example message: "Charizard fainted!switch_turn:player2" or "Blastoise fainted! player1Game Over! Player 1 wins!"
+            // Example messages:
+            // "Charizard fainted!switch_turn:player2" or "Blastoise fainted!Game Over! player1 wins"
 
             // Use a regex to extract the Pokémon name and player (if present)
             var match = Regex.Match(message, @"^(?<pokemon>.+?) fainted!(?:switch_turn:(?<player>player[12]))?");
-            if (!match.Success) return; // Exit if the format is unexpected
+            bool isGameOver = false;
 
-            string faintedPokemonName = match.Groups["pokemon"].Value.Trim();
+            string faintedPokemonName = match.Groups["pokemon"].Value.Trim(); 
             string faintedPlayer = match.Groups["player"].Success ? match.Groups["player"].Value.Trim() : null;
-            bool isGameOver = message.Contains("Game Over!");
+            if (message.Contains("Game Over!"))
+            {
+                faintedPlayer = Regex.Match(message, @"(?<player>player[12])").Value.Trim();
+                isGameOver = true;
+            }
 
-            // Show message about fainted Pokémon
-            MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"{faintedPokemonName} has fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
 
             // Determine if the fainted Pokémon belongs to the player or the opponent
             if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))
             {
                 // Player's Pokémon fainted
                 playerActivePokemonIndex++;
-                if (playerActivePokemonIndex < playerPokemon.Count)
-                {
-                    // Display the next Pokémon
-                    DisplayActivePokemon(true);
-                }
-                else if (isGameOver)
+
+                if (isGameOver)
                 {
                     MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle game-over logic
                     NavigateToLobby();
+                }
+                else if (playerActivePokemonIndex < playerPokemon.Count)
+                {
+                    var nextPokemon = playerPokemon[playerActivePokemonIndex];
+                    DisplayActivePokemon(true);
                 }
             }
             else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
             {
                 // Opponent's Pokémon fainted
                 opponentActivePokemonIndex++;
-                if (opponentActivePokemonIndex < opponentPokemon.Count)
-                {
-                    // Display the next Pokémon
-                    DisplayActivePokemon(false);
-                }
-                else if (isGameOver)
+
+                if (isGameOver)
                 {
                     MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle game-over logic
                     NavigateToLobby();
+                }
+                else if (opponentActivePokemonIndex < opponentPokemon.Count)
+                {
+                    var nextPokemon = opponentPokemon[opponentActivePokemonIndex];
+                    DisplayActivePokemon(false);
                 }
             }
         }
@@ -269,6 +265,7 @@ namespace Avans_PokeBattles.Client
         // Helper method to navigate to the lobby window
         private void NavigateToLobby()
         {
+            profile.RemoveTeam();
             var lobbyWindow = new SelectLobbyWindow(profile);
             lobbyWindow.Show();
             playerBattleMusic.Stop();
