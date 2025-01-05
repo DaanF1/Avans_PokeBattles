@@ -37,20 +37,20 @@ namespace Avans_PokeBattles.Server
         public void AddPokemonToTeam(Pokemon pokemon)
         {
             if (this.Team.Count <= 6)
-                this.Team.Add(pokemon);
+                this.Team.Add(pokemon.DeepCopy());
         }
 
         public void RemovePokemonFromTeam(Pokemon pokemon)
         {
-            if (this.Team.Contains(pokemon))
-                this.Team.Remove(pokemon);
+            if (this.Team.Contains(pokemon.DeepCopy()))
+                this.Team.Remove(pokemon.DeepCopy());
         }
 
         public void RemoveTeam()
         {
             if (this.Team.Count > 0)
             {
-                this.Team.ForEach(pokemon => { this.RemovePokemonFromTeam(pokemon); });
+                this.Team.ForEach(pokemon => { this.RemovePokemonFromTeam(pokemon.DeepCopy()); });
             }
         }
 

@@ -175,7 +175,7 @@ namespace Avans_PokeBattles.Client
                 {
                     ProcessMoveResult(message);
                 }
-                else if (message.Contains("fainted!switch_turn"))
+                else if (message.Contains("fainted!"))
                 {
                     ProcessFaintMessage(message);
                     UpdateTurnIndicator(message);
@@ -207,12 +207,17 @@ namespace Avans_PokeBattles.Client
             // Example message: "Charizard fainted!switch_turn:player2" or "Blastoise fainted! player1Game Over! Player 1 wins!"
 
             // Use a regex to extract the Pokémon name and player (if present)
+            // Blastoise fainted!Game Over! player1 wins
             var match = Regex.Match(message, @"^(?<pokemon>.+?) fainted!(?:switch_turn:(?<player>player[12]))?");
-            if (!match.Success) return; // Exit if the format is unexpected
+            bool isGameOver = false;
 
-            string faintedPokemonName = match.Groups["pokemon"].Value.Trim();
+            string faintedPokemonName = match.Groups["pokemon"].Value.Trim(); 
             string faintedPlayer = match.Groups["player"].Success ? match.Groups["player"].Value.Trim() : null;
-            bool isGameOver = message.Contains("Game Over!");
+            if (message.Contains("Game Over!"))
+            {
+                faintedPlayer = Regex.Match(message, @"(?<player>player[12])").Value.Trim();
+                isGameOver = true;
+            }
 
             MessageBox.Show($"{faintedPokemonName} has fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -248,6 +253,11 @@ namespace Avans_PokeBattles.Client
                     MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
                     NavigateToLobby();
                 }
+            }
+
+            if (isGameOver)
+            {
+
             }
         }
 
