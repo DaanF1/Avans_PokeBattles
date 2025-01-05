@@ -36,8 +36,7 @@ namespace Avans_PokeBattles.Server
 
         public static void Stop()
         {
-            isRunning = false;
-            Stop(); // Stop the Server
+            isRunning = false; // Stop the Server
         }
 
         public static bool IsRunning()

@@ -16,6 +16,7 @@ namespace Avans_PokeBattles.Client
         private readonly NetworkStream stream;
         private readonly LobbyManager lobbyManager;
         private readonly Profile playerProfile;
+        private readonly int port = 8000;
         public LoadingWindow loadingWindow = new LoadingWindow("Waiting for another player."); // Make loading window accessable
 
         public SelectLobbyWindow(Profile profile)
@@ -163,6 +164,10 @@ namespace Avans_PokeBattles.Client
 
                     break; // Exit loop once game starts
                 }
+            }
+            if (!tcpClient.Connected)
+            {
+                tcpClient.Connect("127.0.0.1", port);
             }
             // Console log when the connection is closed or no more messages from server
             Console.WriteLine("Connection closed or no more messages from server.");
