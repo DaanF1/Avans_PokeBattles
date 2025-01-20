@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Avans_PokeBattles.Server
@@ -16,18 +18,24 @@ namespace Avans_PokeBattles.Server
         public ProfileManager()
         {
             profiles = new Dictionary<string, Profile>();
+            LoadProfiles();
         }
 
         public static ProfileManager Instance => _instance;
 
         public Profile CreateProfile(string playerName, TcpClient client)
         {
-            Profile profileToCreate = new Profile(playerName, client);
             if (!profiles.ContainsKey(playerName))
             {
-                profiles[playerName] = profileToCreate;
+                var profile = new Profile(playerName, client);
+                profiles[playerName] = profile;
+                SaveProfile(profile);
             }
-            return profileToCreate;
+            else
+            {
+                profiles[playerName].SetTcpClient(client);
+            }
+            return profiles[playerName];
         }
 
         public Profile GetProfile(string playerName)
@@ -52,6 +60,45 @@ namespace Avans_PokeBattles.Server
                 }
             }
             return null;
+        }
+
+        public void LoadProfiles()
+        {
+            using var connection = Database.GetConnection();
+            connection.Open();
+
+            string query = "SELECT * FROM Profiles";
+            using var command = new SQLiteCommand(query, connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string name = reader.GetString(0);
+                int wins = reader.GetInt32(1);
+                int losses = reader.GetInt32(2);
+
+                var profile = new Profile(name, null)
+                {
+                    Wins = wins,
+                    Losses = losses,
+                };
+                profiles[name] = profile;
+            }
+        }
+
+        public void SaveProfile(Profile profileToSave)
+        {
+            using var connection = Database.GetConnection();
+            connection.Open();
+
+            string query = "INSERT INTO Profiles (Name, Wins, Losses) VALUES (@Name, @Wins, @Losses) " +
+                           "ON CONFLICT(Name) DO UPDATE SET Wins = excluded.Wins, Losses = excluded.Losses";
+            using var command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@Name", profileToSave.GetName());
+            command.Parameters.AddWithValue("@Wins", profileToSave.GetWins());
+            command.Parameters.AddWithValue("@Losses", profileToSave.GetLosses());
+
+            using var reader = command.ExecuteReader();
         }
     }
 }
