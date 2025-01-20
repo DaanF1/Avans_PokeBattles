@@ -1,6 +1,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Numerics;
+using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Media;
@@ -208,6 +209,8 @@ namespace Avans_PokeBattles.Server
 
                                 await SendMessage(stream1, endMessage);
                                 await SendMessage(stream2, endMessage);
+
+                                EndGame();
                                 return;
                             }
                         }
@@ -224,6 +227,24 @@ namespace Avans_PokeBattles.Server
             {
                 await SendMessage(senderStream, "It's not your turn.");
             }
+        }
+
+        public void EndGame()
+        {
+            player1 = null;
+            player2 = null;
+            namePlayer1 = null;
+            namePlayer2 = null;
+            stream1 = null;
+            stream2 = null;
+            player1Team = null;
+            player2Team = null;
+            player1Team?.Clear();
+            player2Team?.Clear();
+            player1ActiveIndex = 0;
+            player2ActiveIndex = 0;
+            isPlayer1Turn = true;
+            IsFull = false;
         }
 
 
