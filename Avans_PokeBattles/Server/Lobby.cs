@@ -210,6 +210,8 @@ namespace Avans_PokeBattles.Server
                                 await SendMessage(stream1, endMessage);
                                 await SendMessage(stream2, endMessage);
 
+                                profileManager.SaveProfile(profileManager.GetProfile(namePlayer1));
+                                profileManager.SaveProfile(profileManager.GetProfile(namePlayer2));
                                 EndGame();
                                 return;
                             }

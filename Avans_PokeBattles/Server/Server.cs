@@ -25,6 +25,7 @@ namespace Avans_PokeBattles.Server
             InitializePokemonLister();
 
             Console.WriteLine("SERVER: Server started. Waiting for connections...");
+            Database.Initialize();
 
             while (true)
             {

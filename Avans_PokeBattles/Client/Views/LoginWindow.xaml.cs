@@ -32,11 +32,17 @@ namespace Avans_PokeBattles.Client
             // Get the name and check if it's valid
             string name = txtName.Text.ToString();
 
+            var profileManager = ProfileManager.Instance;
+            var profile = profileManager.GetProfile(name);
+
             // Makes sure the name is not already chosen
-            if (ProfileManager.Instance.GetProfile(name) != null)
+            if (profile == null)
             {
-                MessageBox.Show("This name was already chosen.", "Duplicate Naming", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                profile = profileManager.CreateProfile(name, tcpClient);
+            }
+            else
+            {
+                profile.SetTcpClient(tcpClient);
             }
             // Make sure that the name is valid in length
             if (string.IsNullOrWhiteSpace(name) || txtName.Text.Equals("Enter your name..."))
@@ -50,8 +56,6 @@ namespace Avans_PokeBattles.Client
                 MessageBox.Show("Please enter a name shorter than 10 characters!", "Invalid Name", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            // Create Profile in ProfileManager
-            Profile profile = ProfileManager.Instance.CreateProfile(name, tcpClient);
 
             // Show the select lobby window and close the current window
             var selectLobbyWindow = new SelectLobbyWindow(profile);
