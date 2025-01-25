@@ -1,7 +1,12 @@
-﻿using Avans_PokeBattles.Server;
+﻿using Avans_PokeBattles.Client.Views;
+using Avans_PokeBattles.Server;
+using System.Diagnostics.Eventing.Reader;
+using System.IO.IsolatedStorage;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 
 namespace Avans_PokeBattles.Client
 {
@@ -10,22 +15,48 @@ namespace Avans_PokeBattles.Client
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
         private readonly LobbyManager lobbyManager;
-        private readonly string playerName = "";
+        private readonly Profile playerProfile;
+        private readonly int port = 8000;
+        public LoadingWindow loadingWindow = new LoadingWindow("Waiting for another player."); // Make loading window accessable
 
-        public SelectLobbyWindow(string name, TcpClient client)
+        public SelectLobbyWindow(Profile profile)
         {
             InitializeComponent();
 
             // Set up the TCP client and network stream with the provided client
-            this.tcpClient = client;
-            this.stream = client.GetStream();
+            this.tcpClient = profile.GetTcpClient();
+            this.stream = profile.GetTcpClient().GetStream();
 
             // Retrieve the lobby manager instance from the server
             this.lobbyManager = Server.Server.GetLobbymanager();
 
             // Set the player’s name and update the label with this information
-            this.playerName = name;
-            lblName.Content = "Name: " + this.playerName;
+            this.playerProfile = profile;
+            lblName.Content = $"Name: {profile.GetName()}";
+
+            // Set Wins & Losses
+            if (profile.GetWins() > 999999999)
+                lblWins.Content = $"Wins: 999999999";
+            else
+                lblWins.Content = $"Wins: {profile.GetWins()}";
+
+            if (profile.GetLosses() > 999999999)
+                lblLosses.Content = $"Losses: 999999999";
+            else
+                lblLosses.Content = $"Losses: {profile.GetLosses()}";
+
+            listTeam.Items.Clear(); // Clear the list to fill with new Team
+            listTeam.DisplayMemberPath = "Name"; // Display Name of Pokemon in list
+            
+            // Only allow team to be set once
+            if (profile.GetTeam().Count == 6)
+                btnTeam.IsEnabled = false;
+
+            // Re-add Pokemon to list
+            if (profile.GetTeam().Count > 0)
+            {
+                profile.GetTeam().ForEach(p=>listTeam.Items.Add(p));
+            }
         }
 
         // Event handler triggered when the SelectLobbyWindow is loaded
@@ -37,10 +68,42 @@ namespace Avans_PokeBattles.Client
 
         // Asynchronous event handlers for the Join Lobby buttons
         // Each button calls the JoinLobby method with a specific lobby ID and number
-        private async void btnJoinLobby1_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-1", 1);
-        private async void btnJoinLobby2_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-2", 2);
-        private async void btnJoinLobby3_Click(object sender, RoutedEventArgs e) => await JoinLobby("Lobby-3", 3);
+        private async void btnJoinLobby1_Click(object sender, RoutedEventArgs e)
+        {
+            if (playerProfile.GetTeam().Count != 6)
+            {
+                MessageBox.Show("Cannot join a Lobby without a full team!", "Invalid Join", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            await JoinLobby("Lobby-1", 1);
+        }
+        private async void btnJoinLobby2_Click(object sender, RoutedEventArgs e)
+        {
+            if (playerProfile.GetTeam().Count != 6)
+            {
+                MessageBox.Show("Cannot join a Lobby without a full team!", "Invalid Join", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            await JoinLobby("Lobby-2", 2);
+        }
 
+        private async void btnJoinLobby3_Click(object sender, RoutedEventArgs e)
+        {
+            if (playerProfile.GetTeam().Count != 6)
+            {
+                MessageBox.Show("Cannot join a Lobby without a full team!", "Invalid Join", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            await JoinLobby("Lobby-3", 3);
+        }
+
+        private void btnTeam_Click(object sender, RoutedEventArgs e)
+        {
+            // Go to create team window
+            var createTeamWindow = new CreateTeamWindow(playerProfile, Server.Server.GetPokemonLister());
+            createTeamWindow.Show();
+            this.Hide();
+        }
 
         // Method to handle joining a specified lobby
         private async Task JoinLobby(string lobbyId, int number)
@@ -62,6 +125,7 @@ namespace Avans_PokeBattles.Client
         {
             // Buffer to store incoming server messages
             byte[] buffer = new byte[10000];
+            bool isPlayerOne = false;
 
             // Continuously read messages from the server while connected
             while (tcpClient.Connected)
@@ -74,11 +138,12 @@ namespace Avans_PokeBattles.Client
                 Console.WriteLine($"Received message from server: {message}");
 
                 // Check the server message type and respond accordingly
-
                 if (message == "lobby-joined")
                 {
                     // Server confirmed the player has joined the lobby
                     Console.WriteLine("Joined lobby successfully. Waiting for other player...");
+                    this.IsEnabled = false; // Disable window to prevent joining another lobby while waiting for pokemon to load in
+                    this.loadingWindow.Show(); // Show the waiting window (embedded in class so that we cannot lose this instance)
                 }
                 else if (message == "lobby-full")
                 {
@@ -88,26 +153,21 @@ namespace Avans_PokeBattles.Client
                 else if (message.StartsWith("start-game"))
                 {
                     // The server sends "start-game" when the game is ready to begin
-
                     // Determine if this player is Player 1 or Player 2 based on the message content
-                    bool isPlayerOne = message == "start-game:player1";
+                    isPlayerOne = message == "start-game:player1";
 
-                    // Invoke UI actions on the main thread to start the game window
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
-                    {
-                        // Create and show the LobbyWindow for the game
-                        var gameWindow = new LobbyWindow(tcpClient, isPlayerOne);
-                        gameWindow.Show();
+                    this.loadingWindow.Close(); // Close loading window (Because the lobby is full))
 
-                        // Close the current SelectLobbyWindow
-                        this.Close();
-                    });
+                    var gameWindow = new LobbyWindow(playerProfile, isPlayerOne);
+                    gameWindow.Show();
+                    this.Hide();
+
                     break; // Exit loop once game starts
                 }
             }
-
             // Console log when the connection is closed or no more messages from server
             Console.WriteLine("Connection closed or no more messages from server.");
         }
+
     }
 }

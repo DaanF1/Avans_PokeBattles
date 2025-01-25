@@ -5,11 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Avans_PokeBattles.Client"
         mc:Ignorable="d"
-        Title="Select a Lobby" Height="160" Width="200" Loaded="SelectLobbyWindow_Loaded" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" >
+        Title="Select a Lobby" Height="250" Width="250" Loaded="SelectLobbyWindow_Loaded" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" >
     <Grid>
-        <Label Name="lblName" Content="Name: " Width="135" Height="25" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" />
-        <Button Name="btnLobby1" Content="Join Lobby 1" HorizontalAlignment="Center" Margin="0,32,0,0" VerticalAlignment="Top" Click="btnJoinLobby1_Click" />
-        <Button Name="btnLobby2" Content="Join Lobby 2" HorizontalAlignment="Center" Margin="0,57,0,0" VerticalAlignment="Top" Click="btnJoinLobby2_Click" />
-        <Button Name="btnLobby3" Content="Join Lobby 3" HorizontalAlignment="Center" Margin="0,82,0,0" VerticalAlignment="Top" Click="btnJoinLobby3_Click" />
+        <!-- Border Lines -->
+        <Line X1="1" X2="233" Y1="1" Y2="1" Stroke="Red" />
+        <Line X1="233" X2="233" Y1="1" Y2="210" Stroke="Red" />
+        <Line X1="233" X2="1" Y1="210" Y2="210" Stroke="Red" />
+        <Line X1="1" X2="1" Y1="210" Y2="1" Stroke="Red" />
+        <Line X1="1" X2="233" Y1="25" Y2="25" Stroke="Red" />
+        <Line X1="113" X2="113" Y1="25" Y2="50" Stroke="Red" />
+        <Line X1="1" X2="233" Y1="50" Y2="50" Stroke="Red" />
+
+        <Label Name="lblName" Content="Name: " Height="30" HorizontalAlignment="Center" Margin="5,0,0,5" VerticalAlignment="Top" />
+        <Label Name="lblWins" Content="Wins: 123456789" Height="25" HorizontalAlignment="Left" Margin="8,25,15,15" VerticalAlignment="Top" />
+        <Label Name="lblLosses" Content="Losses: 123456789" Height="25" HorizontalAlignment="Right" Margin="15,25,8,15" VerticalAlignment="Top" />
+        
+        <Label Name="lblLobbies" Content="Lobby's: " Width="55" Height="30" HorizontalAlignment="Left" Margin="45,55,10,15" VerticalAlignment="Top" />
+        <Button Name="btnLobby1" Content="Join Lobby 1" HorizontalAlignment="Left" Margin="35,85,0,0" VerticalAlignment="Top" Click="btnJoinLobby1_Click" />
+        <Button Name="btnLobby2" Content="Join Lobby 2" HorizontalAlignment="Left" Margin="35,110,0,0" VerticalAlignment="Top" Click="btnJoinLobby2_Click" />
+        <Button Name="btnLobby3" Content="Join Lobby 3" HorizontalAlignment="Left" Margin="35,135,0,0" VerticalAlignment="Top" Click="btnJoinLobby3_Click" />
+        <Button Name="btnTeam" Content="Assign Team" HorizontalAlignment="Left" Margin="20,180,0,0" VerticalAlignment="Top" Click="btnTeam_Click" Width="100" />
+        
+        <Label Name="lblTeam" Content="Assigned Team: " Width="100" Height="30" HorizontalAlignment="Right" Margin="5,55,5,5" VerticalAlignment="Top" />
+        <ListView x:Name="listTeam" HorizontalAlignment="Right" Margin="20,75,15,5" Width="85" Height="125" IsEnabled="False" />
     </Grid>
 </Window>

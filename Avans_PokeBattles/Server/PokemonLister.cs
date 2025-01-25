@@ -25,6 +25,20 @@
         }
 
         /// <summary>
+        /// Gets a random Pokemon from the list
+        /// </summary>
+        public List<Pokemon> GetAllPokemon()
+        {
+            List<Pokemon> availiblePokemon = new List<Pokemon>();
+            foreach (Pokemon pokemon in pokemonList)
+            { 
+                if (pokemon.Name != "Unown")
+                    availiblePokemon.Add(pokemon); 
+            }
+            return availiblePokemon;
+        }
+
+        /// <summary>
         /// Gets the Pokemon based on its Name
         /// If it isn't found we return Unown
         /// </summary>

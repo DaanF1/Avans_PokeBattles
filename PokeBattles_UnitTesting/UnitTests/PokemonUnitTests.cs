@@ -20,10 +20,10 @@ namespace PokeBattles_UnitTesting.UnitTests
             pokemonLister = new();
             List<Move> venusaurMoves =
             [
-                new Move("Solar Beam", 120, 100, Type.Grass),
-                new Move("Take Down", 90, 85, Type.Normal),
-                new Move("Razor Leaf", 55, 95, Type.Grass),
-                new Move("Tackle", 40, 100, Type.Normal),
+                new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0, 0),
+                new Move("Take Down", 90, 85, Type.Normal, StatusEffect.None, 0, 0),
+                new Move("Razor Leaf", 55, 95, Type.Grass, StatusEffect.Poison, 20, 0), // 20% chance to poison
+                new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0, 0)
             ];
             Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), 
@@ -56,10 +56,10 @@ namespace PokeBattles_UnitTesting.UnitTests
 
             List<Move> venusaurMoves =
             [
-                new Move("Solar Beam", 120, 100, Type.Grass),
-                new Move("Take Down", 90, 85, Type.Normal),
-                new Move("Razor Leaf", 55, 95, Type.Grass),
-                new Move("Tackle", 40, 100, Type.Normal),
+                new Move("Solar Beam", 120, 100, Type.Grass, StatusEffect.None, 0, 0),
+                new Move("Take Down", 90, 85, Type.Normal, StatusEffect.None, 0, 0),
+                new Move("Razor Leaf", 55, 95, Type.Grass, StatusEffect.Poison, 20, 0), // 20% chance to poison
+                new Move("Tackle", 40, 100, Type.Normal, StatusEffect.None, 0, 0)
             ];
             Pokemon venusaur = new("Venusaur", new Uri(dirPrefix + "/Sprites/mVenusaurPreview.png", standardUriKind), 
                 new Uri(dirPrefix + "/Sprites/mVenusaurFor.gif", standardUriKind), 

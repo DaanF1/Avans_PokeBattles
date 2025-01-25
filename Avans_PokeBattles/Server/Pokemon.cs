@@ -15,6 +15,8 @@ namespace Avans_PokeBattles
         public int CurrentHealth { get; set; }
         public int Speed { get; set; }
         public List<Move> PokemonMoves { get; set; }
+        public StatusEffect CurrentStatus { get; set; } = StatusEffect.None;
+        public int StatusDuration { get; set; } = 0;
 
         public Pokemon() { }
 
@@ -29,6 +31,74 @@ namespace Avans_PokeBattles
             CurrentHealth = maxHealth;
             Speed = speed;
             PokemonMoves = moves;
+            CurrentStatus = StatusEffect.None;
+        }
+
+
+        public void ApplyStatusEffect(StatusEffect effect, int duration)
+        {
+            if (CurrentStatus == StatusEffect.None || effect == StatusEffect.None)
+            {
+                CurrentStatus = effect;
+                StatusDuration = duration;
+            }
+        }
+
+        public bool HandleStatusEffect()
+        {
+            if (CurrentStatus == StatusEffect.None) return true;
+
+            switch (CurrentStatus)
+            {
+                case StatusEffect.Burn:
+                    int burnDamage = MaxHealth / 16;
+                    CurrentHealth -= burnDamage;
+                    Console.WriteLine($"{Name} is hurt by its burn and takes {burnDamage} damage!");
+                    break;
+
+                case StatusEffect.Poison:
+                    int poisonDamage = MaxHealth / 8;
+                    CurrentHealth -= poisonDamage;
+                    Console.WriteLine($"{Name} is hurt by poison and takes {poisonDamage} damage!");
+                    break;
+
+                case StatusEffect.Paralysis:
+                    Random random = new();
+                    if (random.Next(0, 100) < 25) // 25% chance to be fully paralyzed
+                    {
+                        Console.WriteLine($"{Name} is paralyzed and cannot move!");
+                        return false; // Skip turn
+                    }
+                    break;
+
+                case StatusEffect.Sleep:
+                    if (StatusDuration > 0)
+                    {
+                        Console.WriteLine($"{Name} is asleep and cannot move!");
+                        StatusDuration--;
+                        return false; // Skip turn
+                    }
+                    break;
+
+                case StatusEffect.Freeze:
+                    Console.WriteLine($"{Name} is frozen and cannot move!");
+                    Random rng = new();
+                    if (rng.Next(0, 100) < 20) // 20% chance to thaw
+                    {
+                        Console.WriteLine($"{Name} thawed out!");
+                        CurrentStatus = StatusEffect.None;
+                    }
+                    return false; // Skip turn unless thawed
+            }
+
+            StatusDuration--;
+            if (StatusDuration <= 0)
+            {
+                Console.WriteLine($"{Name}'s {CurrentStatus} effect has worn off!");
+                CurrentStatus = StatusEffect.None;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -51,9 +121,12 @@ namespace Avans_PokeBattles
         {
             return new Pokemon(Name, new Uri(PreviewUri), new Uri(BattleForUri), new Uri(BattleAgainstUri),
                                PokemonType, MaxHealth, Speed,
-                               PokemonMoves.Select(move => new Move(move.MoveName, move.MoveDamage, move.MoveAccuracy, move.TypeOfAttack)).ToList())
+                               PokemonMoves.Select(move =>
+                                   new Move(move.MoveName, move.MoveDamage, move.MoveAccuracy, move.TypeOfAttack, move.Effect, move.EffectChance, move.HealingAmount)).ToList())
             {
-                CurrentHealth = this.CurrentHealth 
+                CurrentHealth = this.CurrentHealth,
+                CurrentStatus = this.CurrentStatus, // Copy current status
+                StatusDuration = this.StatusDuration // Copy status duration
             };
         }
     }

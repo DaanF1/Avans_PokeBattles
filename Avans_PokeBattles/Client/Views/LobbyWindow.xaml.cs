@@ -5,11 +5,15 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using Avans_PokeBattles.Server;
+using WpfAnimatedGif;
 using Brush = System.Windows.Media.Brush;
 
 namespace Avans_PokeBattles.Client
@@ -21,7 +25,9 @@ namespace Avans_PokeBattles.Client
     {
         // TCP client and network stream for communication with the server
         private readonly TcpClient tcpClient;
+        private readonly Profile profile;
         private readonly NetworkStream stream;
+        private static readonly ProfileManager profileManager = ProfileManager.Instance;
 
         // Names of players for display
         private string namePlayer1;
@@ -37,6 +43,7 @@ namespace Avans_PokeBattles.Client
         public MediaPlayer playerBattleMusic = new();
         public MediaPlayer buttonPlayer = new();
         public MediaPlayer hitPlayer = new();
+        public MediaPlayer criticalHitPlayer = new();
 
         // Variables to track the Pokémon and player turns
         private int pokemonIndex = 0;
@@ -44,40 +51,54 @@ namespace Avans_PokeBattles.Client
         private readonly bool isPlayerOne;
 
         // Lists to hold Pokémon objects for each player
-        private readonly List<Pokemon> playerPokemon = [];
-        private readonly List<Pokemon> opponentPokemon = [];
+        private List<Pokemon> playerPokemon = [];
+        private List<Pokemon> opponentPokemon = [];
         private int playerActivePokemonIndex = 0;
         private int opponentActivePokemonIndex = 0;
 
         // Separators used to parse server messages
-        private static readonly string[] failtedSeparator = ["fainted!", "switch_turn:", "Game Over!"];
         private static readonly string[] damageHpSeparator = ["damage dealt.", " has ", " HP left."];
 
-        public LobbyWindow(TcpClient client, bool isPlayerOne)
+        public LobbyWindow(Profile playerProfile, bool isPlayerOne)
         {
             InitializeComponent();
             this.isPlayerOne = isPlayerOne;
+            this.profile = playerProfile;
 
             // Set name template (Should be overwritten later)
             lblPlayer1Name.Content = "Your team:";
-            lblPlayer2Name.Content = "Oponent team:";
-            tcpClient = client;
+            lblPlayer2Name.Content = "Opponent team:";
+            tcpClient = playerProfile.GetTcpClient();
             stream = tcpClient.GetStream();
 
-            // Play music
-            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
-
-            // Ínitialize buttons
+            // Initialize buttons
             InitializeButtonStates();
+
+            // Initialiaze turn indicator
+            InitializeTurnIndicator();
 
             // Start waiting for Server messages
             GetServerMessages();
+
+            // When all Pokemon are received, play the battle music
+            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
         }
 
         // Initializes button states for attack options based on player's turn
         private void InitializeButtonStates()
         {
             bool isPlayerTurn = isPlayerOne;
+            SetMoveButtonsState(isPlayerTurn);
+        }
+
+        private void InitializeTurnIndicator()
+        {
+            // Player 1 starts the game by default
+            bool isPlayerTurn = isPlayerOne;
+            lblTurnIndicator.Content = isPlayerTurn ? "Your Turn" : "Opponent's Turn";
+            lblTurnIndicator.Foreground = isPlayerTurn ? Brushes.Green : Brushes.Red;
+
+            // Enable or disable move buttons based on turn
             SetMoveButtonsState(isPlayerTurn);
         }
 
@@ -102,47 +123,43 @@ namespace Avans_PokeBattles.Client
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Console.WriteLine($"CLIENT: Received from server: {message}");
 
-                var parts = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
                 // Handle player name assignment if message starts with "Player"
                 if (message.StartsWith("Player") && !message.StartsWith("PlayerTeam") && !message.StartsWith("Player 1 used") && !message.StartsWith("Player 2 used"))
                 {
-                    int playerNumber = nameIndex;
-                    if (playerNumber == 1)
+                    string[] parts = message.Split(':');
+                    string playerName = parts[1].Trim('\n');
+                    if (nameIndex == 1)
                     {
                         // Set name for Player 1
-                        namePlayer1 = message.Split(':')[1].Trim('\n');
+                        namePlayer1 = playerName;
                         lblPlayer1Name.Content = $"{namePlayer1}'s team:";
                     }
                     else
                     {
                         // Set name for Player 2
-                        namePlayer2 = message.Split(':')[1].Trim('\n');
+                        namePlayer2 = playerName;
                         lblPlayer2Name.Content = $"{namePlayer2}'s team:";
                     }
-                    nameIndex++;
-                }
-                else if (message.StartsWith("PlayerTeam"))
-                {
-                    // Handles initialization of player and opponent Pokémon teams
-                    if (playerPokemon.Count > 0)
+
+                    // Reassign teams after both player names are known
+                    if (!string.IsNullOrEmpty(namePlayer1) && !string.IsNullOrEmpty(namePlayer2))
                     {
-                        for (int i = 0; i < 6; i++)
+                        if (isPlayerOne)
                         {
-                            Pokemon p = await GetServerPokemon(stream);
-                            opponentPokemon.Add(p);
+                            playerPokemon = profileManager.GetProfile(namePlayer1).GetTeam(); // Player 1's team
+                            opponentPokemon = profileManager.GetProfile(namePlayer2).GetTeam(); // Player 2's team
                         }
+                        else
+                        {
+                            playerPokemon = profileManager.GetProfile(namePlayer1).GetTeam(); // Player 2's team
+                            opponentPokemon = profileManager.GetProfile(namePlayer2).GetTeam(); // Player 1's team
+                        }
+
+                        DisplayTeams(playerPokemon); 
                         DisplayTeams(opponentPokemon);
                     }
-                    else
-                    {
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Pokemon p = await GetServerPokemon(stream);
-                            playerPokemon.Add(p);
-                        }
-                        DisplayTeams(playerPokemon);
-                    }
+
+                    nameIndex++;
                 }
                 else if (message.StartsWith("chat:"))
                 {
@@ -158,60 +175,25 @@ namespace Avans_PokeBattles.Client
                 }
                 else if (message.Contains("damage dealt"))
                 {
+                    if (message.Contains("Super Effective"))
+                        PlayMusic(buttonPlayer, dirPrefix + "/Sounds/CriticalHit.wav", 25, false);
+                    else
+                        PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
                     ProcessMoveResult(message);
                 }
-                else if (message.Contains("fainted! player2switch_turn") || message.Contains("fainted! player1switch_turn"))
+                else if (message.Contains("fainted!"))
                 {
+                    SetMoveButtonsState(false); // Temporarily disable clicking a move
                     ProcessFaintMessage(message);
                     UpdateTurnIndicator(message);
                 }
-                else if (message.Contains("fainted"))
-                {
-                    ProcessFaintMessage(message);
-                }
-                else if (message.StartsWith("switch_turn"))
+                else if (message.Contains("switch_turn"))
                 {
                     UpdateTurnIndicator(message);
                 }
             }
             Console.WriteLine("CLIENT: Connection closed or no more messages from server.");
         }
-
-        /// <summary>
-        /// Helper method to read serialized Pokemon objects.
-        /// Made with help from ChatGPT!
-        /// </summary>
-        /// <param name="stream"></param>
-        private static async Task<Pokemon> GetServerPokemon(NetworkStream stream)
-        {
-            while (true)
-            {
-                // Read the length of the incoming message
-                byte[] lengthBytes = new byte[4];
-                int bytesRead = await stream.ReadAsync(lengthBytes);
-                if (bytesRead == 0) break; // End of stream
-
-                int messageLength = BitConverter.ToInt32(lengthBytes, 0);
-
-                // Read the actual message
-                byte[] jsonBytes = new byte[messageLength];
-                bytesRead = await stream.ReadAsync(jsonBytes);
-                if (bytesRead == 0) break; // End of stream
-
-                // Convert the JSON bytes to a string
-                string jsonString = Encoding.UTF8.GetString(jsonBytes);
-
-                // Deserialize the JSON string to a Pokemon object
-                Pokemon receivedPokemon = JsonSerializer.Deserialize<Pokemon>(jsonString);
-
-                // Display the deserialized object
-                Console.WriteLine($"CLIENT: Received Pokemon: Name={receivedPokemon.Name}, Health={receivedPokemon.CurrentHealth}");
-
-                return receivedPokemon;
-            }
-            return null; // If we even get here
-        }
-
 
         // Process the damage message received from the server and update health displays
         private void ProcessMoveResult(string message)
@@ -229,57 +211,70 @@ namespace Avans_PokeBattles.Client
 
         private void ProcessFaintMessage(string message)
         {
-            // Example message: "Blastoise fainted! player1Game Over! Player 1 wins!"
-            string[] parts = message.Split(failtedSeparator, StringSplitOptions.None);
+            // Example messages:
+            // "Charizard fainted!switch_turn:player2" or "Blastoise fainted!Game Over! player1 wins"
 
-            if (parts.Length < 2) return;  // Exit if the format is unexpected
+            // Use a regex to extract the Pokémon name and player (if present)
+            var match = Regex.Match(message, @"^(?<pokemon>.+?) fainted!(?:switch_turn:(?<player>player[12]))?");
+            bool isGameOver = false;
 
-            string faintedPokemonName = parts[0].Trim();
-            string faintedPlayer = parts[1].Trim();
-            bool isGameOver = message.Contains("Game Over!");
+            string faintedPokemonName = match.Groups["pokemon"].Value.Trim(); 
+            string faintedPlayer = match.Groups["player"].Success ? match.Groups["player"].Value.Trim() : null;
+            if (message.Contains("Game Over!"))
+            {
+                faintedPlayer = Regex.Match(message, @"(?<player>player[12])").Value.Trim();
+                isGameOver = true;
+            }
 
-            // Show message about fainted Pokémon
-            MessageBox.Show($"{faintedPokemonName} fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+            var mes = MessageBox.Show($"{faintedPokemonName} has fainted!", "Pokémon Fainted", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (mes == MessageBoxResult.OK)
+            {
+                SetMoveButtonsState(true); // Only select a move again after clicking the messagebox
+            }
 
-            // Determine if the fainted Pokémon is the player's or the opponent's based on faintedPlayer
+            // Determine if the fainted Pokémon belongs to the player or the opponent
             if ((faintedPlayer == "player1" && isPlayerOne) || (faintedPlayer == "player2" && !isPlayerOne))
             {
                 // Player's Pokémon fainted
                 playerActivePokemonIndex++;
-                if (playerActivePokemonIndex < playerPokemon.Count)
-                {
-                    // Display the next Pokémon
-                    DisplayActivePokemon(true);
-                }
-                else if (isGameOver)
+
+                if (isGameOver)
                 {
                     MessageBox.Show("All your Pokémon have fainted. You lost!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle any additional game-over logic here, such as closing the game or resetting
-                    SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
-                    lobbyWindow.Show();
-                    playerBattleMusic.Stop();
-                    this.Close();
+                    NavigateToLobby();
+                }
+                else if (playerActivePokemonIndex < playerPokemon.Count)
+                {
+                    var nextPokemon = playerPokemon[playerActivePokemonIndex];
+                    DisplayActivePokemon(true);
                 }
             }
             else if ((faintedPlayer == "player2" && isPlayerOne) || (faintedPlayer == "player1" && !isPlayerOne))
             {
                 // Opponent's Pokémon fainted
                 opponentActivePokemonIndex++;
-                if (opponentActivePokemonIndex < opponentPokemon.Count)
-                {
-                    // Display the next Pokémon
-                    DisplayActivePokemon(false);
-                }
-                else if (isGameOver)
+
+                if (isGameOver)
                 {
                     MessageBox.Show("All opponent's Pokémon have fainted. You won!", "Victory", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Handle any additional game-over logic here, such as closing the game or resetting
-                    SelectLobbyWindow lobbyWindow = new(namePlayer1, tcpClient);
-                    lobbyWindow.Show();
-                    playerBattleMusic.Stop();
-                    this.Close();
+                    NavigateToLobby();
+                }
+                else if (opponentActivePokemonIndex < opponentPokemon.Count)
+                {
+                    var nextPokemon = opponentPokemon[opponentActivePokemonIndex];
+                    DisplayActivePokemon(false);
                 }
             }
+        }
+
+        // Helper method to navigate to the lobby window
+        private void NavigateToLobby()
+        {
+            profile.RemoveTeam();
+            var lobbyWindow = new SelectLobbyWindow(profile);
+            lobbyWindow.Show();
+            playerBattleMusic.Stop();
+            this.Close();
         }
 
         // Displays the active Pokémon's GIF and updates health and move buttons for the player or opponent
@@ -388,17 +383,13 @@ namespace Avans_PokeBattles.Client
         private void SetPlayer1Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
-            PokemonPlayer1.Source = pokemonUri;
-            PokemonPlayer1.Play();
-            Task.Run(() => { RefreshMedia1Element(); }); // Start refreshing the MediaElement
+            ImageBehavior.SetAnimatedSource(PokemonPlayer1, new BitmapImage(pokemonUri));
         }
 
         private void SetPlayer2Pokemon(Uri pokemonUri)
         {
             // Set MediaElement to gif
-            PokemonPlayer2.Source = pokemonUri;
-            PokemonPlayer2.Play();
-            Task.Run(() => { RefreshMedia2Element(); }); // Start refreshing the MediaElement
+            ImageBehavior.SetAnimatedSource(PokemonPlayer2, new BitmapImage(pokemonUri));
         }
 
         private void LoadPokemonAttacks(Pokemon pokemon)
@@ -426,37 +417,19 @@ namespace Avans_PokeBattles.Client
                     return Brushes.LightBlue;
                 case Server.Type.Grass:
                     return Brushes.LightGreen;
+                case Server.Type.Ghost:
+                    return Brushes.Purple;
+                case Server.Type.Electric:
+                    return Brushes.Yellow;
+                case Server.Type.Steel:
+                    return Brushes.DarkGray;
+                case Server.Type.Psychic:
+                    return Brushes.Pink;
+                case Server.Type.Toxic:
+                    return Brushes.MediumPurple;
                 default:
-                    return null;
+                    return Brushes.LightGray;
             }
-        }
-
-        // Media:
-        private void PP1_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            // Replay gif animation
-            PokemonPlayer1.RenderSize = new Size(50, 50);
-            PPlayer1State = MediaState.Stop;
-            PokemonPlayer1.Position = new TimeSpan(0, 0, 1);
-            PokemonPlayer1.Play();
-        }
-
-        private void PP1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            Console.WriteLine("CLIENT: Could not load in .gif file!");
-        }
-
-        private void PP2_MediaEndend(object sender, RoutedEventArgs e)
-        {
-            // Replay gif animation
-            PokemonPlayer2.RenderSize = new Size(50, 50);
-            PPlayer2State = MediaState.Stop;
-            PokemonPlayer2.Position = new TimeSpan(0, 0, 1);
-            PokemonPlayer2.Play();
-        }
-        private void PP2_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            Console.WriteLine("CLIENT: Could not load in .gif file!");
         }
 
         /// <summary>
@@ -485,27 +458,6 @@ namespace Avans_PokeBattles.Client
             // Set time to zero (replay/ loop)
             playerBattleMusic.Position = TimeSpan.Zero;
             playerBattleMusic.Play();
-        }
-
-        // Preview sound of attacks:
-        private void btnOption1_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption2_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption3_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
-        }
-
-        private void btnOption4_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            PlayMusic(buttonPlayer, dirPrefix + "/Sounds/AttackButton.wav", 50, false);
         }
 
         // Hit events:
@@ -701,43 +653,6 @@ namespace Avans_PokeBattles.Client
             else {
                 txtReadChat.Text += $"\nServer: No recent chatlog found!";
             }
-        }
-
-        // Helper methods for refreshing MediaElements:
-        private void RefreshMedia1Element()
-        {
-            // Update event for MediaElement of Player 1
-            while (PPlayer1State == MediaState.Manual || PPlayer1State == MediaState.Play)
-            {
-                PPlayer1State = GetMediaState(PokemonPlayer1);
-                // TODO: Prevent gif from leaving dots around
-            }
-        }
-        private void RefreshMedia2Element()
-        {
-            // Update event for MediaElement of Player 2
-            while (PPlayer2State == MediaState.Manual || PPlayer2State == MediaState.Play)
-            {
-                PPlayer2State = GetMediaState(PokemonPlayer2);
-                // TODO: Prevent gif from leaving dots around
-            }
-        }
-
-        /// <summary>
-        /// Helper method to get the state of the MediaElement
-        /// From StackOverflow: https://stackoverflow.com/questions/4338951/how-do-i-determine-if-mediaelement-is-playing
-        /// </summary>
-        /// <param name="myMedia"></param>
-        /// <returns></returns>
-        private MediaState GetMediaState(MediaElement myMedia)
-        {
-            FieldInfo? hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object? helperObject = hlp.GetValue(myMedia);
-            FieldInfo? stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-            MediaState? state = (MediaState)stateField.GetValue(helperObject);
-            if (!state.Equals(null))
-                return (MediaState)state;
-            return MediaState.Stop;
         }
 
     }

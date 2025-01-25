@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 namespace Avans_PokeBattles.Server
 {
-    public enum Type
+    public enum StatusEffect
     {
-        Water,
-        Fire,
-        Grass,
-        Normal,
-        Electric,
-        Ghost,
-        Psychic,
-        Steel,
-        Toxic
+        None,
+        Burn,
+        Poison,
+        Paralysis,
+        Sleep,
+        Freeze
     }
 }

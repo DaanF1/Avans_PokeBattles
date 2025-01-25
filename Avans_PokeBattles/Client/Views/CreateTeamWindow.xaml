@@ -1,0 +1,27 @@
+﻿<Window x:Class="Avans_PokeBattles.Client.Views.CreateTeamWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Avans_PokeBattles.Client.Views"
+        mc:Ignorable="d"
+        Title="Create Team" Height="325" Width="250" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid>
+        <!-- Border Lines -->
+        <Line X1="1" X2="233" Y1="1" Y2="1" Stroke="Red" />
+        <Line X1="233" X2="233" Y1="1" Y2="285" Stroke="Red" />
+        <Line X1="233" X2="1" Y1="285" Y2="285" Stroke="Red" />
+        <Line X1="1" X2="1" Y1="285" Y2="1" Stroke="Red" />
+
+        <Label Content="Add Pokemon:" HorizontalAlignment="Center" Margin="5,5,5,5" VerticalAlignment="Top" />
+        <ComboBox x:Name="cmbSelectPokemon" HorizontalAlignment="Center" Margin="30,30,30,50" VerticalAlignment="Top" Width="100" DropDownClosed="cmbSelectPokemon_ItemSelected" />
+
+        <Label Content="Current Team:" HorizontalAlignment="Center" Margin="10,50,10,80" VerticalAlignment="Top" />
+        <ListBox x:Name="listTeam" HorizontalAlignment="Center" VerticalAlignment="Center" Height="125" Width="100" SelectionChanged="TeamPokemonSelected" />
+
+        <!-- Buttons -->
+        <Button x:Name="btnDeleteSelected" Content="Remove Pokemon" HorizontalAlignment="Left" Margin="15,60,15,40" VerticalAlignment="Bottom" Width="100" Height="30" Click="btnDeleteSelected_Click"/>
+        <Button x:Name="btnDeleteTeam" Content="Remove Team" HorizontalAlignment="Right" Margin="15,60,15,40" VerticalAlignment="Bottom" Width="100" Height="30" Click="btnDeleteTeam_Click"/>
+        <Button x:Name="btnSelectTeam" Content="Confirm Team" HorizontalAlignment="Center" Margin="20,5,20,5" VerticalAlignment="Bottom" Width="125" Height="30" Click="btnSelectTeam_Click"/>
+    </Grid>
+</Window>

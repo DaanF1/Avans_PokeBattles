@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="Login" Height="100" Width="200" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" >
     <Grid>
+        <!-- Border Lines -->
+        <Line X1="1" X2="183" Y1="1" Y2="1" Stroke="Red" />
+        <Line X1="183" X2="183" Y1="1" Y2="60" Stroke="Red" />
+        <Line X1="183" X2="1" Y1="60" Y2="60" Stroke="Red" />
+        <Line X1="1" X2="1" Y1="60" Y2="1" Stroke="Red" />
+
         <TextBox x:Name="txtName" 
                  Margin="0,-25,0,0" 
                  HorizontalAlignment="Center" 
