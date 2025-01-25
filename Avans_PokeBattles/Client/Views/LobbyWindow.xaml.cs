@@ -81,7 +81,7 @@ namespace Avans_PokeBattles.Client
             GetServerMessages();
 
             // When all Pokemon are received, play the battle music
-            //PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
+            PlayMusic(playerBattleMusic, dirPrefix + "/Sounds/BattleMusic.wav", 30, true);
         }
 
         // Initializes button states for attack options based on player's turn
